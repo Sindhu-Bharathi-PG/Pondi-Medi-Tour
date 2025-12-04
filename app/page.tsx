@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Globe, Calendar, MapPin, Phone, Mail, Award, Heart, Star, ChevronRight, Play, Menu, X, Check } from 'lucide-react';
+import Image from 'next/image';
 
 const MedicalTourismHomepage = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -242,7 +243,7 @@ const doctors = [
         Skip to main content
       </a>
       {/* Header */}
-      <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-gradient-to-b from-black/50 to-transparent py-4'} ${highContrast ? 'bg-black border-b-2 border-yellow-400' : ''}`}>
+      <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-linear-to-b from-black/50 to-transparent py-4'} ${highContrast ? 'bg-black border-b-2 border-yellow-400' : ''}`}>
         <div className="container mx-auto px-4">
           {/* Top Utility Bar */}
           <div className="flex justify-between items-center text-sm mb-2">
@@ -344,7 +345,7 @@ const doctors = [
               <a href="#" className={`font-medium hover:text-emerald-600 transition ${scrolled ? 'text-gray-700' : 'text-white'} ${highContrast ? 'text-yellow-400' : ''}`}>Home</a>
               <a href="#" className={`font-medium hover:text-emerald-600 transition ${scrolled ? 'text-gray-700' : 'text-white'} ${highContrast ? 'text-yellow-400' : ''}`}>Hospitals</a>
               <button className={`px-6 py-2.5 rounded-full font-semibold transition-all duration-300 ${
-                highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-500' : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg hover:scale-105'
+                highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-500' : 'bg-linear-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg hover:scale-105'
               }`}>
                 Get Free Quote
               </button>
@@ -378,7 +379,7 @@ const doctors = [
               role="img"
               aria-label={slide.subtitle}
             />
-            <div className={`absolute inset-0 ${highContrast ? 'bg-black/90' : 'bg-gradient-to-r from-black/70 via-black/50 to-transparent'}`} />
+            <div className={`absolute inset-0 ${highContrast ? 'bg-black/90' : 'bg-linear-to-r from-black/70 via-black/50 to-transparent'}`} />
           </div>
         ))}
         
@@ -387,7 +388,7 @@ const doctors = [
             <div className="max-w-3xl text-white space-y-6 animate-fade-in">
               <h1 className="text-6xl md:text-7xl font-bold leading-tight">
                 World-Class Treatment.<br />
-                <span className={`text-transparent bg-clip-text ${highContrast ? 'text-yellow-400' : 'bg-gradient-to-r from-emerald-400 to-teal-300'}`}>
+                <span className={`text-transparent bg-clip-text ${highContrast ? 'text-yellow-400' : 'bg-linear-to-r from-emerald-400 to-teal-300'}`}>
                   Tranquil Recovery.
                 </span>
               </h1>
@@ -396,7 +397,7 @@ const doctors = [
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <button className={`px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-2 ${
-                  highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-500' : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-2xl hover:scale-105'
+                  highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-500' : 'bg-linear-to-r from-emerald-500 to-teal-500 text-white hover:shadow-2xl hover:scale-105'
                 }`} aria-label="Get your free medical quote">
                   Get My Free Quote
                   <ChevronRight className="w-5 h-5" aria-hidden="true" />
@@ -426,7 +427,7 @@ const doctors = [
       </section>
 
       {/* Audience-Specific Funnels */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-linear-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -459,14 +460,14 @@ const doctors = [
                 key={index}
                 className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2"
               >
-                <div className={`h-2 bg-gradient-to-r ${card.color}`} />
+                <div className={`h-2 bg-linear-to-r ${card.color}`} />
                 <div className="p-8">
-                  <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${card.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-16 h-16 rounded-full bg-linear-to-r ${card.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                     <card.icon className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2 text-gray-800">{card.subtitle}</h3>
                   <p className="text-gray-600 mb-6 leading-relaxed">{card.description}</p>
-                  <button className={`text-transparent bg-clip-text bg-gradient-to-r ${card.color} font-semibold flex items-center gap-2 group-hover:gap-4 transition-all`}>
+                  <button className={`text-transparent bg-clip-text bg-linear-to-r ${card.color} font-semibold flex items-center gap-2 group-hover:gap-4 transition-all`}>
                     {card.cta}
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -478,7 +479,7 @@ const doctors = [
       </section>
 
       {/* Social Proof */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+      <section className="py-20 bg-linear-to-r from-emerald-600 to-teal-600 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold mb-4">From Aches to Ease. Hear Their Stories.</h2>
@@ -489,10 +490,12 @@ const doctors = [
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105">
                 <div className="relative mb-4">
-                  <img 
+                  <Image 
                     src={testimonial.image} 
                     alt={testimonial.name}
-                    className="w-20 h-20 rounded-full border-4 border-white/30 object-cover"
+                    width={80}
+                    height={80}
+                    className="rounded-full border-4 border-white/30 object-cover"
                   />
                   {testimonial.isVideo && (
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -507,7 +510,7 @@ const doctors = [
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-white/90 mb-4 italic leading-relaxed">"{testimonial.quote}"</p>
+                <p className="text-white/90 mb-4 italic leading-relaxed">&quot;{testimonial.quote}&quot;</p>
                 <div className="border-t border-white/20 pt-4">
                   <p className="font-bold">{testimonial.name}</p>
                   <p className="text-emerald-100 text-sm">{testimonial.location} • {testimonial.procedure}</p>
@@ -534,14 +537,15 @@ const doctors = [
 
           <div className="grid md:grid-cols-3 gap-8">
             {doctors.map((doctor, index) => (
-              <div key={index} className="group relative bg-gradient-to-b from-gray-50 to-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+              <div key={index} className="group relative bg-linear-to-b from-gray-50 to-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <div className="relative h-80 overflow-hidden">
-                  <img 
+                  <Image 
                     src={doctor.image} 
                     alt={doctor.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <h3 className="text-2xl font-bold mb-1">{doctor.name}</h3>
                     <p className="text-emerald-300 text-sm font-medium">{doctor.credentials}</p>
@@ -563,7 +567,7 @@ const doctors = [
           </div>
 
           <div className="text-center mt-12">
-            <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300">
+            <button className="bg-linear-to-r from-emerald-500 to-teal-500 text-white px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300">
               Meet Our Entire Medical Team
             </button>
           </div>
@@ -571,10 +575,10 @@ const doctors = [
       </section>
 
       {/* Hybrid Packages */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-linear-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold mb-4 text-gray-800">Don't Just Get Treated. Heal.</h2>
+            <h2 className="text-5xl font-bold mb-4 text-gray-800">Don&apos;t Just Get Treated. Heal.</h2>
             <p className="text-xl text-gray-600">Unique Hybrid Packages combining medical excellence with rejuvenating wellness stays</p>
           </div>
 
@@ -598,13 +602,13 @@ const doctors = [
               <div key={index} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <div className="grid grid-cols-2 h-64">
                   <div className="relative overflow-hidden">
-                    <img src={pkg.image1} alt="Medical" className="w-full h-full object-cover" />
+                    <Image src={pkg.image1} alt="Medical" fill className="object-cover" />
                     <div className="absolute top-4 left-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       Medical
                     </div>
                   </div>
                   <div className="relative overflow-hidden">
-                    <img src={pkg.image2} alt="Wellness" className="w-full h-full object-cover" />
+                    <Image src={pkg.image2} alt="Wellness" fill className="object-cover" />
                     <div className="absolute top-4 right-4 bg-teal-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       Wellness
                     </div>
@@ -615,7 +619,7 @@ const doctors = [
                   <p className="text-gray-600 mb-4 leading-relaxed">{pkg.description}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-3xl font-bold text-emerald-600">{pkg.price}</span>
-                    <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all">
+                    <button className="bg-linear-to-r from-emerald-500 to-teal-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all">
                       Learn More
                     </button>
                   </div>
@@ -625,7 +629,7 @@ const doctors = [
           </div>
 
           <div className="text-center mt-12">
-            <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300">
+            <button className="bg-linear-to-r from-emerald-500 to-teal-500 text-white px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300">
               Explore All Hybrid Packages
             </button>
           </div>
@@ -633,7 +637,7 @@ const doctors = [
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+      <section className="py-20 bg-linear-to-r from-gray-900 to-gray-800 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold mb-4">Your Seamless Journey to Wellness in 4 Steps</h2>
@@ -699,7 +703,7 @@ const doctors = [
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+      <section className="py-20 bg-linear-to-r from-emerald-600 to-teal-600 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -730,12 +734,12 @@ const doctors = [
                 </div>
                 <textarea 
                   placeholder="Tell us about your medical needs (optional)" 
-                  rows="4"
+                  rows={4}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition text-gray-800"
                 />
                 <button 
                   type="submit"
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full bg-linear-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   Get My Free Quote Now
                   <ChevronRight className="w-6 h-6" />
@@ -780,15 +784,15 @@ const doctors = [
               <h4 className="text-white font-semibold mb-4">Contact Us</h4>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 mt-1 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 mt-1 shrink-0" />
                   <span>Pondicherry, India</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Phone className="w-4 h-4 mt-1 flex-shrink-0" />
+                  <Phone className="w-4 h-4 mt-1 shrink-0" />
                   <span>24/7: +91-XXX-XXXX</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Mail className="w-4 h-4 mt-1 flex-shrink-0" />
+                  <Mail className="w-4 h-4 mt-1 shrink-0" />
                   <span>care@pondymedical.com</span>
                 </li>
               </ul>
