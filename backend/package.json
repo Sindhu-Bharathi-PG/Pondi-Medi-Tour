@@ -1,0 +1,57 @@
+{
+  "name": "pondimeditour-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Pondicherry Medical Tourism Portal using Fastify",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "migrate": "node scripts/migrate-database.js",
+    "seed": "node scripts/seed-data.js"
+  },
+  "dependencies": {
+    "fastify": "^5.6.2",
+    "@fastify/cors": "^11.1.0",
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/jwt": "^10.0.0",
+    "@fastify/multipart": "^9.3.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^8.3.0",
+    "fastify-plugin": "^5.1.0",
+    "dotenv": "^17.2.3",
+    "mongoose": "^9.0.1",
+    "redis": "^5.10.0",
+    "aws-sdk": "^2.1692.0",
+    "stripe": "^20.0.0",
+    "razorpay": "^2.9.6",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.11",
+    "twilio": "^5.10.7",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.5",
+    "uuid": "^13.0.0",
+    "axios": "^1.13.2",
+    "crypto-js": "^4.2.0",
+    "moment": "^2.30.1",
+    "lodash": "^4.17.21",
+    "winston": "^3.19.0",
+    "express-rate-limit": "^8.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "@types/node": "^24.10.1",
+    "@types/jest": "^30.0.0"
+  },
+  "keywords": [
+    "medical-tourism",
+    "fastify",
+    "api",
+    "healthcare"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
