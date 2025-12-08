@@ -1,12 +1,14 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { eq } = require('drizzle-orm');
+const db = require('../../config/database');
+const { users } = require('../models/User');
 
 const login = async (request, reply) => {
   const { email, password } = request.body;
 
   try {
-    const user = await User.findOne({ email });
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (!user) {
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
@@ -17,12 +19,12 @@ const login = async (request, reply) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, userType: user.userType },
+      { userId: user.id, userType: user.userType },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    reply.send({ token, user: { id: user._id, email: user.email, userType: user.userType } });
+    reply.send({ token, user: { id: user.id, email: user.email, userType: user.userType } });
   } catch (error) {
     request.log.error(error);
     reply.code(500).send({ error: 'Internal server error' });
@@ -33,28 +35,26 @@ const register = async (request, reply) => {
   const { email, password, userType } = request.body;
 
   try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existingUser.length > 0) {
       return reply.code(409).send({ error: 'User already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 12);
 
-    const user = new User({
+    const [newUser] = await db.insert(users).values({
       email,
       password: hashedPassword,
       userType,
-    });
-
-    await user.save();
+    }).returning();
 
     const token = jwt.sign(
-      { userId: user._id, userType: user.userType },
+      { userId: newUser.id, userType: newUser.userType },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    reply.code(201).send({ token, user: { id: user._id, email: user.email, userType: user.userType } });
+    reply.code(201).send({ token, user: { id: newUser.id, email: newUser.email, userType: newUser.userType } });
   } catch (error) {
     request.log.error(error);
     reply.code(500).send({ error: 'Internal server error' });

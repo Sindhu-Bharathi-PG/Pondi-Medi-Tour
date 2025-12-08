@@ -1,17 +1,9 @@
-const mongoose = require('mongoose');
+const { drizzle } = require('drizzle-orm/postgres-js');
+const postgres = require('postgres');
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/medical-tourism', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/medical_tourism';
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('Database connection error:', error);
-    process.exit(1);
-  }
-};
+const client = postgres(connectionString, { prepare: false });
+const db = drizzle(client);
 
-module.exports = connectDB;
+module.exports = db;

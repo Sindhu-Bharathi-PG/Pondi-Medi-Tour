@@ -1,5 +1,4 @@
 require('dotenv').config();
-const connectDB = require('./config/database');
 
 const fastify = require('fastify')({
   logger: {
@@ -100,9 +99,6 @@ fastify.setNotFoundHandler((request, reply) => {
 // Start server
 const start = async () => {
   try {
-    // Connect to database
-    await connectDB();
-
     const port = process.env.PORT || 3001;
     const host = process.env.HOST || '0.0.0.0';
 
