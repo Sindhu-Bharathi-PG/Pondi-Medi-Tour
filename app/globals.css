@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --green: oklch(59.6% 0.145 163.225);
 }
 
 @theme inline {
