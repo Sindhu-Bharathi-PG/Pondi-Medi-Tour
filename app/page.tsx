@@ -1,111 +1,79 @@
 "use client";
 
-import React, { useMemo } from 'react';
-import { useScrolled, useCarousel, useAccessibility } from './hooks';
-import { HOSPITALS, TREATMENTS, HERO_SLIDES, TESTIMONIALS, FEATURED_DOCTORS } from './utils/constants';
-import {
-  AccessibilityMenu,
-  HeroSection,
-  AudienceFunnels,
-  Testimonials,
-  FeaturedDoctors,
-  HybridPackages,
-  HowItWorks,
-  Partners,
-  FinalCTA,
-} from './components/home';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Header, Footer } from './components/common';
+import { useScrolled } from './hooks';
+import { useSiteMode } from './context/SiteModeContext';
+import MedicalHome from './components/home/MedicalHome';
+import WellnessHome from './components/home/WellnessHome';
+import SmoothTransition from './components/common/SmoothTransition';
 
-const MedicalTourismHomepage = () => {
-  // Custom hooks for cleaner state management
+export default function Home() {
   const scrolled = useScrolled(50);
-  const { currentSlide, setCurrentSlide } = useCarousel(HERO_SLIDES.length, 5000);
-  const {
-    fontSize,
-    setFontSize,
-    highContrast,
-    setHighContrast,
-    showMenu: showAccessibilityMenu,
-    setShowMenu: setShowAccessibilityMenu,
-    getFontSizeClass,
-    getContrastClass
-  } = useAccessibility();
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [displayMode, setDisplayMode] = useState<'medical' | 'wellness'>('medical');
+  const [pendingMode, setPendingMode] = useState<'medical' | 'wellness' | null>(null);
 
-  // Search state
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [searchFocused, setSearchFocused] = React.useState(false);
+  // Get mode from context with fallback
+  let currentMode: 'medical' | 'wellness' = 'medical';
 
-  // Combined search items
-  const searchItems = useMemo(() => [...HOSPITALS, ...TREATMENTS], []);
+  try {
+    const siteMode = useSiteMode();
+    currentMode = siteMode.mode;
+  } catch {
+    // Context not available, use default
+  }
 
-  const filteredResults = useMemo(() => {
-    if (searchQuery.length === 0) return [];
-    const lowerQuery = searchQuery.toLowerCase();
-    return searchItems.filter(item =>
-      item.toLowerCase().includes(lowerQuery)
-    );
-  }, [searchQuery, searchItems]);
+  // Handle mode transitions with smooth overlay
+  useEffect(() => {
+    if (currentMode !== displayMode && !showOverlay) {
+      setPendingMode(currentMode);
+      setShowOverlay(true);
+      setIsTransitioning(true);
+    }
+  }, [currentMode, displayMode, showOverlay]);
 
-  // Convert readonly arrays to mutable for component props
-  const heroSlides = [...HERO_SLIDES];
-  const testimonials = [...TESTIMONIALS];
-  const doctors = [...FEATURED_DOCTORS];
-  const hospitals = [...HOSPITALS];
+  const handleTransitionComplete = useCallback(() => {
+    if (pendingMode) {
+      setDisplayMode(pendingMode);
+      setPendingMode(null);
+    }
+    setShowOverlay(false);
+    setIsTransitioning(false);
+  }, [pendingMode]);
 
   return (
-    <div className={`min-h-screen bg-white ${getFontSizeClass()} ${getContrastClass()}`}>
-      <AccessibilityMenu
-        fontSize={fontSize}
-        setFontSize={setFontSize}
-        highContrast={highContrast}
-        setHighContrast={setHighContrast}
-        showAccessibilityMenu={showAccessibilityMenu}
-        setShowAccessibilityMenu={setShowAccessibilityMenu}
+    <div className={`min-h-screen transition-colors duration-500 ${displayMode === 'medical' ? 'theme-medical' : 'theme-wellness'}`}>
+      {/* Smooth Transition Overlay - Fast, no lag */}
+      <SmoothTransition
+        isActive={showOverlay}
+        targetMode={pendingMode || displayMode}
+        onComplete={handleTransitionComplete}
       />
 
-      {/* Skip to Main Content Link */}
+      {/* Skip Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:font-semibold"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white text-gray-900 px-4 py-2 rounded-md z-50"
       >
         Skip to main content
       </a>
 
-      <Header
-        scrolled={scrolled}
-        highContrast={highContrast}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        searchFocused={searchFocused}
-        setSearchFocused={setSearchFocused}
-        filteredResults={filteredResults}
-        hospitals={hospitals}
-      />
+      <Header scrolled={scrolled} />
 
-      <HeroSection
-        heroSlides={heroSlides}
-        currentHeroSlide={currentSlide}
-        setCurrentHeroSlide={setCurrentSlide}
-        highContrast={highContrast}
-      />
-
-      <AudienceFunnels />
-
-      <Testimonials testimonials={testimonials} />
-
-      <FeaturedDoctors doctors={doctors} />
-
-      <HybridPackages />
-
-      <HowItWorks />
-
-      <Partners />
-
-      <FinalCTA />
+      <main
+        id="main-content"
+        className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        {displayMode === 'medical' ? (
+          <MedicalHome />
+        ) : (
+          <WellnessHome />
+        )}
+      </main>
 
       <Footer />
     </div>
   );
-};
-
-export default MedicalTourismHomepage;
+}

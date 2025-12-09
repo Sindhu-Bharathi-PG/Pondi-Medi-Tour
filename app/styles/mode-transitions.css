@@ -1,0 +1,208 @@
+/* Mode Transition Animations */
+@keyframes modeTransitionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modeTransitionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes modeTransitionScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modeTransitionBlur {
+  from {
+    filter: blur(10px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+  }
+}
+
+@keyframes pulseGlowWellness {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.6);
+  }
+}
+
+@keyframes floatUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Mode transition classes */
+.mode-transitioning {
+  transition: all 0.5s ease-out;
+}
+
+.mode-transitioning * {
+  transition: background-color 0.5s ease-out, color 0.5s ease-out, border-color 0.5s ease-out;
+}
+
+.mode-fade-in {
+  animation: modeTransitionFadeIn 0.6s ease-out forwards;
+}
+
+.mode-slide-in {
+  animation: modeTransitionSlideIn 0.5s ease-out forwards;
+}
+
+.mode-scale-in {
+  animation: modeTransitionScale 0.4s ease-out forwards;
+}
+
+.mode-blur-in {
+  animation: modeTransitionBlur 0.5s ease-out forwards;
+}
+
+/* Staggered animations for children */
+.stagger-animation > * {
+  opacity: 0;
+  animation: modeTransitionFadeIn 0.5s ease-out forwards;
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-animation > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Medical Mode Theme */
+.theme-medical {
+  --theme-primary: #059669;
+  --theme-secondary: #0d9488;
+  --theme-accent: #10b981;
+  --theme-glow: rgba(16, 185, 129, 0.3);
+}
+
+/* Wellness Mode Theme */
+.theme-wellness {
+  --theme-primary: #d97706;
+  --theme-secondary: #ea580c;
+  --theme-accent: #f59e0b;
+  --theme-glow: rgba(245, 158, 11, 0.3);
+}
+
+/* Glow effect */
+.glow-medical {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.glow-wellness {
+  animation: pulseGlowWellness 2s ease-in-out infinite;
+}
+
+/* Float animation */
+.float-animation {
+  animation: floatUp 3s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Hero overlay gradient transitions */
+.hero-gradient-medical {
+  background: linear-gradient(135deg, rgba(5, 150, 137, 0.9) 0%, rgba(16, 185, 129, 0.7) 50%, transparent 100%);
+}
+
+.hero-gradient-wellness {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.9) 0%, rgba(245, 158, 11, 0.7) 50%, transparent 100%);
+}
+
+/* Glassmorphism variants */
+.glass-medical {
+  background: rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.glass-wellness {
+  background: rgba(245, 158, 11, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Page transition wrapper */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}

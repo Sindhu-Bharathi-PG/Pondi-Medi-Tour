@@ -77,9 +77,11 @@ export const PARTNERS = [
 
 export const NAV_LINKS = [
       { href: '/', label: 'Home' },
+      { href: '/services', label: 'Treatments' },
       { href: '/hospital', label: 'Hospitals' },
-      { href: '/services', label: 'Services' },
       { href: '/doctor', label: 'Doctors' },
+      { href: '/destination', label: 'Why Pondicherry' },
+      { href: '/packages', label: 'Packages' },
       { href: '/about', label: 'About' }
 ] as const;
 

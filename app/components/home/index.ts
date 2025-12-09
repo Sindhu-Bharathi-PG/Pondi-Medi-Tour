@@ -9,5 +9,9 @@ export { default as HowItWorks } from './HowItWorks';
 export { default as Partners } from './Partners';
 export { default as FinalCTA } from './FinalCTA';
 
+// Mode-specific home pages
+export { default as MedicalHome } from './MedicalHome';
+export { default as WellnessHome } from './WellnessHome';
+
 // Note: Header and Footer are now in common components
 // Import from '@/app/components/common' instead
