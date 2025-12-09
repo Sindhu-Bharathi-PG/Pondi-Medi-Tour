@@ -7,6 +7,7 @@ import { useSiteMode } from './context/SiteModeContext';
 import MedicalHome from './components/home/MedicalHome';
 import WellnessHome from './components/home/WellnessHome';
 import SeaWaveTransition from './components/common/SeaWaveTransition';
+import WaveTransition from './components/common/WaveTransition';
 
 export default function Home() {
   const scrolled = useScrolled(50);
@@ -46,9 +47,9 @@ export default function Home() {
   return (
     <div className={`min-h-screen transition-colors duration-500 ${displayMode === 'medical' ? 'theme-medical' : 'theme-wellness'}`}>
       {/* Sea Wave Transition Overlay */}
-      <SeaWaveTransition
+      <WaveTransition
         isActive={showOverlay}
-        targetMode={pendingMode || displayMode}
+        // targetMode={pendingMode || displayMode}
         onComplete={handleTransitionComplete}
       />
 
