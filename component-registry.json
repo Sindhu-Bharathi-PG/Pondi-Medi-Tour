@@ -1,0 +1,217 @@
+{
+      "name": "pondimeditour-components",
+      "version": "1.0.0",
+      "description": "Component registry for Pondicherry Medical Tourism Portal",
+      "components": {
+            "common": {
+                  "path": "@/app/components/common",
+                  "description": "Shared/reusable components used across the application",
+                  "exports": {
+                        "Header": {
+                              "file": "Header.tsx",
+                              "description": "Global navigation header with search, language selector, and mobile menu",
+                              "props": [
+                                    "scrolled",
+                                    "highContrast",
+                                    "searchQuery",
+                                    "setSearchQuery",
+                                    "searchFocused",
+                                    "setSearchFocused",
+                                    "filteredResults",
+                                    "hospitals"
+                              ]
+                        },
+                        "Footer": {
+                              "file": "Footer.tsx",
+                              "description": "Global footer with navigation links, contact info, and social links",
+                              "props": []
+                        },
+                        "Navigation": {
+                              "file": "Navigation.tsx",
+                              "description": "Navigation component with desktop and mobile variants",
+                              "props": [
+                                    "scrolled",
+                                    "highContrast",
+                                    "variant",
+                                    "onLinkClick"
+                              ]
+                        },
+                        "LoadingSpinner": {
+                              "file": "LoadingSpinner.tsx",
+                              "description": "Animated loading spinner with configurable size and color",
+                              "props": [
+                                    "size",
+                                    "color",
+                                    "className"
+                              ]
+                        },
+                        "ErrorBoundary": {
+                              "file": "ErrorBoundary.tsx",
+                              "description": "React error boundary with fallback UI",
+                              "props": [
+                                    "children",
+                                    "fallback"
+                              ]
+                        }
+                  }
+            },
+            "home": {
+                  "path": "@/app/components/home",
+                  "description": "Homepage-specific section components",
+                  "exports": {
+                        "AccessibilityMenu": {
+                              "file": "AccessibilityMenu.tsx",
+                              "description": "Floating accessibility panel for font size and contrast controls",
+                              "props": [
+                                    "fontSize",
+                                    "setFontSize",
+                                    "highContrast",
+                                    "setHighContrast",
+                                    "showAccessibilityMenu",
+                                    "setShowAccessibilityMenu"
+                              ]
+                        },
+                        "HeroSection": {
+                              "file": "HeroSection.tsx",
+                              "description": "Hero carousel with slides, headlines, and CTA buttons",
+                              "props": [
+                                    "heroSlides",
+                                    "currentHeroSlide",
+                                    "setCurrentHeroSlide",
+                                    "highContrast"
+                              ]
+                        },
+                        "AudienceFunnels": {
+                              "file": "AudienceFunnels.tsx",
+                              "description": "Three audience-specific cards for international, domestic, and local patients",
+                              "props": []
+                        },
+                        "Testimonials": {
+                              "file": "Testimonials.tsx",
+                              "description": "Patient testimonial cards with ratings and video support",
+                              "props": [
+                                    "testimonials"
+                              ]
+                        },
+                        "FeaturedDoctors": {
+                              "file": "FeaturedDoctors.tsx",
+                              "description": "Doctor profile cards with credentials and specialty",
+                              "props": [
+                                    "doctors"
+                              ]
+                        },
+                        "HybridPackages": {
+                              "file": "HybridPackages.tsx",
+                              "description": "Medical + wellness combination package cards",
+                              "props": []
+                        },
+                        "HowItWorks": {
+                              "file": "HowItWorks.tsx",
+                              "description": "4-step patient journey visualization",
+                              "props": []
+                        },
+                        "Partners": {
+                              "file": "Partners.tsx",
+                              "description": "NABH-accredited hospital partner logos",
+                              "props": []
+                        },
+                        "FinalCTA": {
+                              "file": "FinalCTA.tsx",
+                              "description": "Lead generation contact form section",
+                              "props": []
+                        }
+                  }
+            }
+      },
+      "hooks": {
+            "path": "@/app/hooks",
+            "description": "Custom React hooks for reusable logic",
+            "exports": {
+                  "useScrolled": {
+                        "file": "useScrolled.ts",
+                        "description": "Detects if page is scrolled past a threshold",
+                        "params": [
+                              "threshold"
+                        ],
+                        "returns": "boolean"
+                  },
+                  "useCarousel": {
+                        "file": "useCarousel.ts",
+                        "description": "Auto-advancing carousel with navigation controls",
+                        "params": [
+                              "totalSlides",
+                              "interval",
+                              "autoPlay"
+                        ],
+                        "returns": "{ currentSlide, setCurrentSlide, nextSlide, prevSlide, pause, resume }"
+                  },
+                  "useSearch": {
+                        "file": "useSearch.ts",
+                        "description": "Search functionality with filtering",
+                        "params": [
+                              "items"
+                        ],
+                        "returns": "{ query, setQuery, focused, results, handleFocus, handleBlur, selectResult }"
+                  },
+                  "useAccessibility": {
+                        "file": "useAccessibility.ts",
+                        "description": "Accessibility settings management",
+                        "params": [],
+                        "returns": "{ fontSize, setFontSize, highContrast, setHighContrast, showMenu, toggleMenu }"
+                  }
+            }
+      },
+      "utils": {
+            "path": "@/app/utils",
+            "description": "Utility functions and constants",
+            "exports": {
+                  "constants": {
+                        "file": "constants.ts",
+                        "description": "Centralized static data",
+                        "exports": [
+                              "HOSPITALS",
+                              "TREATMENTS",
+                              "LANGUAGES",
+                              "CONTACT_INFO",
+                              "PARTNERS",
+                              "NAV_LINKS",
+                              "HERO_SLIDES",
+                              "TESTIMONIALS",
+                              "FEATURED_DOCTORS",
+                              "HYBRID_PACKAGES",
+                              "JOURNEY_STEPS"
+                        ]
+                  }
+            }
+      },
+      "types": {
+            "path": "@/app/types",
+            "description": "TypeScript type definitions",
+            "exports": {
+                  "index": {
+                        "file": "index.ts",
+                        "types": [
+                              "HeroSlide",
+                              "Testimonial",
+                              "Doctor",
+                              "HybridPackage",
+                              "JourneyStep",
+                              "AudienceCard",
+                              "Language",
+                              "NavLink",
+                              "ContactInfo",
+                              "FontSize",
+                              "AccessibilityState",
+                              "SearchState"
+                        ]
+                  }
+            }
+      },
+      "usage": {
+            "importComponents": "import { Header, Footer } from '@/app/components/common';",
+            "importHomeComponents": "import { HeroSection, Testimonials } from '@/app/components/home';",
+            "importHooks": "import { useScrolled, useCarousel } from '@/app/hooks';",
+            "importConstants": "import { HOSPITALS, TESTIMONIALS } from '@/app/utils/constants';",
+            "importTypes": "import type { Doctor, Testimonial } from '@/app/types';"
+      }
+}
