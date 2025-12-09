@@ -7,3 +7,5 @@ export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as ModeToggle, ModeToggleCompact } from './ModeToggle';
 export { default as TransitionOverlay } from './TransitionOverlay';
 export { default as VideoTransition } from './VideoTransition';
+export { default as SmoothTransition } from './SmoothTransition';
+export { default as SeaWaveTransition } from './SeaWaveTransition';

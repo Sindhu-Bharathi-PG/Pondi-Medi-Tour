@@ -6,7 +6,7 @@ import { useScrolled } from './hooks';
 import { useSiteMode } from './context/SiteModeContext';
 import MedicalHome from './components/home/MedicalHome';
 import WellnessHome from './components/home/WellnessHome';
-import SmoothTransition from './components/common/SmoothTransition';
+import SeaWaveTransition from './components/common/SeaWaveTransition';
 
 export default function Home() {
   const scrolled = useScrolled(50);
@@ -45,8 +45,8 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${displayMode === 'medical' ? 'theme-medical' : 'theme-wellness'}`}>
-      {/* Smooth Transition Overlay - Fast, no lag */}
-      <SmoothTransition
+      {/* Sea Wave Transition Overlay */}
+      <SeaWaveTransition
         isActive={showOverlay}
         targetMode={pendingMode || displayMode}
         onComplete={handleTransitionComplete}
