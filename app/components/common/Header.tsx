@@ -1,247 +1,360 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Phone, Award, Menu, X, Heart, Stethoscope, Leaf, Globe, ChevronDown } from 'lucide-react';
-import { LANGUAGES, CONTACT_INFO } from '@/app/utils/constants';
+import { usePathname } from 'next/navigation';
+import { Phone, Award, Menu, X, Stethoscope, Leaf, Sparkles, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { CONTACT_INFO } from '@/app/utils/constants';
 import { useSiteMode, MEDICAL_NAV_LINKS, WELLNESS_NAV_LINKS, THEME_COLORS } from '@/app/context/SiteModeContext';
-import { ModeToggleCompact } from './ModeToggle';
+
+// Utility for merging tailwind classes
+function cn(...inputs: ClassValue[]) {
+      return twMerge(clsx(inputs));
+}
 
 interface HeaderProps {
-      scrolled?: boolean;
       highContrast?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
-      scrolled = false,
       highContrast = false,
 }) => {
       const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-      const [selectedLanguage, setSelectedLanguage] = useState('English');
+      const [hasScrolled, setHasScrolled] = useState(false);
+      const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+      const pathname = usePathname();
 
-      // Use site mode context - with fallback for pages not wrapped in provider
+      // Track scroll for navbar transformation
+      useEffect(() => {
+            const handleScroll = () => {
+                  setHasScrolled(window.scrollY > 50);
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+            return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      // Use site mode context
       let mode: 'medical' | 'wellness' = 'medical';
       let isMedical = true;
       let navLinks = MEDICAL_NAV_LINKS;
-      let theme = THEME_COLORS.medical;
+      let toggleMode = () => { };
 
       try {
             const siteMode = useSiteMode();
             mode = siteMode.mode;
             isMedical = siteMode.isMedical;
+            toggleMode = siteMode.toggleMode;
             navLinks = isMedical ? MEDICAL_NAV_LINKS : WELLNESS_NAV_LINKS;
-            theme = THEME_COLORS[mode];
       } catch {
             // Context not available, use defaults
       }
 
-      const getTextColor = () => {
-            if (highContrast) return 'text-yellow-400';
-            if (scrolled) return 'text-gray-700';
-            return 'text-white';
+      // ----------------------------------------------------------------------
+      // Styles & Theme Logic
+      // ----------------------------------------------------------------------
+
+      const isActiveLink = (href: string) => {
+            if (href === '/') return pathname === '/';
+            return pathname.startsWith(href);
       };
 
-      const getAccentColor = () => {
-            if (highContrast) return 'text-yellow-400';
-            if (scrolled) return isMedical ? 'text-emerald-600' : 'text-amber-600';
-            return 'text-white';
-      };
+      const accentColor = isMedical ? 'text-emerald-500' : 'text-amber-500';
+      const activePillColor = isMedical ? 'bg-emerald-500' : 'bg-amber-500';
+      const activeTextColor = isMedical ? 'text-emerald-600' : 'text-amber-600';
 
-      const getBorderColor = () => {
-            if (highContrast) return 'border-yellow-400';
-            if (scrolled) return 'border-gray-300';
-            return 'border-white/30';
-      };
+      const glassBase = hasScrolled
+            ? 'border-opacity-50 shadow-xl shadow-black/5'
+            : 'border-opacity-20 shadow-none';
 
-      const getLogoGradient = () => {
-            if (highContrast) return 'text-yellow-400';
-            if (scrolled) {
-                  return isMedical
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
-                        : 'bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent';
+      const containerWidth = hasScrolled ? 'max-w-[1400px] w-[96%]' : 'max-w-5xl w-[92%]';
+
+      const themeColors = isMedical
+            ? {
+                  bg: hasScrolled ? 'bg-white/90' : 'bg-black/20',
+                  border: hasScrolled ? 'border-emerald-100' : 'border-white/10',
+                  text: hasScrolled ? 'text-gray-700' : 'text-white',
+                  subText: hasScrolled ? 'text-gray-500' : 'text-white/70',
+                  hoverBg: hasScrolled ? 'hover:bg-emerald-50' : 'hover:bg-white/10',
             }
-            return 'text-white';
-      };
+            : {
+                  bg: hasScrolled ? 'bg-white/90' : 'bg-black/20',
+                  border: hasScrolled ? 'border-amber-100' : 'border-white/10',
+                  text: hasScrolled ? 'text-gray-700' : 'text-white',
+                  subText: hasScrolled ? 'text-gray-500' : 'text-white/70',
+                  hoverBg: hasScrolled ? 'hover:bg-amber-50' : 'hover:bg-white/10',
+            };
 
       return (
             <>
-                  <header
-                        className={`fixed w-full z-50 transition-all duration-500 ${scrolled
-                                    ? 'bg-white shadow-lg py-2'
-                                    : 'bg-gradient-to-b from-black/50 to-transparent py-4'
-                              } ${highContrast ? 'bg-black border-b-2 border-yellow-400' : ''}`}
-                  >
-                        <div className="container mx-auto px-4">
-                              {/* Top Utility Bar */}
-                              <div className="flex justify-between items-center text-sm mb-2">
-                                    <div className="flex items-center gap-4">
-                                          {/* Language Selector */}
-                                          <select
-                                                value={selectedLanguage}
-                                                onChange={(e) => setSelectedLanguage(e.target.value)}
-                                                className={`bg-transparent border rounded px-2 py-1 text-xs ${getTextColor()} ${getBorderColor()}`}
-                                                aria-label="Select language"
-                                          >
-                                                {LANGUAGES.map((lang) => (
-                                                      <option key={lang.code} value={lang.label} className="text-gray-800">
-                                                            {lang.label}
-                                                      </option>
-                                                ))}
-                                          </select>
+                  {/* Floating Navbar Container */}
+                  <div className="fixed top-4 md:top-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
+                        <motion.nav
+                              layout
+                              initial={false}
+                              animate={{
+                                    width: hasScrolled ? "98%" : "95%",
+                                    maxWidth: hasScrolled ? 1400 : 1280,
+                                    backgroundColor: hasScrolled ? "rgba(255, 255, 255, 0.85)" : "rgba(10, 10, 10, 0.4)",
+                                    borderColor: hasScrolled
+                                          ? (isMedical ? "rgba(209, 250, 229, 0.5)" : "rgba(254, 243, 199, 0.5)")
+                                          : "rgba(255, 255, 255, 0.15)",
+                                    padding: hasScrolled ? "0.5rem 0.5rem" : "0.75rem 1.25rem",
+                              }}
+                              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                              className={cn(
+                                    "pointer-events-auto relative flex items-center justify-between px-2 py-2 rounded-full backdrop-blur-xl border transition-shadow duration-500",
+                                    glassBase,
+                                    hasScrolled && "shadow-[0_8px_32px_rgba(0,0,0,0.04)]"
+                              )}
+                        >
+                              {/* ----------------------------------------------------------------------
+                                  Left: Logo 
+                              ---------------------------------------------------------------------- */}
+                              <Link href="/" className="flex items-center gap-3 pl-2 group shrink-0">
+                                    <div className={cn(
+                                          "w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:rotate-12",
+                                          isMedical
+                                                ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-500/20"
+                                                : "bg-gradient-to-br from-amber-400 to-orange-600 text-white shadow-amber-500/20"
+                                    )}>
+                                          {isMedical ? <Stethoscope className="w-5 h-5" /> : <Leaf className="w-5 h-5" />}
+                                    </div>
+                                    <div className="hidden sm:flex flex-col">
+                                          <span className={cn(
+                                                "text-lg font-bold tracking-tight leading-none",
+                                                hasScrolled
+                                                      ? "bg-gradient-to-r bg-clip-text text-transparent from-gray-900 to-gray-600"
+                                                      : "text-white"
+                                          )}>
+                                                Pondy<span className={cn("font-extrabold", isMedical ? "text-emerald-500" : "text-amber-400")}>Health</span>
+                                          </span>
+                                          <span className={cn(
+                                                "text-[9px] font-medium tracking-widest uppercase opacity-80",
+                                                hasScrolled ? "text-gray-500" : "text-white/80"
+                                          )}>
+                                                {isMedical ? 'Medical Tourism' : 'Wellness & AYUSH'}
+                                          </span>
+                                    </div>
+                              </Link>
 
-                                          {/* Phone */}
-                                          <div className={`hidden md:flex items-center gap-2 ${getTextColor()}`}>
-                                                <Phone className="w-4 h-4" />
-                                                <span className="font-semibold">{CONTACT_INFO.phone}</span>
+                              {/* ----------------------------------------------------------------------
+                                  Center: Navigation 
+                              ---------------------------------------------------------------------- */}
+                              <div className="hidden lg:flex items-center justify-center flex-1 px-4">
+                                    <ul className="flex items-center gap-1">
+                                          {navLinks.map((link) => {
+                                                const isActive = isActiveLink(link.href);
+                                                return (
+                                                      <li key={link.href} className="relative">
+                                                            <Link
+                                                                  href={link.href}
+                                                                  onMouseEnter={() => setHoveredLink(link.href)}
+                                                                  onMouseLeave={() => setHoveredLink(null)}
+                                                                  className={cn(
+                                                                        "relative z-10 block px-4 py-2 text-sm font-medium transition-colors duration-200",
+                                                                        isActive
+                                                                              ? (hasScrolled ? "text-white" : "text-white")
+                                                                              : (hasScrolled ? "text-gray-600 hover:text-gray-900" : "text-white/80 hover:text-white")
+                                                                  )}
+                                                            >
+                                                                  {link.label}
+                                                            </Link>
+
+                                                            {/* Active Indicator (Pill) */}
+                                                            {isActive && (
+                                                                  <motion.div
+                                                                        layoutId="activePill"
+                                                                        className={cn(
+                                                                              "absolute inset-0 rounded-full shadow-md",
+                                                                              isMedical
+                                                                                    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                                                                                    : "bg-gradient-to-r from-amber-500 to-orange-500"
+                                                                        )}
+                                                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                                  />
+                                                            )}
+
+                                                            {/* Hover Indicator (Subtable bg) */}
+                                                            {hoveredLink === link.href && !isActive && (
+                                                                  <motion.div
+                                                                        layoutId="hoverPill"
+                                                                        className={cn(
+                                                                              "absolute inset-0 rounded-full",
+                                                                              hasScrolled
+                                                                                    ? "bg-gray-100"
+                                                                                    : "bg-white/10"
+                                                                        )}
+                                                                        transition={{ type: "spring", bounce: 0, duration: 0.2 }}
+                                                                  />
+                                                            )}
+                                                      </li>
+                                                );
+                                          })}
+                                    </ul>
+                              </div>
+
+                              {/* ----------------------------------------------------------------------
+                                  Right: Actions 
+                              ---------------------------------------------------------------------- */}
+                              <div className="flex items-center gap-2 pr-1 shrink-0">
+
+                                    {/* Medical/Wellness Toggle */}
+                                    <div className={cn(
+                                          "relative p-1 rounded-full flex cursor-pointer transition-colors duration-300",
+                                          hasScrolled ? "bg-gray-100" : "bg-white/10 border border-white/10"
+                                    )} onClick={toggleMode}>
+                                          <div className={cn(
+                                                "absolute inset-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-500 ease-out",
+                                                isMedical
+                                                      ? "left-1 bg-white"
+                                                      : "left-[calc(50%)] bg-white",
+                                                hasScrolled ? "shadow-md bg-white" : "shadow-none bg-white/20"
+                                          )} />
+                                          <div className={cn("relative z-10 p-2 rounded-full transition-colors", isMedical ? (hasScrolled ? "text-emerald-600" : "text-white") : "opacity-50")}>
+                                                <Stethoscope className="w-4 h-4" />
+                                          </div>
+                                          <div className={cn("relative z-10 p-2 rounded-full transition-colors", !isMedical ? (hasScrolled ? "text-amber-600" : "text-white") : "opacity-50")}>
+                                                <Leaf className="w-4 h-4" />
                                           </div>
                                     </div>
 
-                                    {/* Mode Toggle - Center */}
-                                    <div className="absolute left-1/2 transform -translate-x-1/2">
-                                          <ModeToggleCompact />
-                                    </div>
-
-                                    {/* Trust Badge */}
-                                    <div className={`hidden md:flex items-center gap-2 ${getAccentColor()}`}>
-                                          {isMedical ? (
-                                                <>
-                                                      <Award className="w-4 h-4" />
-                                                      <span className="text-xs font-medium">NABH-Accredited Network</span>
-                                                </>
-                                          ) : (
-                                                <>
-                                                      <Leaf className="w-4 h-4" />
-                                                      <span className="text-xs font-medium">AYUSH Certified Wellness</span>
-                                                </>
+                                    {/* Desktop CTA */}
+                                    <Link
+                                          href="/booking"
+                                          className={cn(
+                                                "hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden relative",
+                                                isMedical
+                                                      ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25"
+                                                      : "bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25"
                                           )}
-                                    </div>
-                              </div>
-
-                              {/* Main Navigation */}
-                              <div className="flex justify-between items-center gap-4">
-                                    {/* Logo */}
-                                    <Link href="/" className={`text-2xl font-bold ${getLogoGradient()} flex items-center gap-2`}>
-                                          {isMedical ? (
-                                                <Stethoscope className={`w-7 h-7 ${scrolled ? (isMedical ? 'text-emerald-600' : 'text-amber-600') : 'text-white'}`} />
-                                          ) : (
-                                                <Leaf className={`w-7 h-7 ${scrolled ? 'text-amber-600' : 'text-white'}`} />
-                                          )}
-                                          <span>
-                                                {isMedical ? 'Pondy HealthPort' : 'Pondy Wellness'}
+                                    >
+                                          <span className="relative z-10 flex items-center gap-2">
+                                                Book Now
+                                                <Sparkles className="w-3.5 h-3.5" />
                                           </span>
+                                          {/* Shine-over effect */}
+                                          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                                     </Link>
 
-                                    {/* Desktop Navigation */}
-                                    <nav className="hidden lg:flex items-center gap-1">
-                                          {navLinks.map((link) => (
-                                                <Link
-                                                      key={link.href}
-                                                      href={link.href}
-                                                      className={`px-4 py-2 rounded-lg font-medium transition-all hover:bg-white/10 ${getTextColor()} ${scrolled ? 'hover:bg-gray-100' : ''
-                                                            }`}
-                                                >
-                                                      {link.label}
-                                                </Link>
-                                          ))}
-                                    </nav>
-
-                                    {/* CTA Buttons */}
-                                    <div className="hidden md:flex items-center gap-3">
-                                          <Link
-                                                href="/booking"
-                                                className={`px-6 py-2 rounded-full font-semibold transition-all ${isMedical
-                                                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg'
-                                                            : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg'
-                                                      }`}
-                                          >
-                                                {isMedical ? 'Book Consultation' : 'Book Retreat'}
-                                          </Link>
-                                    </div>
-
-                                    {/* Mobile Menu Button */}
+                                    {/* Mobile Menu Toggle */}
                                     <button
-                                          className={`lg:hidden p-2 ${getTextColor()}`}
-                                          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                          aria-label="Toggle menu"
+                                          onClick={() => setMobileMenuOpen(true)}
+                                          className={cn(
+                                                "lg:hidden p-2.5 rounded-full transition-colors",
+                                                hasScrolled ? "bg-gray-100 hover:bg-gray-200 text-gray-700" : "bg-white/10 hover:bg-white/20 text-white"
+                                          )}
                                     >
-                                          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                          <Menu className="w-5 h-5" />
                                     </button>
                               </div>
-                        </div>
-                  </header>
-
-                  {/* Mobile Menu */}
-                  <div
-                        className={`fixed inset-0 z-40 transition-all duration-300 lg:hidden ${mobileMenuOpen ? 'visible' : 'invisible'
-                              }`}
-                  >
-                        {/* Backdrop */}
-                        <div
-                              className={`absolute inset-0 bg-black transition-opacity ${mobileMenuOpen ? 'opacity-50' : 'opacity-0'
-                                    }`}
-                              onClick={() => setMobileMenuOpen(false)}
-                        />
-
-                        {/* Menu Panel */}
-                        <div
-                              className={`absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transition-transform ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-                                    }`}
-                        >
-                              <div className="p-6">
-                                    {/* Mobile Menu Header */}
-                                    <div className="flex items-center justify-between mb-8">
-                                          <span className={`text-xl font-bold ${isMedical ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                                {isMedical ? 'Pondy HealthPort' : 'Pondy Wellness'}
-                                          </span>
-                                          <button onClick={() => setMobileMenuOpen(false)}>
-                                                <X className="w-6 h-6 text-gray-500" />
-                                          </button>
-                                    </div>
-
-                                    {/* Mode Toggle in Mobile */}
-                                    <div className="mb-6 pb-6 border-b">
-                                          <p className="text-sm text-gray-500 mb-3">Switch Mode</p>
-                                          <ModeToggleCompact />
-                                    </div>
-
-                                    {/* Mobile Navigation Links */}
-                                    <nav className="space-y-2">
-                                          {navLinks.map((link) => (
-                                                <Link
-                                                      key={link.href}
-                                                      href={link.href}
-                                                      onClick={() => setMobileMenuOpen(false)}
-                                                      className={`block px-4 py-3 rounded-lg font-medium text-gray-700 hover:${theme.bg} transition-colors`}
-                                                >
-                                                      {link.label}
-                                                </Link>
-                                          ))}
-                                    </nav>
-
-                                    {/* Mobile CTA */}
-                                    <div className="mt-8">
-                                          <Link
-                                                href="/booking"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className={`block w-full text-center py-3 rounded-full font-semibold text-white ${isMedical
-                                                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
-                                                            : 'bg-gradient-to-r from-amber-500 to-orange-500'
-                                                      }`}
-                                          >
-                                                {isMedical ? 'Book Consultation' : 'Book Retreat'}
-                                          </Link>
-                                    </div>
-
-                                    {/* Contact Info */}
-                                    <div className="mt-8 pt-6 border-t">
-                                          <div className="flex items-center gap-3 text-gray-600">
-                                                <Phone className="w-5 h-5" />
-                                                <span>{CONTACT_INFO.phone}</span>
-                                          </div>
-                                    </div>
-                              </div>
-                        </div>
+                        </motion.nav>
                   </div>
+
+                  {/* ----------------------------------------------------------------------
+                      Mobile Menu Overlay 
+                  ---------------------------------------------------------------------- */}
+                  <AnimatePresence>
+                        {mobileMenuOpen && (
+                              <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="fixed inset-0 z-50 lg:hidden bg-black/60 backdrop-blur-sm"
+                                    onClick={() => setMobileMenuOpen(false)}
+                              >
+                                    <motion.div
+                                          initial={{ x: "100%" }}
+                                          animate={{ x: 0 }}
+                                          exit={{ x: "100%" }}
+                                          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                                          className={cn(
+                                                "absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl p-6 overflow-y-auto",
+                                                isMedical ? "border-l-4 border-emerald-500" : "border-l-4 border-amber-500"
+                                          )}
+                                          onClick={(e) => e.stopPropagation()}
+                                    >
+                                          {/* Mobile Header */}
+                                          <div className="flex items-center justify-between mb-8">
+                                                <div className="flex items-center gap-3">
+                                                      <div className={cn(
+                                                            "w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg",
+                                                            isMedical ? "bg-emerald-500" : "bg-amber-500"
+                                                      )}>
+                                                            {isMedical ? <Stethoscope className="w-5 h-5" /> : <Leaf className="w-5 h-5" />}
+                                                      </div>
+                                                      <span className={cn("font-bold text-lg", isMedical ? "text-emerald-700" : "text-amber-700")}>
+                                                            PondyHealth
+                                                      </span>
+                                                </div>
+                                                <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                                                      <X className="w-5 h-5 text-gray-500" />
+                                                </button>
+                                          </div>
+
+                                          {/* Mobile Nav Links */}
+                                          <nav className="space-y-2 mb-8">
+                                                {navLinks.map((link, i) => (
+                                                      <motion.div
+                                                            key={link.href}
+                                                            initial={{ opacity: 0, x: 20 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: i * 0.05 }}
+                                                      >
+                                                            <Link
+                                                                  href={link.href}
+                                                                  onClick={() => setMobileMenuOpen(false)}
+                                                                  className={cn(
+                                                                        "flex items-center justify-between p-4 rounded-xl font-medium transition-all active:scale-95",
+                                                                        isActiveLink(link.href)
+                                                                              ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                              : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                                                  )}
+                                                            >
+                                                                  {link.label}
+                                                                  {isActiveLink(link.href) && (
+                                                                        <span className={cn("w-2 h-2 rounded-full", isMedical ? "bg-emerald-500" : "bg-amber-500")} />
+                                                                  )}
+                                                            </Link>
+                                                      </motion.div>
+                                                ))}
+                                          </nav>
+
+                                          {/* Mobile Actions */}
+                                          <div className="space-y-4">
+                                                <button
+                                                      onClick={toggleMode}
+                                                      className="w-full flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
+                                                >
+                                                      <span className="font-medium text-gray-600">Switch Mode</span>
+                                                      <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm border border-gray-100">
+                                                            {isMedical ? <Stethoscope className="w-4 h-4 text-emerald-500" /> : <Leaf className="w-4 h-4 text-amber-500" />}
+                                                            <span className={cn("text-xs font-bold uppercase", isMedical ? "text-emerald-600" : "text-amber-600")}>
+                                                                  {isMedical ? 'Medical' : 'Wellness'}
+                                                            </span>
+                                                      </div>
+                                                </button>
+
+                                                <Link
+                                                      href="/booking"
+                                                      onClick={() => setMobileMenuOpen(false)}
+                                                      className={cn(
+                                                            "block w-full py-4 rounded-xl text-center font-bold text-white shadow-lg transition-transform active:scale-95",
+                                                            isMedical
+                                                                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20"
+                                                                  : "bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/20"
+                                                      )}
+                                                >
+                                                      Book Consultation
+                                                </Link>
+                                          </div>
+                                    </motion.div>
+                              </motion.div>
+                        )}
+                  </AnimatePresence>
             </>
       );
 };

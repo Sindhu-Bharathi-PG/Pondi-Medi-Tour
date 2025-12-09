@@ -235,3 +235,45 @@ body {
     display: none !important;
   }
 }
+
+/* Navbar Glassmorphism Utilities */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-nav-medical {
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 4px 30px rgba(16, 185, 129, 0.05);
+}
+
+.glass-nav-wellness {
+  border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+  box-shadow: 0 4px 30px rgba(245, 158, 11, 0.05);
+}
+
+/* Mode-specific glow effects */
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Navbar link underline animation */
+@keyframes underline-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.nav-underline-animate {
+  animation: underline-grow 0.3s ease-out forwards;
+  transform-origin: center;
+}
