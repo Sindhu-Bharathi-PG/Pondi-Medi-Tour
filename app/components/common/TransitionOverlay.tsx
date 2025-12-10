@@ -13,13 +13,18 @@ const TransitionOverlay: React.FC<TransitionOverlayProps> = ({ isActive, targetM
       const [phase, setPhase] = useState<'idle' | 'entering' | 'showing' | 'exiting'>('idle');
 
       useEffect(() => {
+            let enterTimer: NodeJS.Timeout;
+            let showTimer: NodeJS.Timeout;
+            let exitTimer: NodeJS.Timeout;
+
             if (isActive) {
-                  setPhase('entering');
+                  // Use setTimeout to avoid synchronous setState in effect
+                  setTimeout(() => setPhase('entering'), 0);
 
                   // Phase timeline
-                  const enterTimer = setTimeout(() => setPhase('showing'), 800);
-                  const showTimer = setTimeout(() => setPhase('exiting'), 2000);
-                  const exitTimer = setTimeout(() => {
+                  enterTimer = setTimeout(() => setPhase('showing'), 800);
+                  showTimer = setTimeout(() => setPhase('exiting'), 2000);
+                  exitTimer = setTimeout(() => {
                         setPhase('idle');
                         onComplete();
                   }, 2800);
@@ -122,19 +127,25 @@ const WellnessTransition: React.FC<{ phase: string }> = ({ phase }) => {
 
                   {/* Foam particles */}
                   <div className="absolute bottom-40 left-0 right-0 h-20">
-                        {[...Array(30)].map((_, i) => (
-                              <div
-                                    key={i}
-                                    className={`absolute w-2 h-2 bg-white rounded-full transition-all duration-500 ${phase === 'showing' ? 'opacity-80' : 'opacity-0'
-                                          }`}
-                                    style={{
-                                          left: `${Math.random() * 100}%`,
-                                          bottom: `${Math.random() * 100}%`,
-                                          animation: `float ${2 + Math.random() * 2}s ease-in-out infinite`,
-                                          animationDelay: `${Math.random() * 2}s`
-                                    }}
-                              />
-                        ))}
+                        {[...Array(30)].map((_, i) => {
+                              const randomLeft = Math.random() * 100;
+                              const randomBottom = Math.random() * 100;
+                              const randomDuration = 2 + Math.random() * 2;
+                              const randomDelay = Math.random() * 2;
+                              return (
+                                    <div
+                                          key={i}
+                                          className={`absolute w-2 h-2 bg-white rounded-full transition-all duration-500 ${phase === 'showing' ? 'opacity-80' : 'opacity-0'
+                                                }`}
+                                          style={{
+                                                left: `${randomLeft}%`,
+                                                bottom: `${randomBottom}%`,
+                                                animation: `float ${randomDuration}s ease-in-out infinite`,
+                                                animationDelay: `${randomDelay}s`
+                                          }}
+                                    />
+                              );
+                        })}
                   </div>
 
                   {/* Beach sand */}

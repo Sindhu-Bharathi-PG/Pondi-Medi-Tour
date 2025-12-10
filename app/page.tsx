@@ -51,7 +51,7 @@ export default function Home() {
       {/* Sea Wave Transition Overlay */}
       <WaveTransition
         isActive={showOverlay}
-        // targetMode={pendingMode || displayMode}
+        targetMode={pendingMode || displayMode}
         onComplete={handleTransitionComplete}
       />
 

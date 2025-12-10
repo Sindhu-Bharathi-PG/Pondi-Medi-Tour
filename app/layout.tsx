@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SiteModeProvider } from "./context/SiteModeContext";
+import ClientProviders from "./components/ClientProviders";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,9 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SiteModeProvider>
+        <ClientProviders>
           {children}
-        </SiteModeProvider>
+        </ClientProviders>
       </body>
     </html>
   );

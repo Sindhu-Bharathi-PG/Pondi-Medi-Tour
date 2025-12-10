@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
 interface WaveTransitionProps {
       isActive: boolean;
@@ -26,6 +26,20 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ isActive, onComplete })
       }, [isActive, onComplete]);
 
       if (!isActive) return null;
+
+      // Generate particles with random values once, memoized
+      const particles = useMemo(() => {
+            return [...Array(30)].map((_, i) => ({
+                  id: i,
+                  left: Math.random() * 100,
+                  top: Math.random() * 100,
+                  width: Math.random() * 4 + 2,
+                  height: Math.random() * 4 + 2,
+                  duration: 2 + Math.random() * 2,
+                  delay: 1 + Math.random() * 1,
+                  repeatDelay: Math.random() * 1,
+            }));
+      }, []);
 
       return (
             <div className="fixed inset-0 z-50 w-screen h-screen overflow-hidden bg-black">
@@ -181,15 +195,15 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ isActive, onComplete })
                   />
 
                   {/* Glowing particles */}
-                  {[...Array(30)].map((_, i) => (
+                  {particles.map((particle) => (
                         <motion.div
-                              key={i}
+                              key={particle.id}
                               className="absolute rounded-full bg-amber-300"
                               style={{
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 100}%`,
-                                    width: Math.random() * 4 + 2,
-                                    height: Math.random() * 4 + 2,
+                                    left: `${particle.left}%`,
+                                    top: `${particle.top}%`,
+                                    width: particle.width,
+                                    height: particle.height,
                               }}
                               initial={{ opacity: 0, scale: 0 }}
                               animate={{
@@ -198,10 +212,10 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ isActive, onComplete })
                                     y: [0, -100],
                               }}
                               transition={{
-                                    duration: 2 + Math.random() * 2,
-                                    delay: 1 + Math.random() * 1,
+                                    duration: particle.duration,
+                                    delay: particle.delay,
                                     repeat: phase === 'exit' ? 0 : Infinity,
-                                    repeatDelay: Math.random() * 1
+                                    repeatDelay: particle.repeatDelay
                               }}
                         />
                   ))}

@@ -35,11 +35,16 @@ const VideoTransition: React.FC<VideoTransitionProps> = ({ isActive, targetMode,
       const videoRef = useRef<HTMLVideoElement>(null);
 
       useEffect(() => {
+            let enterTimer: NodeJS.Timeout;
+            let exitTimer: NodeJS.Timeout;
+            let completeTimer: NodeJS.Timeout;
+
             if (isActive && phase === 'idle') {
-                  setPhase('entering');
+                  // Use setTimeout to avoid synchronous setState in effect
+                  setTimeout(() => setPhase('entering'), 0);
 
                   // Start playing video
-                  const enterTimer = setTimeout(() => {
+                  enterTimer = setTimeout(() => {
                         setPhase('playing');
                         if (videoRef.current) {
                               videoRef.current.currentTime = 0;
@@ -48,12 +53,12 @@ const VideoTransition: React.FC<VideoTransitionProps> = ({ isActive, targetMode,
                   }, 300);
 
                   // Begin exit
-                  const exitTimer = setTimeout(() => {
+                  exitTimer = setTimeout(() => {
                         setPhase('exiting');
                   }, 2500);
 
                   // Complete transition
-                  const completeTimer = setTimeout(() => {
+                  completeTimer = setTimeout(() => {
                         setPhase('idle');
                         setVideoLoaded(false);
                         onComplete();

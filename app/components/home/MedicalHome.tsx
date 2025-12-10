@@ -3,7 +3,7 @@
 import medicalConfigDefault from '@/app/config/home/medicalConfig.json';
 import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
 import { HomePageConfig } from '@/app/types/homeConfig.types';
-// import { SectionRenderer } from './dynamic';
+import { SectionRenderer } from './dynamic';
 
 interface MedicalHomeProps {
       // Allow passing config externally for non-provider usage

@@ -51,9 +51,12 @@ export default function WhyPondicherryPage() {
       const [activeTestimonial, setActiveTestimonial] = useState(0);
 
       useEffect(() => {
-            setIsVisible(true);
+            const visibilityTimer = setTimeout(() => setIsVisible(true), 0);
             const timer = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 6000);
-            return () => clearInterval(timer);
+            return () => {
+                  clearTimeout(visibilityTimer);
+                  clearInterval(timer);
+            };
       }, []);
 
       return (

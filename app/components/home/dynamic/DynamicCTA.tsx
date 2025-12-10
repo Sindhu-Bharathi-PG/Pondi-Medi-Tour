@@ -5,6 +5,7 @@ import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
 import { CTASectionConfig } from '@/app/types/homeConfig.types';
 import { getIcon } from '@/app/utils/iconMap';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 interface DynamicCTAProps {
     config: CTASectionConfig;
@@ -32,7 +33,10 @@ export default function DynamicCTA({ config, mode }: DynamicCTAProps) {
             buttonShadow: 'hover:shadow-amber-500/30',
         };
 
-    const ButtonIcon = config.content.buttonIcon ? getIcon(config.content.buttonIcon) : null;
+    // Memoize icon component to avoid recreating during render
+    const ButtonIcon = useMemo(() => {
+        return config.content.buttonIcon ? getIcon(config.content.buttonIcon) : null;
+    }, [config.content.buttonIcon]);
 
     return (
         <section className={`py-24 bg-gradient-to-r ${config.content.gradientColors} text-white`}>

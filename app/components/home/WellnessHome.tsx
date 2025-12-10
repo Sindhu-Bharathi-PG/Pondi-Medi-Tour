@@ -3,7 +3,7 @@
 import wellnessConfigDefault from '@/app/config/home/wellnessConfig.json';
 import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
 import { HomePageConfig } from '@/app/types/homeConfig.types';
-// import { SectionRenderer } from './dynamic';
+import { SectionRenderer } from './dynamic';
 
 interface WellnessHomeProps {
       // Allow passing config externally for non-provider usage

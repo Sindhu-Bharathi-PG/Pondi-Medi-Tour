@@ -72,21 +72,25 @@ const SmoothTransition: React.FC<SmoothTransitionProps> = ({ isActive, targetMod
 
                   {/* Animated circles/particles */}
                   <div className="absolute inset-0 overflow-hidden">
-                        {[...Array(8)].map((_, i) => (
-                              <div
-                                    key={i}
-                                    className={`absolute rounded-full ${isWellness ? 'bg-amber-300/20' : 'bg-emerald-300/20'
-                                          }`}
-                                    style={{
-                                          width: `${80 + i * 40}px`,
-                                          height: `${80 + i * 40}px`,
-                                          left: `${Math.random() * 100}%`,
-                                          top: `${Math.random() * 100}%`,
-                                          animation: `pulse ${1 + i * 0.2}s ease-in-out infinite`,
-                                          animationDelay: `${i * 0.1}s`,
-                                    }}
-                              />
-                        ))}
+                        {[...Array(8)].map((_, i) => {
+                              const randomLeft = Math.random() * 100;
+                              const randomTop = Math.random() * 100;
+                              return (
+                                    <div
+                                          key={i}
+                                          className={`absolute rounded-full ${isWellness ? 'bg-amber-300/20' : 'bg-emerald-300/20'
+                                                }`}
+                                          style={{
+                                                width: `${80 + i * 40}px`,
+                                                height: `${80 + i * 40}px`,
+                                                left: `${randomLeft}%`,
+                                                top: `${randomTop}%`,
+                                                animation: `pulse ${1 + i * 0.2}s ease-in-out infinite`,
+                                                animationDelay: `${i * 0.1}s`,
+                                          }}
+                                    />
+                              );
+                        })}
                   </div>
 
                   {/* Center Content */}

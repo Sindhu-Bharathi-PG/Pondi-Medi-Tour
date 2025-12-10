@@ -18,13 +18,19 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
 
       // Generate random foam particles once
       const foamParticles = useMemo(() =>
-            [...Array(30)].map((_, i) => ({
-                  id: i,
-                  left: `${Math.random() * 100}%`,
-                  delay: Math.random() * 0.5,
-                  size: 4 + Math.random() * 8,
-                  duration: 1 + Math.random() * 1.5,
-            })), []
+            [...Array(30)].map((_, i) => {
+                  const randomLeft = Math.random() * 100;
+                  const randomDelay = Math.random() * 0.5;
+                  const randomSize = 4 + Math.random() * 8;
+                  const randomDuration = 1 + Math.random() * 1.5;
+                  return {
+                        id: i,
+                        left: randomLeft,
+                        delay: randomDelay,
+                        size: randomSize,
+                        duration: randomDuration,
+                  };
+            }), []
       );
 
       useEffect(() => {
@@ -171,40 +177,47 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
                   {/* Foam particles/bubbles */}
                   <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isPeak ? 'opacity-100' : 'opacity-0'
                         }`}>
-                        {foamParticles.map((particle) => (
-                              <div
-                                    key={particle.id}
-                                    className="absolute rounded-full animate-bounce"
-                                    style={{
-                                          left: particle.left,
-                                          bottom: `${30 + Math.random() * 20}%`,
-                                          width: `${particle.size}px`,
-                                          height: `${particle.size}px`,
-                                          background: colors.foam,
-                                          animationDelay: `${particle.delay}s`,
+                        {foamParticles.map((particle) => {
+                              const randomBottom = 30 + Math.random() * 20;
+                              return (
+                                    <div
+                                          key={particle.id}
+                                          className="absolute rounded-full animate-bounce"
+                                          style={{
+                                                left: `${particle.left}%`,
+                                                bottom: `${randomBottom}%`,
+                                                width: `${particle.size}px`,
+                                                height: `${particle.size}px`,
+                                                background: colors.foam,
+                                                animationDelay: `${particle.delay}s`,
                                           animationDuration: `${particle.duration}s`,
                                           opacity: 0.7,
                                     }}
                               />
-                        ))}
+                        );
+                        })}
                   </div>
 
                   {/* Sparkle effects */}
                   <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isPeak ? 'opacity-100' : 'opacity-0'
                         }`}>
-                        {[...Array(8)].map((_, i) => (
-                              <Sparkles
-                                    key={i}
-                                    className={`absolute ${colors.accent} animate-ping`}
-                                    style={{
-                                          left: `${10 + Math.random() * 80}%`,
-                                          top: `${20 + Math.random() * 40}%`,
-                                          animationDelay: `${i * 0.15}s`,
+                        {[...Array(8)].map((_, i) => {
+                              const randomLeft = 10 + Math.random() * 80;
+                              const randomTop = 20 + Math.random() * 40;
+                              return (
+                                    <Sparkles
+                                          key={i}
+                                          className={`absolute ${colors.accent} animate-ping`}
+                                          style={{
+                                                left: `${randomLeft}%`,
+                                                top: `${randomTop}%`,
+                                                animationDelay: `${i * 0.15}s`,
                                           opacity: 0.6,
                                     }}
                                     size={16 + Math.random() * 16}
                               />
-                        ))}
+                        );
+                        })}
                   </div>
 
                   {/* Center Content */}

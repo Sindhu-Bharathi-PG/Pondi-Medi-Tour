@@ -1,6 +1,7 @@
 "use client";
 
 import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
+import { useLanguage, type Language } from '@/app/context/LanguageContext';
 import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, DollarSign, Globe, Leaf, Menu, Search, Stethoscope, X } from 'lucide-react';
@@ -14,16 +15,20 @@ function cn(...inputs: ClassValue[]) {
       return twMerge(clsx(inputs));
 }
 
-// Language options with flags
-const LANGUAGES = [
+// Language options with flags (mapped to LanguageContext types)
+const LANGUAGES: Array<{ code: Language; name: string; flag: string }> = [
       { code: 'en', name: 'English', flag: '🇺🇸' },
+      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+      { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+      { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
+      { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
       { code: 'fr', name: 'Français', flag: '🇫🇷' },
       { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
       { code: 'es', name: 'Español', flag: '🇪🇸' },
-      { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+      { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+      { code: 'pt', name: 'Português', flag: '🇵🇹' },
+      { code: 'ja', name: '日本語', flag: '🇯🇵' },
       { code: 'zh', name: '中文', flag: '🇨🇳' },
-      { code: 'ru', name: 'Русский', flag: '🇷🇺' },
 ];
 
 // Currency options
@@ -50,6 +55,9 @@ const Header: React.FC<HeaderProps> = ({
       const [hoveredLink, setHoveredLink] = useState<string | null>(null);
       const pathname = usePathname();
 
+      // Get language from context
+      const { currentLanguage, setLanguage, isLoading, t } = useLanguage();
+
       // New state for language, currency, and search
       const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
       const [selectedCurrency, setSelectedCurrency] = useState(CURRENCIES[0]);
@@ -61,6 +69,14 @@ const Header: React.FC<HeaderProps> = ({
       const searchInputRef = useRef<HTMLInputElement>(null);
       const languageDropdownRef = useRef<HTMLDivElement>(null);
       const currencyDropdownRef = useRef<HTMLDivElement>(null);
+
+      // Update selected language when context changes
+      useEffect(() => {
+            const langOption = LANGUAGES.find(l => l.code === currentLanguage);
+            if (langOption) {
+                  setSelectedLanguage(langOption);
+            }
+      }, [currentLanguage]);
 
       // Close dropdowns when clicking outside
       useEffect(() => {
@@ -96,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({
       // Use site mode context
       let mode: 'medical' | 'wellness' = 'medical';
       let isMedical = true;
-      let navLinks = MEDICAL_NAV_LINKS;
+      let navLinks: typeof MEDICAL_NAV_LINKS = MEDICAL_NAV_LINKS;
       let toggleMode = () => { };
 
       try {
@@ -104,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({
             mode = siteMode.mode;
             isMedical = siteMode.isMedical;
             toggleMode = siteMode.toggleMode;
-            navLinks = isMedical ? MEDICAL_NAV_LINKS : WELLNESS_NAV_LINKS;
+            navLinks = (isMedical ? MEDICAL_NAV_LINKS : WELLNESS_NAV_LINKS) as typeof MEDICAL_NAV_LINKS;
       } catch {
             // Context not available, use defaults
       }
@@ -317,8 +333,9 @@ const Header: React.FC<HeaderProps> = ({
                                                       setLanguageDropdownOpen(!languageDropdownOpen);
                                                       setCurrencyDropdownOpen(false);
                                                 }}
+                                                disabled={isLoading}
                                                 className={cn(
-                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50",
                                                       hasScrolled
                                                             ? "hover:bg-gray-100 text-gray-600"
                                                             : "hover:bg-white/10 text-white/80"
@@ -326,6 +343,7 @@ const Header: React.FC<HeaderProps> = ({
                                           >
                                                 <span className="text-base">{selectedLanguage.flag}</span>
                                                 <span className="hidden lg:inline text-xs">{selectedLanguage.code.toUpperCase()}</span>
+                                                {isLoading && <span className="animate-spin">⟳</span>}
                                                 <ChevronDown className={cn(
                                                       "w-3 h-3 transition-transform",
                                                       languageDropdownOpen && "rotate-180"
@@ -339,25 +357,25 @@ const Header: React.FC<HeaderProps> = ({
                                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                                             transition={{ duration: 0.15 }}
-                                                            className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                            className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
                                                       >
                                                             <div className="p-1">
                                                                   {LANGUAGES.map((lang) => (
                                                                         <button
                                                                               key={lang.code}
                                                                               onClick={() => {
-                                                                                    setSelectedLanguage(lang);
+                                                                                    setLanguage(lang.code);
                                                                                     setLanguageDropdownOpen(false);
                                                                               }}
                                                                               className={cn(
-                                                                                    "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
-                                                                                    selectedLanguage.code === lang.code
-                                                                                          ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
-                                                                                          : "hover:bg-gray-50 text-gray-700"
+                                                                                    "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
+                                                                                    currentLanguage === lang.code
+                                                                                          ? "bg-blue-500 text-white"
+                                                                                          : "hover:bg-gray-100 text-gray-700"
                                                                               )}
                                                                         >
-                                                                              <span className="text-lg">{lang.flag}</span>
-                                                                              <span>{lang.name}</span>
+                                                                              <span className="mr-2">{lang.flag}</span>
+                                                                              {lang.name}
                                                                         </button>
                                                                   ))}
                                                             </div>
@@ -573,7 +591,7 @@ const Header: React.FC<HeaderProps> = ({
                                                                                           <button
                                                                                                 key={lang.code}
                                                                                                 onClick={() => {
-                                                                                                      setSelectedLanguage(lang);
+                                                                                                      setLanguage(lang.code);
                                                                                                       setLanguageDropdownOpen(false);
                                                                                                 }}
                                                                                                 className={cn(

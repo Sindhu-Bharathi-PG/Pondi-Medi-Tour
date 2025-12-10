@@ -22,7 +22,8 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
     const [countUp, setCountUp] = useState<Record<string, number>>({});
 
     useEffect(() => {
-        setIsVisible(true);
+        // Use setTimeout to defer state update to avoid hydration issues
+        const visibilityTimer = setTimeout(() => setIsVisible(true), 0);
 
         // Count up animation for stats
         if (config.stats) {
@@ -46,8 +47,13 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
                 if (step >= steps) clearInterval(timer);
             }, interval);
 
-            return () => clearInterval(timer);
+            return () => {
+                clearTimeout(visibilityTimer);
+                clearInterval(timer);
+            };
         }
+
+        return () => clearTimeout(visibilityTimer);
     }, [config.stats]);
 
     const handleContentUpdate = (path: string, value: string) => {

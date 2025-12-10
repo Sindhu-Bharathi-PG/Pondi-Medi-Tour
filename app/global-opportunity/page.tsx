@@ -49,7 +49,9 @@ export default function GlobalOpportunityPage() {
       const [isVisible, setIsVisible] = useState(false);
 
       useEffect(() => {
-            setIsVisible(true);
+            // Schedule state update after render to avoid hydration issues
+            const timer = setTimeout(() => setIsVisible(true), 0);
+            return () => clearTimeout(timer);
       }, []);
 
       return (
@@ -211,7 +213,7 @@ export default function GlobalOpportunityPage() {
                                     </table>
                               </div>
                               <div className="mt-8 text-center">
-                                    <p className="text-gray-500">Aligned with "Heal in India" national initiative</p>
+                                    <p className="text-gray-500">Aligned with &quot;Heal in India&quot; national initiative</p>
                               </div>
                         </div>
                   </section>

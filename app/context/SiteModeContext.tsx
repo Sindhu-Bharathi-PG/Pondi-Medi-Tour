@@ -78,7 +78,7 @@ export const MEDICAL_NAV_LINKS = [
 // ============================================================================
 export const WELLNESS_NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/why-pondicherry', label: 'Why Pondy?' },
+  { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
   { href: '/wellness', label: 'Retreats' },
   { href: '/ayush', label: 'AYUSH' },
   { href: '/yoga-meditation', label: 'Yoga' },

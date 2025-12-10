@@ -7,6 +7,7 @@ import { getIcon } from '@/app/utils/iconMap';
 import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 interface DynamicTreatmentsProps {
     config: TreatmentsSectionConfig;
@@ -38,7 +39,10 @@ export default function DynamicTreatments({ config, mode }: DynamicTreatmentsPro
             sectionBg: 'bg-gradient-to-b from-amber-50 to-white',
         };
 
-    const BadgeIcon = getIcon(config.content.badge.icon);
+    // Memoize icon component to avoid recreating during render
+    const BadgeIcon = useMemo(() => {
+        return getIcon(config.content.badge.icon);
+    }, [config.content.badge.icon]);
 
     return (
         <section className={`py-24 ${themeColors.sectionBg}`}>

@@ -66,7 +66,8 @@ export default function WellnessTourismPage() {
       const [isVisible, setIsVisible] = useState(false);
 
       useEffect(() => {
-            setIsVisible(true);
+            const timer = setTimeout(() => setIsVisible(true), 0);
+            return () => clearTimeout(timer);
       }, []);
 
       return (
