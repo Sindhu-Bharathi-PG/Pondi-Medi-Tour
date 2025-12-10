@@ -3,7 +3,7 @@ export { useScrolled } from './useScrolled';
 export { useCarousel } from './useCarousel';
 export { useSearch } from './useSearch';
 export { useAccessibility } from './useAccessibility';
-export { useLocalization } from './useLocalization';
+// export { useLocalization } from './useLocalization';
 
 // Re-export default exports for convenience
 export { default as useScrolledDefault } from './useScrolled';

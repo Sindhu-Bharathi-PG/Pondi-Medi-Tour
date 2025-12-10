@@ -1,7 +1,7 @@
 "use client";
 
 import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
-import { useLanguage, type Language } from '@/app/context/LanguageContext';
+// import { useLanguage, type Language } from '@/app/context/LanguageContext';
 import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, DollarSign, Globe, Leaf, Menu, Search, Stethoscope, X } from 'lucide-react';
@@ -56,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({
       const pathname = usePathname();
 
       // Get language from context
-      const { currentLanguage, setLanguage, isLoading, t } = useLanguage();
+      // const { currentLanguage, setLanguage, isLoading, t } = useLanguage();
 
       // New state for language, currency, and search
       const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
@@ -71,12 +71,12 @@ const Header: React.FC<HeaderProps> = ({
       const currencyDropdownRef = useRef<HTMLDivElement>(null);
 
       // Update selected language when context changes
-      useEffect(() => {
-            const langOption = LANGUAGES.find(l => l.code === currentLanguage);
-            if (langOption) {
-                  setSelectedLanguage(langOption);
-            }
-      }, [currentLanguage]);
+      // useEffect(() => {
+      //       const langOption = LANGUAGES.find(l => l.code === currentLanguage);
+      //       if (langOption) {
+      //             setSelectedLanguage(langOption);
+      //       }
+      // }, [currentLanguage]);
 
       // Close dropdowns when clicking outside
       useEffect(() => {
@@ -333,7 +333,7 @@ const Header: React.FC<HeaderProps> = ({
                                                       setLanguageDropdownOpen(!languageDropdownOpen);
                                                       setCurrencyDropdownOpen(false);
                                                 }}
-                                                disabled={isLoading}
+                                                // disabled={isLoading}
                                                 className={cn(
                                                       "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50",
                                                       hasScrolled
@@ -343,7 +343,7 @@ const Header: React.FC<HeaderProps> = ({
                                           >
                                                 <span className="text-base">{selectedLanguage.flag}</span>
                                                 <span className="hidden lg:inline text-xs">{selectedLanguage.code.toUpperCase()}</span>
-                                                {isLoading && <span className="animate-spin">⟳</span>}
+                                                {/* {isLoading && <span className="animate-spin">⟳</span>} */}
                                                 <ChevronDown className={cn(
                                                       "w-3 h-3 transition-transform",
                                                       languageDropdownOpen && "rotate-180"
@@ -364,15 +364,15 @@ const Header: React.FC<HeaderProps> = ({
                                                                         <button
                                                                               key={lang.code}
                                                                               onClick={() => {
-                                                                                    setLanguage(lang.code);
+                                                                                    // setLanguage(lang.code);
                                                                                     setLanguageDropdownOpen(false);
                                                                               }}
-                                                                              className={cn(
-                                                                                    "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
-                                                                                    currentLanguage === lang.code
-                                                                                          ? "bg-blue-500 text-white"
-                                                                                          : "hover:bg-gray-100 text-gray-700"
-                                                                              )}
+                                                                              // className={cn(
+                                                                              //       "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
+                                                                              //       // currentLanguage === lang.code
+                                                                              //             ? "bg-blue-500 text-white"
+                                                                              //             : "hover:bg-gray-100 text-gray-700"
+                                                                              // )}
                                                                         >
                                                                               <span className="mr-2">{lang.flag}</span>
                                                                               {lang.name}
