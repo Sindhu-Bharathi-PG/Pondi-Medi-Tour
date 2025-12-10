@@ -27,6 +27,22 @@
   }
 }
 
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-float, .animate-slide-in-left, .animate-slide-in-right, .animate-slide-in-bottom, .animate-scale-in, .gradient-animated, .animate-pulse, .wave-animate-slow, .wave-animate-medium, .wave-animate-fast {
+    animation: none !important;
+  }
+  .no-animated-scroll {
+    scroll-behavior: auto !important;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

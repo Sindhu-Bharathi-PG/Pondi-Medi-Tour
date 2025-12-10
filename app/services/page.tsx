@@ -15,11 +15,14 @@ const ServicesPage = () => {
                   id: 'orthopedics',
                   icon: Bone,
                   title: 'Orthopedics & Joint Replacement',
-                  description: 'World-class joint replacement, spine surgery, and sports medicine with FRCS-trained surgeons.',
+                  description: 'World-class joint replacement with 95%+ satisfaction at 5-year follow-up. FRCS-trained surgeons with international fellowship experience.',
                   image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800',
                   procedures: ['Total Knee Replacement', 'Hip Replacement', 'Spine Surgery', 'ACL Reconstruction', 'Shoulder Arthroscopy'],
                   savings: '70%',
-                  recovery: '14-21 days',
+                  pondyPrice: '$8,500',
+                  usPrice: '$35,000',
+                  recovery: '6-12 weeks',
+                  successRate: '95%+ satisfied at 5 years',
                   color: 'from-blue-600 to-cyan-500',
                   featured: true
             },
@@ -27,11 +30,14 @@ const ServicesPage = () => {
                   id: 'ivf',
                   icon: Baby,
                   title: 'IVF & Fertility Treatment',
-                  description: 'Advanced reproductive medicine with 60%+ success rates and compassionate care.',
+                  description: 'Advanced reproductive medicine with 45%+ live birth rate (age <35). 35+ IVF specialists with international protocols.',
                   image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800',
                   procedures: ['IVF Treatment', 'IUI', 'ICSI', 'Egg Freezing', 'Donor Programs'],
-                  savings: '65%',
-                  recovery: '2-3 weeks',
+                  savings: '80%',
+                  pondyPrice: '$3,500',
+                  usPrice: '$18,000',
+                  recovery: '14 days to pregnancy test',
+                  successRate: '45%+ live birth (age <35)',
                   color: 'from-pink-600 to-rose-500',
                   featured: true
             },
@@ -39,11 +45,14 @@ const ServicesPage = () => {
                   id: 'ophthalmology',
                   icon: Eye,
                   title: 'Eye Surgery & LASIK',
-                  description: 'Leading eye care center with 15,000+ cataract surgeries annually at Aravind Eye Hospital.',
+                  description: 'Leading eye care with 99%+ vision improvement rate. 15,000+ cataract surgeries annually at Aravind Eye Hospital.',
                   image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800',
                   procedures: ['Cataract Surgery', 'LASIK', 'Retina Treatment', 'Glaucoma Surgery', 'Cornea Transplant'],
-                  savings: '80%',
+                  savings: '85%',
+                  pondyPrice: '$1,200',
+                  usPrice: '$8,000',
                   recovery: '3-7 days',
+                  successRate: '99%+ vision improvement',
                   color: 'from-teal-600 to-emerald-500',
                   featured: true
             },
@@ -51,22 +60,28 @@ const ServicesPage = () => {
                   id: 'cardiology',
                   icon: Heart,
                   title: 'Cardiac Surgery',
-                  description: 'Interventional cardiology and open-heart surgery at JIPMER with international protocols.',
+                  description: 'Interventional cardiology at JIPMER with 98.5% success rate and <1% mortality. 50+ board-certified cardiologists.',
                   image: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800',
                   procedures: ['Bypass Surgery', 'Angioplasty', 'Valve Replacement', 'Pacemaker Implant', 'Heart Transplant'],
-                  savings: '75%',
-                  recovery: '4-6 weeks',
+                  savings: '76%',
+                  pondyPrice: '$12,000',
+                  usPrice: '$50,000',
+                  recovery: '8-12 weeks',
+                  successRate: '98.5% success, <1% mortality',
                   color: 'from-red-600 to-pink-500'
             },
             {
                   id: 'gastroenterology',
                   icon: Activity,
                   title: 'Gastroenterology & Bariatric',
-                  description: 'Asia\'s premier GI center at GEM Hospital with laparoscopic expertise.',
+                  description: 'Asia\'s premier GI center at GEM Hospital with JCI accreditation. World-class laparoscopic expertise.',
                   image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=800',
                   procedures: ['Bariatric Surgery', 'Laparoscopic Surgery', 'Liver Treatment', 'Colorectal Surgery', 'Endoscopy'],
                   savings: '70%',
+                  pondyPrice: '$6,000',
+                  usPrice: '$20,000',
                   recovery: '7-14 days',
+                  successRate: '97%+ procedure success',
                   color: 'from-orange-600 to-amber-500'
             },
             {
@@ -77,39 +92,48 @@ const ServicesPage = () => {
                   image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800',
                   procedures: ['Brain Tumor Surgery', 'Spine Surgery', 'Epilepsy Surgery', 'Stroke Treatment', 'Deep Brain Stimulation'],
                   savings: '75%',
+                  pondyPrice: '$15,000',
+                  usPrice: '$60,000',
                   recovery: '2-4 weeks',
+                  successRate: '96%+ procedure success',
                   color: 'from-purple-600 to-indigo-500'
             },
             {
                   id: 'dental',
                   icon: Scissors,
                   title: 'Dental Care & Implants',
-                  description: 'Full mouth rehabilitation, implants, and cosmetic dentistry at world-class clinics.',
+                  description: 'Full mouth rehabilitation with 98%+ 10-year implant survival. 25+ dental specialists with cosmetic expertise.',
                   image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800',
                   procedures: ['Dental Implants', 'Full Mouth Rehab', 'Veneers', 'Root Canal', 'Smile Makeover'],
-                  savings: '60%',
+                  savings: '85%',
+                  pondyPrice: '$600',
+                  usPrice: '$4,000',
                   recovery: '3-10 days',
+                  successRate: '98%+ 10-year survival',
                   color: 'from-cyan-600 to-blue-500'
             },
             {
                   id: 'oncology',
                   icon: Stethoscope,
                   title: 'Cancer Treatment',
-                  description: 'Comprehensive oncology care with the latest chemotherapy and radiation protocols.',
+                  description: 'Comprehensive oncology care with 30+ oncologists using latest chemotherapy and radiation protocols.',
                   image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800',
                   procedures: ['Chemotherapy', 'Radiation Therapy', 'Surgical Oncology', 'Immunotherapy', 'Palliative Care'],
                   savings: '65%',
-                  recovery: 'Varies',
+                  pondyPrice: '$8,000',
+                  usPrice: '$25,000',
+                  recovery: 'Varies by treatment',
+                  successRate: 'Varies by stage',
                   color: 'from-green-600 to-teal-500'
             },
       ];
 
       return (
             <div className="min-h-screen bg-white">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
-                  <section className="relative pt-32 pb-24 overflow-hidden">
+                  <section className="relative h-screen pt-32 pb-12 overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-900" />
                         <div className="absolute inset-0 opacity-20">
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551076805-e1869033e561?w=1600')] bg-cover bg-center" />

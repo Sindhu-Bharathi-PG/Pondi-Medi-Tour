@@ -34,7 +34,7 @@ const CostCalculatorPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
                   <section className="relative pt-32 pb-20 overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-emerald-800 to-teal-900" />
                         <div className="relative container mx-auto px-4 text-center text-white">

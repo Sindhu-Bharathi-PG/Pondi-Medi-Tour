@@ -30,7 +30,7 @@ const DashboardPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-100">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   <div className="pt-28 pb-16">
                         <div className="container mx-auto px-4">

@@ -45,6 +45,8 @@ export default function Home() {
   }, [pendingMode]);
 
   return (
+
+
     <div className={`min-h-screen transition-colors duration-500 ${displayMode === 'medical' ? 'theme-medical' : 'theme-wellness'}`}>
       {/* Sea Wave Transition Overlay */}
       <WaveTransition
@@ -61,7 +63,7 @@ export default function Home() {
         Skip to main content
       </a>
 
-      <Header scrolled={scrolled} />
+      <Header />
 
       <main
         id="main-content"

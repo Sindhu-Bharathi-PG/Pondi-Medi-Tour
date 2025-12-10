@@ -126,7 +126,7 @@ const TestimonialsPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero */}
                   <section className="relative pt-32 pb-20 bg-gradient-to-br from-rose-900 via-pink-800 to-rose-900">

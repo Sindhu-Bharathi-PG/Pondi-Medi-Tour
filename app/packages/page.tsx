@@ -86,7 +86,7 @@ const PackagesPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero */}
                   <section className="relative pt-32 pb-24 overflow-hidden">

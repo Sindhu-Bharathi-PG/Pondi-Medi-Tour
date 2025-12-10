@@ -24,7 +24,7 @@ const TelemedicinePage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   <section className="relative pt-32 pb-24 overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-cyan-900 via-blue-800 to-indigo-900" />

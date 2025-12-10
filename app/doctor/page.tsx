@@ -137,7 +137,7 @@ const DoctorPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
                   <section className="relative pt-32 pb-20 overflow-hidden">

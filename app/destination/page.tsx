@@ -88,7 +88,7 @@ const DestinationPage = () => {
 
       return (
             <div className="min-h-screen bg-white">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
                   <section className="relative h-screen min-h-[700px] flex items-center">

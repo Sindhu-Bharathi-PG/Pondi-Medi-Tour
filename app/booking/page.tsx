@@ -9,12 +9,28 @@ const BookingPage = () => {
       const scrolled = useScrolled(50);
       const [step, setStep] = useState(1);
       const [formData, setFormData] = useState({ name: '', email: '', phone: '', country: '', treatment: '', message: '' });
+      const [errors, setErrors] = useState<{[key:string]: string}>({});
 
       const treatments = ['Orthopedics', 'IVF & Fertility', 'Cardiology', 'Ophthalmology', 'Dental', 'Gastroenterology', 'Neurology', 'Oncology'];
 
+      const handleStep1Next = () => {
+            const newErrors: {[key:string]: string} = {};
+            if (!formData.name.trim()) newErrors.name = 'Please enter your full name';
+            if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Please enter a valid email address';
+            if (!formData.phone.trim()) newErrors.phone = 'Please enter a phone number';
+            if (!formData.country.trim()) newErrors.country = 'Please select your country';
+            setErrors(newErrors);
+            if (Object.keys(newErrors).length === 0) {
+                  setStep(2);
+            } else {
+                  const firstInvalid = document.querySelector('[aria-invalid="true"]') as HTMLElement | null;
+                  firstInvalid?.focus();
+            }
+      };
+
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   <section className="relative pt-32 pb-20 overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-800 to-indigo-900" />
@@ -46,26 +62,89 @@ const BookingPage = () => {
                                                 <div>
                                                       <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
                                                       <div className="grid md:grid-cols-2 gap-6">
-                                                            <div><label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                                                                  <div className="relative"><User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                                                        <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="John Doe" /></div></div>
-                                                            <div><label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                                                                  <div className="relative"><Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                                                        <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="john@email.com" /></div></div>
-                                                            <div><label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-                                                                  <div className="relative"><Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                                                        <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+1 234 567 8900" /></div></div>
-                                                            <div><label className="block text-sm font-medium text-gray-700 mb-2">Country *</label>
-                                                                  <div className="relative"><MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                                                        <select value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                                                                              <option value="">Select Country</option><option>United States</option><option>United Kingdom</option><option>UAE</option><option>Singapore</option><option>Australia</option><option>Other</option>
-                                                                        </select></div></div>
+                                                            {/* Full Name */}
+                                                            <div>
+                                                                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">Full Name *</label>
+                                                                  <div className="relative">
+                                                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                                                        <input
+                                                                              id="name"
+                                                                              type="text"
+                                                                              value={formData.name}
+                                                                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                                              placeholder="John Doe"
+                                                                              aria-invalid={!!errors.name}
+                                                                              aria-describedby={errors.name ? 'name-error' : undefined}
+                                                                        />
+                                                                  </div>
+                                                                  {errors.name && <p id="name-error" role="alert" className="text-red-600 mt-2 text-sm">{errors.name}</p>}
+                                                            </div>
+
+                                                            {/* Email */}
+                                                            <div>
+                                                                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">Email Address *</label>
+                                                                  <div className="relative">
+                                                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                                                        <input
+                                                                              id="email"
+                                                                              type="email"
+                                                                              value={formData.email}
+                                                                              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                                              placeholder="john@email.com"
+                                                                              aria-invalid={!!errors.email}
+                                                                              aria-describedby={errors.email ? 'email-error' : undefined}
+                                                                        />
+                                                                  </div>
+                                                                  {errors.email && <p id="email-error" role="alert" className="text-red-600 mt-2 text-sm">{errors.email}</p>}
+                                                            </div>
+
+                                                            {/* Phone */}
+                                                            <div>
+                                                                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="phone">Phone Number *</label>
+                                                                  <div className="relative">
+                                                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                                                        <input
+                                                                              id="phone"
+                                                                              type="tel"
+                                                                              value={formData.phone}
+                                                                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                                              placeholder="+1 234 567 8900"
+                                                                              aria-invalid={!!errors.phone}
+                                                                              aria-describedby={errors.phone ? 'phone-error' : undefined}
+                                                                        />
+                                                                  </div>
+                                                                  {errors.phone && <p id="phone-error" role="alert" className="text-red-600 mt-2 text-sm">{errors.phone}</p>}
+                                                            </div>
+
+                                                            {/* Country */}
+                                                            <div>
+                                                                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="country">Country *</label>
+                                                                  <div className="relative">
+                                                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                                                        <select
+                                                                              id="country"
+                                                                              value={formData.country}
+                                                                              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                                                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                                              aria-invalid={!!errors.country}
+                                                                              aria-describedby={errors.country ? 'country-error' : undefined}
+                                                                        >
+                                                                              <option value="">Select Country</option>
+                                                                              <option>United States</option>
+                                                                              <option>United Kingdom</option>
+                                                                              <option>UAE</option>
+                                                                              <option>Singapore</option>
+                                                                              <option>Australia</option>
+                                                                              <option>Other</option>
+                                                                        </select>
+                                                                  </div>
+                                                                  {errors.country && <p id="country-error" role="alert" className="text-red-600 mt-2 text-sm">{errors.country}</p>}
+                                                            </div>
                                                       </div>
-                                                      <button onClick={() => setStep(2)} className="w-full mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                                                      <button onClick={() => handleStep1Next()} className="w-full mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
                                                             Continue <ChevronRight className="w-5 h-5" /></button>
                                                 </div>
                                           )}

@@ -19,30 +19,34 @@ const HospitalPage = () => {
                   image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800',
                   rating: 4.9,
                   reviews: 2840,
-                  specialties: ['Multi-Specialty', 'Cardiology', 'Oncology', 'Neurology'],
+                  specialties: ['Multi-Specialty', 'Cardiology', 'Oncology', 'Neurology', 'Nephrology', 'Orthopedics'],
                   accreditation: ['NABH', 'NABL'],
                   location: 'Gorimedu, Pondicherry',
                   established: 1823,
                   beds: 2500,
                   type: 'government',
                   featured: true,
-                  description: 'Premier government medical institution offering world-class treatment at affordable costs.'
+                  description: 'AIIMS-equivalent status with world-class research. Premier government medical institution matching top US hospitals in quality.',
+                  equipment: ['64-slice CT scanner', '3T MRI', 'Digital Operating Theaters', 'Advanced Blood Bank'],
+                  highlights: ['1,100+ beds active', 'All specialties', 'World-class research', '50+ Cardiologists trained in US/UK']
             },
             {
                   id: 2,
-                  name: 'PIMS',
-                  fullName: 'Pondicherry Institute of Medical Sciences',
+                  name: 'Apollo Pondicherry',
+                  fullName: 'Apollo Speciality Hospitals Pondicherry',
                   image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
                   rating: 4.8,
                   reviews: 1560,
-                  specialties: ['Orthopedics', 'Cardiology', 'Neurosurgery', 'IVF'],
-                  accreditation: ['NABH'],
-                  location: 'Kalapet, Pondicherry',
-                  established: 1999,
-                  beds: 850,
+                  specialties: ['Cardiology', 'Orthopedics', 'Neurosurgery', 'IVF', 'Oncology'],
+                  accreditation: ['NABH', 'JCI'],
+                  location: 'Ariyankuppam, Pondicherry',
+                  established: 2005,
+                  beds: 300,
                   type: 'private',
                   featured: true,
-                  description: 'Leading private medical college offering cutting-edge treatments with personalized care.'
+                  description: 'JCI accredited with advanced diagnostic center. International patient wing with multilingual staff.',
+                  equipment: ['Da Vinci Surgical Robot', 'PET-CT Scanner', '64-slice CT', 'Cath Lab'],
+                  highlights: ['300+ beds', 'JCI accredited', 'International patient services', 'Advanced diagnostic center']
             },
             {
                   id: 3,
@@ -51,13 +55,16 @@ const HospitalPage = () => {
                   image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800',
                   rating: 4.7,
                   reviews: 1230,
-                  specialties: ['General Surgery', 'Pediatrics', 'Gynecology', 'Ophthalmology'],
+                  specialties: ['General Surgery', 'Pediatrics', 'Gynecology', 'Ophthalmology', 'ENT', 'Dermatology'],
                   accreditation: ['NABH', 'NABL'],
                   location: 'Pillaiyarkuppam, Pondicherry',
                   established: 2007,
                   beds: 1200,
                   type: 'private',
-                  description: 'Comprehensive healthcare with focus on research and advanced medical education.'
+                  featured: true,
+                  description: 'NABH accredited multi-specialty hospital with focus on research and advanced medical education.',
+                  equipment: ['MRI 1.5T', 'CT Scanner', 'Digital X-ray', 'Modern ICUs'],
+                  highlights: ['900+ beds', 'NABH accredited', 'Multi-specialty', 'Medical education focus']
             },
             {
                   id: 4,
@@ -66,14 +73,16 @@ const HospitalPage = () => {
                   image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=800',
                   rating: 4.9,
                   reviews: 980,
-                  specialties: ['Gastroenterology', 'Bariatric Surgery', 'Laparoscopy'],
+                  specialties: ['Gastroenterology', 'Bariatric Surgery', 'Laparoscopy', 'Colorectal Surgery'],
                   accreditation: ['NABH', 'JCI'],
                   location: 'East Coast Road, Pondicherry',
                   established: 2005,
                   beds: 300,
                   type: 'specialty',
                   featured: true,
-                  description: 'Asia\'s premier gastroenterology center with internationally trained specialists.'
+                  description: 'Asia\'s premier gastroenterology center with internationally trained specialists. World leader in laparoscopic GI surgery.',
+                  equipment: ['Advanced Endoscopy Suite', 'Laparoscopic Towers', 'Bariatric Surgery Equipment'],
+                  highlights: ['JCI certified', 'Asia\'s premier GI center', '97%+ procedure success', 'International faculty']
             },
             {
                   id: 5,
@@ -82,28 +91,32 @@ const HospitalPage = () => {
                   image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800',
                   rating: 4.9,
                   reviews: 3200,
-                  specialties: ['Cataract Surgery', 'LASIK', 'Retina', 'Glaucoma'],
+                  specialties: ['Cataract Surgery', 'LASIK', 'Retina', 'Glaucoma', 'Cornea', 'Pediatric Ophthalmology'],
                   accreditation: ['NABH'],
                   location: 'Cuddalore Road, Pondicherry',
                   established: 2003,
                   beds: 250,
                   type: 'specialty',
-                  description: 'World-renowned eye care with highest volume of cataract surgeries globally.'
+                  description: 'World-renowned eye care with highest volume of cataract surgeries globally. 15,000+ surgeries annually.',
+                  equipment: ['Femto Laser', 'Phaco Machines', 'OCT Scanner', 'Fundus Camera'],
+                  highlights: ['15,000+ cataract surgeries/year', '99%+ vision improvement', 'World-class eye care', 'Affordable excellence']
             },
             {
                   id: 6,
-                  name: 'POSH Hospital',
-                  fullName: 'Pondy Ortho Speciality Hospital',
+                  name: 'PIMS',
+                  fullName: 'Pondicherry Institute of Medical Sciences',
                   image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800',
                   rating: 4.8,
                   reviews: 890,
-                  specialties: ['Joint Replacement', 'Spine Surgery', 'Sports Medicine', 'Trauma'],
+                  specialties: ['Orthopedics', 'Joint Replacement', 'Spine Surgery', 'Sports Medicine', 'Trauma'],
                   accreditation: ['NABH'],
-                  location: 'Anna Nagar, Pondicherry',
-                  established: 2010,
-                  beds: 150,
-                  type: 'specialty',
-                  description: 'Leading orthopedic center with internationally trained surgeons and latest technology.'
+                  location: 'Kalapet, Pondicherry',
+                  established: 1999,
+                  beds: 850,
+                  type: 'private',
+                  description: 'Leading orthopedic and multi-specialty center with FRCS-trained surgeons and latest technology.',
+                  equipment: ['Arthroscopy Suite', 'C-Arm', 'Navigation Systems', 'Laminar Flow OTs'],
+                  highlights: ['850 beds', 'NABH accredited', '40+ Orthopedic surgeons', 'International fellowship experience']
             },
       ];
 
@@ -120,7 +133,7 @@ const HospitalPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
                   <section className="relative pt-32 pb-20 overflow-hidden">
@@ -193,8 +206,8 @@ const HospitalPage = () => {
                                                       key={filter.id}
                                                       onClick={() => setActiveFilter(filter.id)}
                                                       className={`px-6 py-3 rounded-full font-medium transition-all ${activeFilter === filter.id
-                                                                  ? 'bg-blue-600 text-white shadow-lg'
-                                                                  : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
+                                                            ? 'bg-blue-600 text-white shadow-lg'
+                                                            : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
                                                             }`}
                                                 >
                                                       {filter.label}

@@ -14,6 +14,7 @@ const ModeToggle: React.FC = () => {
                         onClick={toggleMode}
                         className="relative flex items-center gap-1 p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-all duration-300 shadow-inner"
                         aria-label={`Switch to ${isMedical ? 'Wellness' : 'Medical'} mode`}
+                        aria-pressed={isMedical}
                   >
                         {/* Medical Option */}
                         <div
@@ -61,6 +62,7 @@ export const ModeToggleCompact: React.FC = () => {
                               : 'bg-gradient-to-r from-amber-500 to-orange-500'
                         }`}
                   aria-label="Toggle site mode"
+                  aria-pressed={isMedical}
             >
                   {/* Slider */}
                   <div

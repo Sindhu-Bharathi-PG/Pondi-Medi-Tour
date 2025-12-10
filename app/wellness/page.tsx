@@ -13,78 +13,78 @@ const WellnessPage = () => {
       const wellnessPackages = [
             {
                   id: 1,
-                  title: 'Post-Surgery Recovery Retreat',
-                  duration: '14 days',
-                  location: 'Quiet Healing Centre, Auroville',
-                  image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
-                  price: 'From $2,500',
+                  title: '7-Day Ayurvedic Detox',
+                  duration: '7 days',
+                  location: 'Traditional Wellness Centre',
+                  image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
+                  price: '$1,200-1,500',
                   rating: 4.9,
-                  reviews: 145,
-                  includes: ['Aquatic Therapy', 'Physiotherapy', 'Yoga Sessions', 'Organic Meals', 'Spa Treatments'],
-                  description: 'Holistic recovery program designed for post-surgical patients with expert physiotherapy and nature healing.',
+                  reviews: 230,
+                  includes: ['Daily Abhyanga Massage', 'Panchakarma Treatments', 'Shirodhara Therapy', 'Sattvic Diet (Pure Foods)', 'Daily Meditation'],
+                  description: 'Authentic Kerala-style Ayurveda for complete detoxification and rejuvenation. Observable benefits within 7 days.',
                   featured: true
             },
             {
                   id: 2,
-                  title: 'Ayurveda Rejuvenation',
-                  duration: '7-21 days',
-                  location: 'Traditional Wellness Centre',
-                  image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
-                  price: 'From $1,800',
-                  rating: 4.8,
-                  reviews: 230,
-                  includes: ['Panchakarma', 'Abhyanga Massage', 'Shirodhara', 'Herbal Treatments', 'Meditation'],
-                  description: 'Authentic Kerala-style Ayurveda treatments for detoxification and rejuvenation.',
+                  title: '14-Day Yoga & Spiritual Immersion',
+                  duration: '14 days',
+                  location: 'Sri Aurobindo Ashram',
+                  image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+                  price: '$1,500-2,000',
+                  rating: 4.9,
+                  reviews: 312,
+                  includes: ['2hr Morning Yoga', '1hr Evening Yoga', 'Ashram Meditation', 'Philosophy Teachings', 'Beach Walks', 'Cultural Tours'],
+                  description: 'Deep yoga immersion with spiritual practices at the renowned Sri Aurobindo Ashram. Transform body and mind.',
                   featured: true
             },
             {
                   id: 3,
-                  title: 'French Heritage Wellness Stay',
-                  duration: '7 days',
-                  location: 'Heritage Hotel, White Town',
-                  image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800',
-                  price: 'From $1,500',
+                  title: '21-Day Complete Wellness Rejuvenation',
+                  duration: '21 days',
+                  location: 'Quiet Healing Centre, Auroville',
+                  image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
+                  price: '$2,500-3,500',
                   rating: 4.9,
-                  reviews: 89,
-                  includes: ['Colonial Villa Stay', 'French Cuisine', 'Beach Walks', 'Cultural Tours', 'Spa Access'],
-                  description: 'Recover in colonial-era luxury while exploring Pondicherry\'s unique French-Indian culture.',
+                  reviews: 145,
+                  includes: ['Ayurveda + Yoga + Naturopathy', 'Intensive Daily Schedule', 'Lifestyle Coaching', 'Complete Transformation', 'Expert Consultations'],
+                  description: 'The ultimate wellness experience combining all AYUSH modalities. Complete mind-body-spirit transformation.',
                   featured: true
             },
             {
                   id: 4,
-                  title: 'Beachside Healing Program',
-                  duration: '10 days',
+                  title: 'Post-Surgery Recovery Retreat',
+                  duration: '14 days',
                   location: 'Beach Resort, ECR',
                   image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800',
-                  price: 'From $2,000',
-                  rating: 4.7,
+                  price: '$2,000-2,500',
+                  rating: 4.8,
                   reviews: 167,
-                  includes: ['Ocean View Room', 'Beach Yoga', 'Naturopathy', 'Reflexology', 'Healthy Dining'],
-                  description: 'Heal with the sounds of waves and gentle sea breeze in our beachfront wellness retreat.'
+                  includes: ['Aquatic Therapy', 'Physiotherapy', 'Gentle Yoga', 'Organic Meals', 'Spa Treatments'],
+                  description: 'Holistic post-surgical recovery with physiotherapy and nature healing. Sea salt air aids respiratory healing.'
             },
             {
                   id: 5,
-                  title: 'Meditation & Mindfulness',
-                  duration: '5-14 days',
-                  location: 'Sri Aurobindo Ashram',
-                  image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
-                  price: 'From $800',
-                  rating: 4.9,
-                  reviews: 312,
-                  includes: ['Guided Meditation', 'Ashram Stay', 'Spiritual Discourses', 'Volunteer Activities', 'Simple Meals'],
-                  description: 'Find inner peace through spiritual practices at the renowned Sri Aurobindo Ashram.'
-            },
-            {
-                  id: 6,
-                  title: 'Auroville Eco-Healing',
+                  title: 'Auroville Eco-Healing Experience',
                   duration: '7-14 days',
                   location: 'Auroville Community',
                   image: 'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=800',
-                  price: 'From $1,200',
+                  price: '$1,200-1,800',
                   rating: 4.8,
                   reviews: 198,
                   includes: ['Eco-friendly Stay', 'Organic Farm Tours', 'Sustainable Living Workshops', 'Forest Walks', 'Community Dining'],
-                  description: 'Experience sustainable healing in the experimental township of Auroville.'
+                  description: 'Experience sustainable healing in the experimental township of Auroville. UNESCO-recognized spiritual community.'
+            },
+            {
+                  id: 6,
+                  title: 'French Heritage Wellness Stay',
+                  duration: '7 days',
+                  location: 'Heritage Hotel, White Town',
+                  image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800',
+                  price: '$1,500-2,000',
+                  rating: 4.9,
+                  reviews: 89,
+                  includes: ['Colonial Villa Stay', 'French Cuisine', 'Beach Walks', 'Cultural Tours', 'Spa Access'],
+                  description: 'Recover in colonial-era luxury while exploring Pondicherry\'s unique French-Indian heritage.'
             },
       ];
 
@@ -97,7 +97,7 @@ const WellnessPage = () => {
 
       return (
             <div className="min-h-screen bg-white">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
                   <section className="relative pt-32 pb-24 overflow-hidden">

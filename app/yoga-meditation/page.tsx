@@ -54,7 +54,7 @@ const YogaMeditationPage = () => {
 
       return (
             <div className="min-h-screen bg-white">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero */}
                   <section className="relative h-screen min-h-[700px] flex items-center">

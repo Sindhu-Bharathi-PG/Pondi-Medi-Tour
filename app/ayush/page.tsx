@@ -14,75 +14,95 @@ const AyushPage = () => {
             {
                   id: 'ayurveda',
                   name: 'Ayurveda',
+                  subtitle: '5,000+ years old',
                   icon: Leaf,
                   image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
-                  description: 'Ancient Indian healing system focusing on balance of body, mind, and spirit through herbs, diet, and lifestyle.',
-                  treatments: ['Panchakarma Detox', 'Abhyanga Massage', 'Shirodhara', 'Nasya', 'Herbal Steam Bath'],
+                  description: 'Science of life, balance of three doshas (Vata, Pitta, Kapha). Only authentic in India; taught by licensed Vaidyas.',
+                  treatments: ['Panchakarma (cleansing)', 'Abhyanga Massage', 'Shirodhara (oil therapy)', 'Nasya', 'Herbal Steam Bath'],
+                  conditions: ['Arthritis', 'Diabetes', 'Stress', 'Skin Conditions', 'Digestive Issues'],
                   duration: '7-21 days',
+                  benefit: 'Observable benefits within treatment period',
                   color: 'from-green-600 to-emerald-500'
             },
             {
                   id: 'yoga',
                   name: 'Yoga & Pranayama',
+                  subtitle: 'Traditional System',
                   icon: Sun,
                   image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
-                  description: 'Transform your body and mind through ancient yogic practices, breathing techniques, and meditation.',
-                  treatments: ['Hatha Yoga', 'Ashtanga Yoga', 'Pranayama', 'Yoga Nidra', 'Meditation'],
-                  duration: '3-14 days',
+                  description: 'Union of body, mind, spirit through posture, breathing, meditation. Authentic teaching lineages from India\'s spiritual heritage.',
+                  treatments: ['Hatha Yoga', 'Ashtanga Yoga', 'Kundalini Yoga', 'Pranayama', 'Yoga Nidra', 'Meditation'],
+                  conditions: ['Flexibility', 'Strength', 'Mental Clarity', 'Stress Relief', 'Spiritual Growth'],
+                  duration: '1 hour drop-in to 14-day immersion',
+                  benefit: 'Immediate relaxation, long-term transformation',
                   color: 'from-orange-500 to-amber-500'
-            },
-            {
-                  id: 'unani',
-                  name: 'Unani Medicine',
-                  icon: Droplets,
-                  image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800',
-                  description: 'Traditional Greco-Arabic medicine system using natural elements to restore body\'s natural balance.',
-                  treatments: ['Hijama (Cupping)', 'Hammam Bath', 'Dalak Massage', 'Herbal Remedies', 'Diet Therapy'],
-                  duration: '5-14 days',
-                  color: 'from-blue-600 to-cyan-500'
             },
             {
                   id: 'siddha',
                   name: 'Siddha Medicine',
+                  subtitle: 'Ancient Tamil Tradition',
                   icon: Flame,
                   image: 'https://images.unsplash.com/photo-1552693673-1bf958298935?w=800',
-                  description: 'Ancient Tamil Nadu healing tradition using herbs, minerals, and spiritual practices for holistic health.',
-                  treatments: ['Varmam Therapy', 'Thokkanam', 'Purgation', 'Herbal Medicine', 'Kayakalpa'],
+                  description: 'Ancient Tamil healing system using herbs, minerals, metals. Pondicherry is the authentic center for Siddha tradition.',
+                  treatments: ['Varmam Therapy', 'Thokkanam (massage)', 'Purgation', 'Herbal Medicine', 'Kayakalpa (rejuvenation)'],
+                  conditions: ['Chronic pain', 'Neurological disorders', 'Joint problems', 'Skin diseases', 'Respiratory issues'],
                   duration: '7-21 days',
+                  benefit: 'Regional expertise, unavailable elsewhere',
                   color: 'from-red-600 to-orange-500'
             },
             {
                   id: 'naturopathy',
                   name: 'Naturopathy',
+                  subtitle: 'Nature Cure',
                   icon: Wind,
                   image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
-                  description: 'Nature cure using the healing power of natural elements - water, earth, air, sunlight, and fasting.',
+                  description: 'Healing through natural elements: water, mud, herbs, air, diet. Detoxification and chronic disease management.',
                   treatments: ['Hydrotherapy', 'Mud Therapy', 'Fasting Therapy', 'Diet Therapy', 'Massage'],
-                  duration: '5-14 days',
+                  conditions: ['Detoxification', 'Chronic Disease', 'Lifestyle Diseases', 'Obesity', 'Sleep Disorders'],
+                  duration: '3-7 weeks',
+                  benefit: 'Therapeutic benefits from natural healing',
                   color: 'from-teal-600 to-cyan-500'
+            },
+            {
+                  id: 'unani',
+                  name: 'Unani Medicine',
+                  subtitle: 'Greco-Islamic Tradition',
+                  icon: Droplets,
+                  image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800',
+                  description: 'Traditional Greco-Arabic medicine balancing four humors (blood, phlegm, yellow bile, black bile).',
+                  treatments: ['Hijama (Cupping)', 'Hammam Bath', 'Dalak Massage', 'Herbal Remedies', 'Diet Therapy'],
+                  conditions: ['Skin disorders', 'Digestive issues', 'Respiratory problems', 'Joint pain', 'General wellness'],
+                  duration: '5-14 days',
+                  benefit: 'Natural balance restoration',
+                  color: 'from-blue-600 to-cyan-500'
             },
             {
                   id: 'homeopathy',
                   name: 'Homeopathy',
+                  subtitle: 'Gentle Healing',
                   icon: Heart,
                   image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800',
-                  description: 'Gentle healing system using highly diluted natural substances to stimulate the body\'s healing response.',
+                  description: 'Gentle healing using diluted natural substances to stimulate body\'s own healing response. No side effects.',
                   treatments: ['Constitutional Treatment', 'Acute Care', 'Chronic Disease Care', 'Mental Health', 'Preventive Care'],
-                  duration: 'Ongoing',
+                  conditions: ['Chronic illnesses', 'Allergies', 'Functional disorders', 'Anxiety', 'Depression'],
+                  duration: 'Ongoing treatment',
+                  benefit: 'Safe, gentle, non-invasive healing',
                   color: 'from-purple-600 to-pink-500'
             },
       ];
 
       const centers = [
-            { name: 'Quiet Healing Centre', location: 'Auroville', specialty: 'Naturopathy & Yoga', rating: 4.9 },
-            { name: 'Auroville Ayurveda', location: 'Auroville', specialty: 'Traditional Ayurveda', rating: 4.8 },
-            { name: 'Svastha Wellness', location: 'White Town', specialty: 'Siddha & Yoga', rating: 4.7 },
-            { name: 'Ananda Spa', location: 'ECR', specialty: 'Holistic Wellness', rating: 4.8 },
+            { name: 'Quiet Healing Centre', location: 'Auroville', specialty: 'Naturopathy & Yoga', rating: 4.9, certified: true },
+            { name: 'Auroville Ayurveda', location: 'Auroville', specialty: 'Traditional Ayurveda', rating: 4.8, certified: true },
+            { name: 'Svastha Wellness', location: 'White Town', specialty: 'Siddha & Yoga', rating: 4.7, certified: true },
+            { name: 'Ananda Spa', location: 'ECR', specialty: 'Holistic Wellness', rating: 4.8, certified: true },
+            { name: 'Pitanga Centre', location: 'Auroville', specialty: 'Yoga & Movement', rating: 4.9, certified: true },
+            { name: 'Kailash Clinic', location: 'Pondicherry', specialty: 'Siddha Medicine', rating: 4.7, certified: true },
       ];
 
       return (
             <div className="min-h-screen bg-white">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero Section */}
                   <section className="relative h-screen min-h-[700px] flex items-center">

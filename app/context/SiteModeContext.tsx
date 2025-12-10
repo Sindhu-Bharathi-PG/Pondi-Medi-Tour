@@ -64,23 +64,34 @@ export const useSiteMode = () => {
 
 // Navigation links for each mode
 export const MEDICAL_NAV_LINKS = [
-      { href: '/', label: 'Home' },
-      { href: '/services', label: 'Treatments' },
-      { href: '/hospital', label: 'Hospitals' },
-      { href: '/doctor', label: 'Doctors' },
-      { href: '/packages', label: 'Packages' },
-      { href: '/cost-calculator', label: 'Cost Calculator' },
-      { href: '/about', label: 'About' },
-];
+  { href: '/', label: 'Home' },
+  { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
+  { href: '/services', label: 'Treatments' },
+  { href: '/hospital', label: 'Hospitals' },
+  { href: '/doctor', label: 'Doctors' },
+  { href: '/packages', label: 'Packages' },
+  { href: '/cost-calculator', label: 'Cost Tool' },
+] as const;
 
+// ============================================================================
+// SECTION 2: WELLNESS & LIFESTYLE - Simple holistic navigation
+// ============================================================================
 export const WELLNESS_NAV_LINKS = [
-      { href: '/', label: 'Home' },
-      { href: '/wellness', label: 'Wellness Retreats' },
-      { href: '/ayush', label: 'AYUSH Therapies' },
-      { href: '/destination', label: 'Explore Pondicherry' },
-      { href: '/yoga-meditation', label: 'Yoga & Meditation' },
-      { href: '/spa-rejuvenation', label: 'Spa & Rejuvenation' },
-      { href: '/about', label: 'About' },
+  { href: '/', label: 'Home' },
+  { href: '/why-pondicherry', label: 'Why Pondy?' },
+  { href: '/wellness', label: 'Retreats' },
+  { href: '/ayush', label: 'AYUSH' },
+  { href: '/yoga-meditation', label: 'Yoga' },
+  { href: '/spa-rejuvenation', label: 'Spa' },
+  { href: '/destination', label: 'Explore' },
+] as const;
+
+// Educational content links (Chapter 1)
+export const LEARN_LINKS = [
+      { href: '/why-pondicherry', label: 'Why Pondicherry', desc: 'Cost advantage & infrastructure' },
+      { href: '/medical-tourism', label: 'Medical Tourism', desc: 'Understanding medical travel' },
+      { href: '/wellness-tourism', label: 'Wellness Tourism', desc: 'Holistic healing journeys' },
+      { href: '/global-opportunity', label: 'Global Opportunity', desc: 'Market trends & vision' },
 ];
 
 // Theme colors for each mode

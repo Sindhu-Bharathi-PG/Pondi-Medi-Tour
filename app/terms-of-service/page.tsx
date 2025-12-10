@@ -20,7 +20,7 @@ const TermsOfServicePage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   <section className="pt-32 pb-16 bg-gradient-to-br from-indigo-800 to-purple-900">
                         <div className="container mx-auto px-4 text-center text-white">

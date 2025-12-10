@@ -50,7 +50,7 @@ const VisaPage = () => {
 
       return (
             <div className="min-h-screen bg-gray-50">
-                  <Header scrolled={scrolled} />
+                  <Header />
 
                   {/* Hero */}
                   <section className="relative pt-32 pb-20 bg-gradient-to-br from-blue-900 via-indigo-800 to-blue-900">
