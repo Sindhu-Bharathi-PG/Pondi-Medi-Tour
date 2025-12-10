@@ -1,0 +1,206 @@
+{
+    "mode": "wellness",
+    "version": "1.0.0",
+    "lastModified": "2025-12-10T00:00:00Z",
+    "sections": [
+        {
+            "id": "hero-wellness",
+            "type": "hero",
+            "enabled": true,
+            "order": 1,
+            "content": {
+                "badge": {
+                    "icon": "Sparkles",
+                    "text": "Holistic Wellness Destination"
+                },
+                "title": {
+                    "line1": "Discover",
+                    "line2": "Inner Peace"
+                },
+                "subtitle": "Experience ancient healing traditions in the spiritual haven of Pondicherry. Where Auroville's wisdom meets beachside serenity.",
+                "primaryCTA": {
+                    "text": "Start Your Journey",
+                    "link": "/booking",
+                    "icon": "ArrowRight"
+                },
+                "secondaryCTA": {
+                    "text": "Watch Video",
+                    "link": "#video",
+                    "icon": "Play"
+                },
+                "backgroundImage": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1920",
+                "gradientColors": "from-amber-900/90 via-orange-800/70 to-transparent"
+            },
+            "highlights": [
+                {
+                    "id": "auroville",
+                    "icon": "TreePine",
+                    "label": "Auroville",
+                    "value": "Spiritual Township"
+                },
+                {
+                    "id": "ashram",
+                    "icon": "Moon",
+                    "label": "Ashram",
+                    "value": "Sri Aurobindo"
+                },
+                {
+                    "id": "beaches",
+                    "icon": "Waves",
+                    "label": "Beaches",
+                    "value": "35km Coastline"
+                },
+                {
+                    "id": "ayush",
+                    "icon": "Leaf",
+                    "label": "AYUSH",
+                    "value": "50+ Centers"
+                }
+            ]
+        },
+        {
+            "id": "treatments-wellness",
+            "type": "treatments",
+            "enabled": true,
+            "order": 2,
+            "content": {
+                "badge": {
+                    "icon": "Sparkles",
+                    "text": "Transformative Experiences"
+                },
+                "title": "Your Wellness Journey Awaits",
+                "subtitle": "Explore our curated wellness experiences designed to nurture your body, mind, and soul.",
+                "viewAllLink": "/wellness",
+                "viewAllText": "View All Experiences"
+            },
+            "items": [
+                {
+                    "id": "ayush",
+                    "icon": "Leaf",
+                    "title": "AYUSH Therapies",
+                    "description": "Ancient healing wisdom of Ayurveda, Yoga, Unani, Siddha & Naturopathy",
+                    "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600",
+                    "link": "/ayush",
+                    "color": "from-green-500 to-emerald-500"
+                },
+                {
+                    "id": "yoga",
+                    "icon": "Sun",
+                    "title": "Yoga & Meditation",
+                    "description": "Transform your mind and body in spiritual Auroville ashrams",
+                    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600",
+                    "link": "/yoga-meditation",
+                    "color": "from-orange-500 to-amber-500"
+                },
+                {
+                    "id": "spa",
+                    "icon": "Sparkles",
+                    "title": "Spa & Rejuvenation",
+                    "description": "Luxurious treatments blending Eastern and Western techniques",
+                    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600",
+                    "link": "/spa-rejuvenation",
+                    "color": "from-purple-500 to-pink-500"
+                },
+                {
+                    "id": "beach",
+                    "icon": "Waves",
+                    "title": "Beach Wellness",
+                    "description": "Healing retreats along the pristine Bay of Bengal coastline",
+                    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600",
+                    "link": "/wellness",
+                    "color": "from-cyan-500 to-blue-500"
+                }
+            ]
+        },
+        {
+            "id": "whyPondicherry-wellness",
+            "type": "whyPondicherry",
+            "enabled": true,
+            "order": 3,
+            "content": {
+                "title": "Why Wellness Seekers Choose Pondicherry",
+                "subtitle": "A unique blend of French colonial charm, ancient Indian spirituality, and natural coastal beauty."
+            },
+            "features": [
+                {
+                    "id": "f1",
+                    "icon": "TreePine",
+                    "text": "Auroville - UNESCO recognized spiritual community"
+                },
+                {
+                    "id": "f2",
+                    "icon": "Heart",
+                    "text": "Sri Aurobindo Ashram - World-famous meditation center"
+                },
+                {
+                    "id": "f3",
+                    "icon": "Waves",
+                    "text": "Pristine beaches for yoga and healing"
+                },
+                {
+                    "id": "f4",
+                    "icon": "Leaf",
+                    "text": "50+ AYUSH certified wellness centers"
+                }
+            ],
+            "images": [
+                "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400",
+                "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400"
+            ],
+            "rating": {
+                "value": "4.9★",
+                "label": "Average Rating"
+            }
+        },
+        {
+            "id": "testimonials-wellness",
+            "type": "testimonials",
+            "enabled": true,
+            "order": 4,
+            "content": {
+                "title": "Transformative Stories",
+                "subtitle": "Hear from our wellness travelers"
+            },
+            "items": [
+                {
+                    "id": "t1",
+                    "name": "Emily Sanders",
+                    "location": "London, UK",
+                    "text": "The Ayurvedic retreat changed my life. I feel 10 years younger!",
+                    "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200",
+                    "rating": 5
+                },
+                {
+                    "id": "t2",
+                    "name": "David Chen",
+                    "location": "Singapore",
+                    "text": "Best yoga teacher training I've ever experienced. Truly transformative.",
+                    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200",
+                    "rating": 5
+                },
+                {
+                    "id": "t3",
+                    "name": "Maria Garcia",
+                    "location": "Madrid, Spain",
+                    "text": "The spa treatments were heavenly. Pondicherry is paradise!",
+                    "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200",
+                    "rating": 5
+                }
+            ]
+        },
+        {
+            "id": "cta-wellness",
+            "type": "cta",
+            "enabled": true,
+            "order": 5,
+            "content": {
+                "title": "Ready to Transform Your Life?",
+                "subtitle": "Book your wellness retreat and discover the healing power of Pondicherry.",
+                "buttonText": "Begin Your Journey",
+                "buttonLink": "/booking",
+                "buttonIcon": "ArrowRight",
+                "gradientColors": "from-gray-900 to-gray-800"
+            }
+        }
+    ]
+}

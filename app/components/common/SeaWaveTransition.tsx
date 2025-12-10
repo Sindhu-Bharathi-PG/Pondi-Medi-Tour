@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { Waves, Sparkles, Heart, Leaf } from 'lucide-react';
+import { Heart, Leaf, Sparkles, Waves } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 interface SeaWaveTransitionProps {
       isActive: boolean;
@@ -69,14 +69,14 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
                   iconBg: 'from-amber-400 to-orange-500',
             }
             : {
-                  sky: 'from-teal-400 via-cyan-500 to-blue-500',
-                  wave1: '#14b8a6', // teal-500
-                  wave2: '#0d9488', // teal-600
-                  wave3: '#0f766e', // teal-700
-                  wave4: '#115e59', // teal-800
-                  foam: 'rgba(204, 251, 241, 0.8)', // teal-100
-                  accent: 'text-teal-200',
-                  iconBg: 'from-emerald-400 to-teal-500',
+                  sky: 'from-emerald-400 via-green-500 to-teal-500',
+                  wave1: '#10b981', // emerald-500
+                  wave2: '#059669', // emerald-600
+                  wave3: '#047857', // emerald-700
+                  wave4: '#065f46', // emerald-800
+                  foam: 'rgba(209, 250, 229, 0.8)', // emerald-100
+                  accent: 'text-emerald-200',
+                  iconBg: 'from-emerald-400 to-green-500',
             };
 
       // Animation states
@@ -94,16 +94,16 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
 
                   {/* Animated sun/glow behind waves */}
                   <div
-                        className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl transition-all duration-700 ${isWellness ? 'bg-yellow-300/60' : 'bg-cyan-300/40'
+                        className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl transition-all duration-700 ${isWellness ? 'bg-yellow-300/60' : 'bg-emerald-300/40'
                               } ${isPeak || isExiting ? 'scale-150 opacity-30' : 'scale-100 opacity-60'}`}
                   />
 
                   {/* Wave Layer 4 (Back - darkest) */}
                   <svg
                         className={`absolute bottom-0 w-full transition-transform duration-700 ease-out ${isEntering ? 'translate-y-full' :
-                                    isExiting ? 'translate-y-full' : 'translate-y-0'
+                              isExiting ? 'translate-y-full' : 'translate-y-0'
                               }`}
-                        style={{ transitionDelay: isEntering ? '0ms' : '300ms', height: '70vh' }}
+                        style={{ transitionDelay: isEntering ? '0ms' : '300ms', height: '120vh' }}
                         viewBox="0 0 1440 320"
                         preserveAspectRatio="none"
                   >
@@ -117,9 +117,9 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
                   {/* Wave Layer 3 */}
                   <svg
                         className={`absolute bottom-0 w-full transition-transform duration-600 ease-out ${isEntering ? 'translate-y-full' :
-                                    isExiting ? 'translate-y-full' : 'translate-y-0'
+                              isExiting ? 'translate-y-full' : 'translate-y-0'
                               }`}
-                        style={{ transitionDelay: isEntering ? '100ms' : '200ms', height: '60vh' }}
+                        style={{ transitionDelay: isEntering ? '100ms' : '200ms', height: '120vh' }}
                         viewBox="0 0 1440 320"
                         preserveAspectRatio="none"
                   >
@@ -133,9 +133,9 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
                   {/* Wave Layer 2 */}
                   <svg
                         className={`absolute bottom-0 w-full transition-transform duration-500 ease-out ${isEntering ? 'translate-y-full' :
-                                    isExiting ? 'translate-y-full' : 'translate-y-0'
+                              isExiting ? 'translate-y-full' : 'translate-y-0'
                               }`}
-                        style={{ transitionDelay: isEntering ? '200ms' : '100ms', height: '50vh' }}
+                        style={{ transitionDelay: isEntering ? '200ms' : '100ms', height: '120vh' }}
                         viewBox="0 0 1440 320"
                         preserveAspectRatio="none"
                   >
@@ -149,9 +149,9 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
                   {/* Wave Layer 1 (Front - lightest with foam) */}
                   <svg
                         className={`absolute bottom-0 w-full transition-transform duration-500 ease-out ${isEntering ? 'translate-y-full' :
-                                    isExiting ? 'translate-y-full' : 'translate-y-0'
+                              isExiting ? 'translate-y-full' : 'translate-y-0'
                               }`}
-                        style={{ transitionDelay: isEntering ? '300ms' : '0ms', height: '40vh' }}
+                        style={{ transitionDelay: isEntering ? '300ms' : '0ms', height: '120vh' }}
                         viewBox="0 0 1440 320"
                         preserveAspectRatio="none"
                   >

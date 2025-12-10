@@ -1,19 +1,42 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
+import { clsx, type ClassValue } from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, DollarSign, Globe, Leaf, Menu, Search, Stethoscope, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Phone, Award, Menu, X, Stethoscope, Leaf, Sparkles, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { clsx, type ClassValue } from 'clsx';
+import React, { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { CONTACT_INFO } from '@/app/utils/constants';
-import { useSiteMode, MEDICAL_NAV_LINKS, WELLNESS_NAV_LINKS, THEME_COLORS } from '@/app/context/SiteModeContext';
 
 // Utility for merging tailwind classes
 function cn(...inputs: ClassValue[]) {
       return twMerge(clsx(inputs));
 }
+
+// Language options with flags
+const LANGUAGES = [
+      { code: 'en', name: 'English', flag: '🇺🇸' },
+      { code: 'fr', name: 'Français', flag: '🇫🇷' },
+      { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+      { code: 'es', name: 'Español', flag: '🇪🇸' },
+      { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+      { code: 'zh', name: '中文', flag: '🇨🇳' },
+      { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+];
+
+// Currency options
+const CURRENCIES = [
+      { code: 'USD', symbol: '$', name: 'US Dollar' },
+      { code: 'EUR', symbol: '€', name: 'Euro' },
+      { code: 'GBP', symbol: '£', name: 'British Pound' },
+      { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+      { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+      { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
+      { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+      { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+];
 
 interface HeaderProps {
       highContrast?: boolean;
@@ -26,6 +49,39 @@ const Header: React.FC<HeaderProps> = ({
       const [hasScrolled, setHasScrolled] = useState(false);
       const [hoveredLink, setHoveredLink] = useState<string | null>(null);
       const pathname = usePathname();
+
+      // New state for language, currency, and search
+      const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
+      const [selectedCurrency, setSelectedCurrency] = useState(CURRENCIES[0]);
+      const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+      const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+      const [searchOpen, setSearchOpen] = useState(false);
+      const [searchQuery, setSearchQuery] = useState('');
+
+      const searchInputRef = useRef<HTMLInputElement>(null);
+      const languageDropdownRef = useRef<HTMLDivElement>(null);
+      const currencyDropdownRef = useRef<HTMLDivElement>(null);
+
+      // Close dropdowns when clicking outside
+      useEffect(() => {
+            const handleClickOutside = (event: MouseEvent) => {
+                  if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+                        setLanguageDropdownOpen(false);
+                  }
+                  if (currencyDropdownRef.current && !currencyDropdownRef.current.contains(event.target as Node)) {
+                        setCurrencyDropdownOpen(false);
+                  }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
+
+      // Focus search input when opened
+      useEffect(() => {
+            if (searchOpen && searchInputRef.current) {
+                  searchInputRef.current.focus();
+            }
+      }, [searchOpen]);
 
       // Track scroll for navbar transformation
       useEffect(() => {
@@ -200,7 +256,172 @@ const Header: React.FC<HeaderProps> = ({
                               {/* ----------------------------------------------------------------------
                                   Right: Actions 
                               ---------------------------------------------------------------------- */}
-                              <div className="flex items-center gap-2 pr-1 shrink-0">
+                              <div className="flex items-center gap-1 md:gap-2 pr-1 shrink-0">
+
+                                    {/* Search Bar */}
+                                    <div className="relative hidden md:flex items-center">
+                                          <AnimatePresence>
+                                                {searchOpen && (
+                                                      <motion.div
+                                                            initial={{ width: 0, opacity: 0 }}
+                                                            animate={{ width: 200, opacity: 1 }}
+                                                            exit={{ width: 0, opacity: 0 }}
+                                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                            className="overflow-hidden"
+                                                      >
+                                                            <input
+                                                                  ref={searchInputRef}
+                                                                  type="text"
+                                                                  placeholder="Search treatments..."
+                                                                  value={searchQuery}
+                                                                  onChange={(e) => setSearchQuery(e.target.value)}
+                                                                  onKeyDown={(e) => {
+                                                                        if (e.key === 'Escape') {
+                                                                              setSearchOpen(false);
+                                                                              setSearchQuery('');
+                                                                        }
+                                                                  }}
+                                                                  className={cn(
+                                                                        "w-full px-4 py-2 text-sm rounded-full border outline-none transition-all",
+                                                                        hasScrolled
+                                                                              ? "bg-gray-50 border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-300"
+                                                                              : "bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-white/40"
+                                                                  )}
+                                                            />
+                                                      </motion.div>
+                                                )}
+                                          </AnimatePresence>
+                                          <button
+                                                onClick={() => {
+                                                      if (searchOpen && searchQuery) {
+                                                            // Handle search submission
+                                                            console.log('Searching for:', searchQuery);
+                                                      }
+                                                      setSearchOpen(!searchOpen);
+                                                }}
+                                                className={cn(
+                                                      "p-2 rounded-full transition-colors",
+                                                      hasScrolled
+                                                            ? "hover:bg-gray-100 text-gray-600"
+                                                            : "hover:bg-white/10 text-white/80"
+                                                )}
+                                          >
+                                                <Search className="w-4 h-4" />
+                                          </button>
+                                    </div>
+
+                                    {/* Language Selector */}
+                                    <div ref={languageDropdownRef} className="relative hidden md:block">
+                                          <button
+                                                onClick={() => {
+                                                      setLanguageDropdownOpen(!languageDropdownOpen);
+                                                      setCurrencyDropdownOpen(false);
+                                                }}
+                                                className={cn(
+                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                      hasScrolled
+                                                            ? "hover:bg-gray-100 text-gray-600"
+                                                            : "hover:bg-white/10 text-white/80"
+                                                )}
+                                          >
+                                                <span className="text-base">{selectedLanguage.flag}</span>
+                                                <span className="hidden lg:inline text-xs">{selectedLanguage.code.toUpperCase()}</span>
+                                                <ChevronDown className={cn(
+                                                      "w-3 h-3 transition-transform",
+                                                      languageDropdownOpen && "rotate-180"
+                                                )} />
+                                          </button>
+
+                                          <AnimatePresence>
+                                                {languageDropdownOpen && (
+                                                      <motion.div
+                                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                            transition={{ duration: 0.15 }}
+                                                            className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                      >
+                                                            <div className="p-1">
+                                                                  {LANGUAGES.map((lang) => (
+                                                                        <button
+                                                                              key={lang.code}
+                                                                              onClick={() => {
+                                                                                    setSelectedLanguage(lang);
+                                                                                    setLanguageDropdownOpen(false);
+                                                                              }}
+                                                                              className={cn(
+                                                                                    "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
+                                                                                    selectedLanguage.code === lang.code
+                                                                                          ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                                          : "hover:bg-gray-50 text-gray-700"
+                                                                              )}
+                                                                        >
+                                                                              <span className="text-lg">{lang.flag}</span>
+                                                                              <span>{lang.name}</span>
+                                                                        </button>
+                                                                  ))}
+                                                            </div>
+                                                      </motion.div>
+                                                )}
+                                          </AnimatePresence>
+                                    </div>
+
+                                    {/* Currency Selector */}
+                                    <div ref={currencyDropdownRef} className="relative hidden md:block">
+                                          <button
+                                                onClick={() => {
+                                                      setCurrencyDropdownOpen(!currencyDropdownOpen);
+                                                      setLanguageDropdownOpen(false);
+                                                }}
+                                                className={cn(
+                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                      hasScrolled
+                                                            ? "hover:bg-gray-100 text-gray-600"
+                                                            : "hover:bg-white/10 text-white/80"
+                                                )}
+                                          >
+                                                <DollarSign className="w-4 h-4" />
+                                                <span className="text-xs">{selectedCurrency.code}</span>
+                                                <ChevronDown className={cn(
+                                                      "w-3 h-3 transition-transform",
+                                                      currencyDropdownOpen && "rotate-180"
+                                                )} />
+                                          </button>
+
+                                          <AnimatePresence>
+                                                {currencyDropdownOpen && (
+                                                      <motion.div
+                                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                            transition={{ duration: 0.15 }}
+                                                            className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                      >
+                                                            <div className="p-1">
+                                                                  {CURRENCIES.map((currency) => (
+                                                                        <button
+                                                                              key={currency.code}
+                                                                              onClick={() => {
+                                                                                    setSelectedCurrency(currency);
+                                                                                    setCurrencyDropdownOpen(false);
+                                                                              }}
+                                                                              className={cn(
+                                                                                    "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
+                                                                                    selectedCurrency.code === currency.code
+                                                                                          ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                                          : "hover:bg-gray-50 text-gray-700"
+                                                                              )}
+                                                                        >
+                                                                              <span className="w-6 text-center font-medium">{currency.symbol}</span>
+                                                                              <span>{currency.code}</span>
+                                                                              <span className="text-gray-400 text-xs ml-auto">{currency.name}</span>
+                                                                        </button>
+                                                                  ))}
+                                                            </div>
+                                                      </motion.div>
+                                                )}
+                                          </AnimatePresence>
+                                    </div>
 
                                     {/* Medical/Wellness Toggle */}
                                     <div className={cn(
@@ -222,23 +443,7 @@ const Header: React.FC<HeaderProps> = ({
                                           </div>
                                     </div>
 
-                                    {/* Desktop CTA */}
-                                    <Link
-                                          href="/booking"
-                                          className={cn(
-                                                "hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden relative",
-                                                isMedical
-                                                      ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25"
-                                                      : "bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25"
-                                          )}
-                                    >
-                                          <span className="relative z-10 flex items-center gap-2">
-                                                Book Now
-                                                <Sparkles className="w-3.5 h-3.5" />
-                                          </span>
-                                          {/* Shine-over effect */}
-                                          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                                    </Link>
+
 
                                     {/* Mobile Menu Toggle */}
                                     <button
@@ -325,6 +530,116 @@ const Header: React.FC<HeaderProps> = ({
 
                                           {/* Mobile Actions */}
                                           <div className="space-y-4">
+                                                {/* Mobile Search */}
+                                                <div className="relative">
+                                                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                                      <input
+                                                            type="text"
+                                                            placeholder="Search treatments, hospitals..."
+                                                            value={searchQuery}
+                                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                                            className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300"
+                                                      />
+                                                </div>
+
+                                                {/* Mobile Language & Currency Row */}
+                                                <div className="flex gap-3">
+                                                      {/* Language Selector */}
+                                                      <div className="flex-1 relative">
+                                                            <button
+                                                                  onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+                                                                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100"
+                                                            >
+                                                                  <div className="flex items-center gap-2">
+                                                                        <Globe className="w-4 h-4 text-gray-500" />
+                                                                        <span className="text-sm font-medium text-gray-600">Language</span>
+                                                                  </div>
+                                                                  <div className="flex items-center gap-1.5">
+                                                                        <span className="text-base">{selectedLanguage.flag}</span>
+                                                                        <span className="text-xs text-gray-500">{selectedLanguage.code.toUpperCase()}</span>
+                                                                  </div>
+                                                            </button>
+
+                                                            <AnimatePresence>
+                                                                  {languageDropdownOpen && (
+                                                                        <motion.div
+                                                                              initial={{ opacity: 0, y: -5 }}
+                                                                              animate={{ opacity: 1, y: 0 }}
+                                                                              exit={{ opacity: 0, y: -5 }}
+                                                                              className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                                        >
+                                                                              <div className="p-1 max-h-48 overflow-y-auto">
+                                                                                    {LANGUAGES.map((lang) => (
+                                                                                          <button
+                                                                                                key={lang.code}
+                                                                                                onClick={() => {
+                                                                                                      setSelectedLanguage(lang);
+                                                                                                      setLanguageDropdownOpen(false);
+                                                                                                }}
+                                                                                                className={cn(
+                                                                                                      "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
+                                                                                                      selectedLanguage.code === lang.code
+                                                                                                            ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                                                            : "hover:bg-gray-50 text-gray-700"
+                                                                                                )}
+                                                                                          >
+                                                                                                <span className="text-lg">{lang.flag}</span>
+                                                                                                <span>{lang.name}</span>
+                                                                                          </button>
+                                                                                    ))}
+                                                                              </div>
+                                                                        </motion.div>
+                                                                  )}
+                                                            </AnimatePresence>
+                                                      </div>
+
+                                                      {/* Currency Selector */}
+                                                      <div className="flex-1 relative">
+                                                            <button
+                                                                  onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
+                                                                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100"
+                                                            >
+                                                                  <div className="flex items-center gap-2">
+                                                                        <DollarSign className="w-4 h-4 text-gray-500" />
+                                                                        <span className="text-sm font-medium text-gray-600">Currency</span>
+                                                                  </div>
+                                                                  <span className="text-xs font-medium text-gray-700">{selectedCurrency.code}</span>
+                                                            </button>
+
+                                                            <AnimatePresence>
+                                                                  {currencyDropdownOpen && (
+                                                                        <motion.div
+                                                                              initial={{ opacity: 0, y: -5 }}
+                                                                              animate={{ opacity: 1, y: 0 }}
+                                                                              exit={{ opacity: 0, y: -5 }}
+                                                                              className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                                        >
+                                                                              <div className="p-1 max-h-48 overflow-y-auto">
+                                                                                    {CURRENCIES.map((currency) => (
+                                                                                          <button
+                                                                                                key={currency.code}
+                                                                                                onClick={() => {
+                                                                                                      setSelectedCurrency(currency);
+                                                                                                      setCurrencyDropdownOpen(false);
+                                                                                                }}
+                                                                                                className={cn(
+                                                                                                      "w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors",
+                                                                                                      selectedCurrency.code === currency.code
+                                                                                                            ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                                                            : "hover:bg-gray-50 text-gray-700"
+                                                                                                )}
+                                                                                          >
+                                                                                                <span className="w-5 text-center font-medium">{currency.symbol}</span>
+                                                                                                <span>{currency.code}</span>
+                                                                                          </button>
+                                                                                    ))}
+                                                                              </div>
+                                                                        </motion.div>
+                                                                  )}
+                                                            </AnimatePresence>
+                                                      </div>
+                                                </div>
+
                                                 <button
                                                       onClick={toggleMode}
                                                       className="w-full flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
@@ -337,19 +652,6 @@ const Header: React.FC<HeaderProps> = ({
                                                             </span>
                                                       </div>
                                                 </button>
-
-                                                <Link
-                                                      href="/booking"
-                                                      onClick={() => setMobileMenuOpen(false)}
-                                                      className={cn(
-                                                            "block w-full py-4 rounded-xl text-center font-bold text-white shadow-lg transition-transform active:scale-95",
-                                                            isMedical
-                                                                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20"
-                                                                  : "bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/20"
-                                                      )}
-                                                >
-                                                      Book Consultation
-                                                </Link>
                                           </div>
                                     </motion.div>
                               </motion.div>

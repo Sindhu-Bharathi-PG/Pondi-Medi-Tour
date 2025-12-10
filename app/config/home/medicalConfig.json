@@ -1,0 +1,222 @@
+{
+    "mode": "medical",
+    "version": "1.0.0",
+    "lastModified": "2025-12-10T00:00:00Z",
+    "sections": [
+        {
+            "id": "hero-medical",
+            "type": "hero",
+            "enabled": true,
+            "order": 1,
+            "content": {
+                "badge": {
+                    "icon": "Shield",
+                    "text": "NABH & JCI Accredited Network",
+                    "rating": "4.9/5 Rating"
+                },
+                "title": {
+                    "line1": "World-Class",
+                    "line2": "Healthcare"
+                },
+                "subtitle": "Save up to 70% on medical procedures at India's top NABH-accredited hospitals. From heart surgery to fertility treatments, with complete travel support.",
+                "primaryCTA": {
+                    "text": "Free Consultation",
+                    "link": "/booking",
+                    "icon": "ArrowRight"
+                },
+                "secondaryCTA": {
+                    "text": "Calculate Savings",
+                    "link": "/cost-calculator",
+                    "icon": "DollarSign"
+                },
+                "helpline": {
+                    "label": "24/7 Helpline",
+                    "number": "+91-9876543210"
+                },
+                "backgroundImage": "https://images.unsplash.com/photo-1551076805-e1869033e561?w=1920",
+                "gradientColors": "from-emerald-900/95 via-teal-800/80 to-transparent"
+            },
+            "stats": [
+                {
+                    "value": "15,000+",
+                    "label": "Patients Treated",
+                    "icon": "Users",
+                    "animateValue": 15000
+                },
+                {
+                    "value": "70%",
+                    "label": "Cost Savings",
+                    "icon": "DollarSign",
+                    "animateValue": 70
+                },
+                {
+                    "value": "50+",
+                    "label": "NABH Hospitals",
+                    "icon": "Building2",
+                    "animateValue": 50
+                },
+                {
+                    "value": "500+",
+                    "label": "Specialists",
+                    "icon": "Stethoscope",
+                    "animateValue": 500
+                }
+            ]
+        },
+        {
+            "id": "treatments-medical",
+            "type": "treatments",
+            "enabled": true,
+            "order": 2,
+            "content": {
+                "badge": {
+                    "icon": "Stethoscope",
+                    "text": "Medical Excellence"
+                },
+                "title": "World-Class Treatments",
+                "subtitle": "Access the same quality care as Western hospitals at a fraction of the cost.",
+                "viewAllLink": "/services",
+                "viewAllText": "View All Treatments"
+            },
+            "items": [
+                {
+                    "id": "cardiac",
+                    "icon": "Heart",
+                    "title": "Cardiac Care",
+                    "description": "World-class heart surgery at 70% less cost",
+                    "savings": "70%",
+                    "procedures": [
+                        "Bypass Surgery",
+                        "Angioplasty",
+                        "Valve Replacement"
+                    ],
+                    "color": "from-red-500 to-pink-500"
+                },
+                {
+                    "id": "orthopedics",
+                    "icon": "Building2",
+                    "title": "Orthopedics",
+                    "description": "Joint replacements with rapid recovery",
+                    "savings": "65%",
+                    "procedures": [
+                        "Knee Replacement",
+                        "Hip Replacement",
+                        "Spine Surgery"
+                    ],
+                    "color": "from-blue-500 to-indigo-500"
+                },
+                {
+                    "id": "ivf",
+                    "icon": "Users",
+                    "title": "IVF & Fertility",
+                    "description": "Premium fertility treatments with high success",
+                    "savings": "60%",
+                    "procedures": [
+                        "IVF",
+                        "ICSI",
+                        "Egg Freezing"
+                    ],
+                    "color": "from-purple-500 to-pink-500"
+                },
+                {
+                    "id": "cancer",
+                    "icon": "Stethoscope",
+                    "title": "Cancer Care",
+                    "description": "Comprehensive oncology with latest technology",
+                    "savings": "75%",
+                    "procedures": [
+                        "Chemotherapy",
+                        "Radiation",
+                        "Surgery"
+                    ],
+                    "color": "from-teal-500 to-cyan-500"
+                }
+            ]
+        },
+        {
+            "id": "hospitals-medical",
+            "type": "hospitals",
+            "enabled": true,
+            "order": 3,
+            "content": {
+                "title": "Partner Hospitals",
+                "subtitle": "NABH & JCI accredited medical institutions",
+                "viewAllLink": "/hospital",
+                "viewAllText": "View All Hospitals"
+            },
+            "items": [
+                {
+                    "id": "jipmer",
+                    "name": "JIPMER",
+                    "type": "Government",
+                    "accreditation": "NABH",
+                    "image": "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=400"
+                },
+                {
+                    "id": "gem",
+                    "name": "GEM Hospital",
+                    "type": "Private",
+                    "accreditation": "NABH",
+                    "image": "https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=400"
+                },
+                {
+                    "id": "aravind",
+                    "name": "Aravind Eye",
+                    "type": "Specialty",
+                    "accreditation": "JCI",
+                    "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400"
+                }
+            ]
+        },
+        {
+            "id": "howItWorks-medical",
+            "type": "howItWorks",
+            "enabled": true,
+            "order": 4,
+            "content": {
+                "title": "How It Works",
+                "subtitle": "Your medical journey in 4 simple steps"
+            },
+            "steps": [
+                {
+                    "id": "step1",
+                    "step": 1,
+                    "title": "Free Consultation",
+                    "description": "Share your medical reports for review"
+                },
+                {
+                    "id": "step2",
+                    "step": 2,
+                    "title": "Treatment Plan",
+                    "description": "Get personalized options & cost estimate"
+                },
+                {
+                    "id": "step3",
+                    "step": 3,
+                    "title": "Travel & Stay",
+                    "description": "We arrange visa, flights & accommodation"
+                },
+                {
+                    "id": "step4",
+                    "step": 4,
+                    "title": "Treatment & Recovery",
+                    "description": "Quality care with complete support"
+                }
+            ]
+        },
+        {
+            "id": "cta-medical",
+            "type": "cta",
+            "enabled": true,
+            "order": 5,
+            "content": {
+                "title": "Ready to Save on Healthcare?",
+                "subtitle": "Get a free consultation and cost estimate within 24 hours.",
+                "buttonText": "Book Free Consultation",
+                "buttonLink": "/booking",
+                "buttonIcon": "ArrowRight",
+                "gradientColors": "from-gray-900 to-gray-800"
+            }
+        }
+    ]
+}
