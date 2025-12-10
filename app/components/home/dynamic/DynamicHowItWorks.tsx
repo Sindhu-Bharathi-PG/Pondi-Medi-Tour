@@ -1,7 +1,6 @@
 "use client";
 
-import EditableText from '@/app/components/admin/EditableText';
-import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
+// Simplified HowItWorks: render static content
 import { HowItWorksSectionConfig } from '@/app/types/homeConfig.types';
 
 interface DynamicHowItWorksProps {
@@ -10,14 +9,6 @@ interface DynamicHowItWorksProps {
 }
 
 export default function DynamicHowItWorks({ config, mode }: DynamicHowItWorksProps) {
-    const homeConfig = useHomeConfigOptional();
-    const isEditing = homeConfig?.isEditing ?? false;
-
-    const handleContentUpdate = (path: string, value: string) => {
-        if (homeConfig) {
-            homeConfig.updateSectionContent(config.id, path, value);
-        }
-    };
 
     // Theme colors based on mode
     const themeColors = mode === 'medical'
@@ -35,20 +26,8 @@ export default function DynamicHowItWorks({ config, mode }: DynamicHowItWorksPro
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <EditableText
-                        value={config.content.title}
-                        onSave={(v) => handleContentUpdate('content.title', v)}
-                        isEditing={isEditing}
-                        className="text-4xl font-bold text-gray-800 mb-4"
-                        as="h2"
-                    />
-                    <EditableText
-                        value={config.content.subtitle}
-                        onSave={(v) => handleContentUpdate('content.subtitle', v)}
-                        isEditing={isEditing}
-                        className="text-xl text-gray-600"
-                        as="p"
-                    />
+                    <h2 className="text-4xl font-bold text-gray-800 mb-4">{config.content.title}</h2>
+                    <p className="text-xl text-gray-600">{config.content.subtitle}</p>
                 </div>
 
                 {/* Steps */}

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Calculator, DollarSign, Plane, Building2, Stethoscope, Shield, ChevronRight, TrendingDown, CheckCircle, Globe } from 'lucide-react';
-import { Header, Footer } from '../components/common';
+import { Calculator, ChevronRight, Globe, Shield, Stethoscope, TrendingDown } from 'lucide-react';
+import { useState } from 'react';
+import { Footer, Header } from '../components/common';
+import { ConvertedPrice } from '../components/common/ConvertedPrice';
 import { useScrolled } from '../hooks';
 
 const CostCalculatorPage = () => {
@@ -85,18 +86,24 @@ const CostCalculatorPage = () => {
                                                       <div className="grid md:grid-cols-2 gap-8 mb-8">
                                                             <div className="bg-red-50 rounded-2xl p-6 border-2 border-red-100">
                                                                   <Globe className="w-5 h-5 text-red-600 mb-2" />
-                                                                  <div className="text-4xl font-bold text-red-600">${homePrice.toLocaleString()}</div>
+                                                                  <div className="text-4xl font-bold text-red-600">
+                                                                        <ConvertedPrice amount={homePrice} fromCurrency="USD" />
+                                                                  </div>
                                                                   <p className="text-red-600/70 text-sm">In {countries.find(c => c.id === selectedCountry)?.name}</p>
                                                             </div>
                                                             <div className="bg-emerald-50 rounded-2xl p-6 border-2 border-emerald-200">
                                                                   <Shield className="w-5 h-5 text-emerald-600 mb-2" />
-                                                                  <div className="text-4xl font-bold text-emerald-600">${totalPackage.toLocaleString()}</div>
+                                                                  <div className="text-4xl font-bold text-emerald-600">
+                                                                        <ConvertedPrice amount={totalPackage} fromCurrency="USD" />
+                                                                  </div>
                                                                   <p className="text-emerald-600/70 text-sm">All-Inclusive Pondicherry Package</p>
                                                             </div>
                                                       </div>
                                                       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8 text-white text-center mb-8">
                                                             <div className="text-lg mb-2">Your Total Savings</div>
-                                                            <div className="text-5xl font-bold mb-2">${savings.toLocaleString()}</div>
+                                                            <div className="text-5xl font-bold mb-2">
+                                                                  <ConvertedPrice amount={savings} fromCurrency="USD" />
+                                                            </div>
                                                             <div className="text-emerald-100">That&apos;s <span className="font-bold text-yellow-300">{savingsPercent}%</span> savings!</div>
                                                       </div>
                                                       <div className="text-center">

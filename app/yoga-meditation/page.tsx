@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import { Footer, Header } from '@/app/components/common';
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+import { useScrolled } from '@/app/hooks';
+import { CheckCircle, ChevronRight, Clock, Heart, Moon, Sun, Wind } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sun, Moon, Sparkles, Heart, Wind, Leaf, Clock, MapPin, Star, ChevronRight, CheckCircle, Users, Calendar } from 'lucide-react';
-import { Header, Footer } from '@/app/components/common';
-import { useScrolled } from '@/app/hooks';
 
 const YogaMeditationPage = () => {
       const scrolled = useScrolled(50);
@@ -14,7 +14,7 @@ const YogaMeditationPage = () => {
             {
                   name: 'Beginner Yoga Retreat',
                   duration: '5 days',
-                  price: 'From $599',
+                  basePrice: 599,
                   image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
                   includes: ['Daily 2-hour yoga sessions', 'Pranayama classes', 'Meditation basics', 'Healthy vegetarian meals', 'Beach sunrise sessions'],
                   level: 'Beginner'
@@ -22,7 +22,7 @@ const YogaMeditationPage = () => {
             {
                   name: 'Advanced Ashtanga Intensive',
                   duration: '10 days',
-                  price: 'From $1,299',
+                  basePrice: 1299,
                   image: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=800',
                   includes: ['5 hours daily practice', 'Mysore-style training', 'Philosophy lectures', 'One-on-one guidance', 'Certificate of completion'],
                   level: 'Advanced'
@@ -30,7 +30,7 @@ const YogaMeditationPage = () => {
             {
                   name: 'Silent Meditation Retreat',
                   duration: '7 days',
-                  price: 'From $899',
+                  basePrice: 899,
                   image: 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800',
                   includes: ['Vipassana meditation', 'Noble silence practice', 'Walking meditation', 'Dharma talks', 'Ashram accommodation'],
                   level: 'All Levels'
@@ -38,12 +38,46 @@ const YogaMeditationPage = () => {
             {
                   name: 'Yoga Teacher Training (200hr)',
                   duration: '28 days',
-                  price: 'From $2,499',
+                  basePrice: 2499,
                   image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800',
                   includes: ['Yoga Alliance certified', 'Anatomy & philosophy', 'Teaching methodology', 'Practicum sessions', 'Lifetime support'],
                   level: 'Intermediate+'
             },
       ];
+
+      // ... (rest of the file until the map function)
+
+      {
+            programs.map((program, i) => (
+                  <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all flex flex-col md:flex-row">
+                        <div className="relative w-full md:w-1/3 h-48 md:h-auto">
+                              <Image src={program.image} alt={program.name} fill className="object-cover" />
+                              <div className="absolute top-4 left-4">
+                                    <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">{program.level}</span>
+                              </div>
+                        </div>
+                        <div className="flex-1 p-6">
+                              <h3 className="text-xl font-bold text-gray-800 mb-2">{program.name}</h3>
+                              <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
+                                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{program.duration}</span>
+                                    <span className="text-amber-600 font-semibold flex gap-1">
+                                          From <ConvertedPrice amount={program.basePrice} fromCurrency="USD" />
+                                    </span>
+                              </div>
+                              <ul className="space-y-2 mb-4">
+                                    {program.includes.slice(0, 4).map((item, j) => (
+                                          <li key={j} className="flex items-center gap-2 text-gray-600 text-sm">
+                                                <CheckCircle className="w-4 h-4 text-green-500" />{item}
+                                          </li>
+                                    ))}
+                              </ul>
+                              <Link href="/booking" className="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:shadow-lg transition-all">
+                                    Book Now
+                              </Link>
+                        </div>
+                  </div>
+            ))
+      }
 
       const styles = [
             { name: 'Hatha Yoga', icon: Sun, desc: 'Traditional poses for balance' },
@@ -122,7 +156,9 @@ const YogaMeditationPage = () => {
                                                       <h3 className="text-xl font-bold text-gray-800 mb-2">{program.name}</h3>
                                                       <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
                                                             <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{program.duration}</span>
-                                                            <span className="text-amber-600 font-semibold">{program.price}</span>
+                                                            <span className="text-amber-600 font-semibold flex gap-1">
+                                                                  From <ConvertedPrice amount={program.basePrice} fromCurrency="USD" />
+                                                            </span>
                                                       </div>
                                                       <ul className="space-y-2 mb-4">
                                                             {program.includes.slice(0, 4).map((item, j) => (

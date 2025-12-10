@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
-import Image from 'next/image';
 import { HYBRID_PACKAGES } from '@/app/utils/constants';
+import Image from 'next/image';
+import React from 'react';
 
 const HybridPackages: React.FC = () => {
       return (
@@ -34,7 +34,9 @@ const HybridPackages: React.FC = () => {
                                                 <h3 className="text-2xl font-bold mb-3 text-gray-800">{pkg.title}</h3>
                                                 <p className="text-gray-600 mb-4 leading-relaxed">{pkg.description}</p>
                                                 <div className="flex justify-between items-center">
-                                                      <span className="text-3xl font-bold text-emerald-600">{pkg.price}</span>
+                                                      <div className="text-3xl font-bold text-emerald-600">
+                                                            From <ConvertedPrice amount={index === 0 ? 8500 : 6200} fromCurrency="USD" />
+                                                      </div>
                                                       <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all">
                                                             Learn More
                                                       </button>

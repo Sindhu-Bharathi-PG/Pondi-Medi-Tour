@@ -1,7 +1,6 @@
 "use client";
 
-import EditableText from '@/app/components/admin/EditableText';
-import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
+// Simplified hospitals: render content without admin hooks
 import { HospitalsSectionConfig } from '@/app/types/homeConfig.types';
 import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
@@ -13,14 +12,6 @@ interface DynamicHospitalsProps {
 }
 
 export default function DynamicHospitals({ config, mode }: DynamicHospitalsProps) {
-    const homeConfig = useHomeConfigOptional();
-    const isEditing = homeConfig?.isEditing ?? false;
-
-    const handleContentUpdate = (path: string, value: string) => {
-        if (homeConfig) {
-            homeConfig.updateSectionContent(config.id, path, value);
-        }
-    };
 
     // Theme colors based on mode
     const themeColors = mode === 'medical'
@@ -40,20 +31,8 @@ export default function DynamicHospitals({ config, mode }: DynamicHospitalsProps
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <EditableText
-                        value={config.content.title}
-                        onSave={(v) => handleContentUpdate('content.title', v)}
-                        isEditing={isEditing}
-                        className="text-4xl font-bold mb-4"
-                        as="h2"
-                    />
-                    <EditableText
-                        value={config.content.subtitle}
-                        onSave={(v) => handleContentUpdate('content.subtitle', v)}
-                        isEditing={isEditing}
-                        className={`text-xl ${themeColors.subtitleColor}`}
-                        as="p"
-                    />
+                    <h2 className="text-4xl font-bold mb-4">{config.content.title}</h2>
+                    <p className={`text-xl ${themeColors.subtitleColor}`}>{config.content.subtitle}</p>
                 </div>
 
                 {/* Hospitals Grid */}

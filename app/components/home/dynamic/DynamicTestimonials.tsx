@@ -1,7 +1,6 @@
 "use client";
 
-import EditableText from '@/app/components/admin/EditableText';
-import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
+// Simplified Testimonials: render static content
 import { TestimonialsSectionConfig } from '@/app/types/homeConfig.types';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
@@ -13,26 +12,16 @@ interface DynamicTestimonialsProps {
 }
 
 export default function DynamicTestimonials({ config, mode }: DynamicTestimonialsProps) {
-    const homeConfig = useHomeConfigOptional();
-    const isEditing = homeConfig?.isEditing ?? false;
     const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-    const handleContentUpdate = (path: string, value: string) => {
-        if (homeConfig) {
-            homeConfig.updateSectionContent(config.id, path, value);
-        }
-    };
 
     // Auto-rotate testimonials
     useEffect(() => {
-        if (isEditing) return; // Don't auto-rotate in edit mode
-
         const timer = setInterval(() => {
             setActiveTestimonial(prev => (prev + 1) % config.items.length);
         }, 5000);
 
         return () => clearInterval(timer);
-    }, [config.items.length, isEditing]);
+    }, [config.items.length]);
 
     // Theme colors based on mode
     const themeColors = mode === 'medical'
@@ -54,20 +43,8 @@ export default function DynamicTestimonials({ config, mode }: DynamicTestimonial
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <EditableText
-                        value={config.content.title}
-                        onSave={(v) => handleContentUpdate('content.title', v)}
-                        isEditing={isEditing}
-                        className="text-4xl font-bold text-gray-800 mb-4"
-                        as="h2"
-                    />
-                    <EditableText
-                        value={config.content.subtitle}
-                        onSave={(v) => handleContentUpdate('content.subtitle', v)}
-                        isEditing={isEditing}
-                        className="text-xl text-gray-600"
-                        as="p"
-                    />
+                    <h2 className="text-4xl font-bold text-gray-800 mb-4">{config.content.title}</h2>
+                    <p className="text-xl text-gray-600">{config.content.subtitle}</p>
                 </div>
 
                 {/* Testimonials Carousel */}

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import { Footer, Header } from '@/app/components/common';
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+import { useScrolled } from '@/app/hooks';
+import { Award, Calendar, Car, CheckCircle, ChevronRight, Globe, Heart, Hotel, Phone, Plane, Shield, Sparkles, Users, Utensils } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plane, Hotel, Car, Utensils, Heart, Shield, Clock, Star, CheckCircle, ChevronRight, Calendar, Users, Globe, Award, Sparkles, MapPin, Phone } from 'lucide-react';
-import { Header, Footer } from '@/app/components/common';
-import { useScrolled } from '@/app/hooks';
+import { useState } from 'react';
 
 const PackagesPage = () => {
       const scrolled = useScrolled(50);
@@ -16,7 +17,7 @@ const PackagesPage = () => {
                   id: 'essential',
                   name: 'Essential Care',
                   tagline: 'Quality treatment, smart savings',
-                  price: 'From $4,999',
+                  basePrice: 4999,
                   duration: '7-10 days',
                   image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
                   color: 'from-blue-600 to-cyan-500',
@@ -35,7 +36,7 @@ const PackagesPage = () => {
                   id: 'premium',
                   name: 'Premium Wellness',
                   tagline: 'Complete care with luxury comfort',
-                  price: 'From $8,999',
+                  basePrice: 8999,
                   duration: '14-18 days',
                   image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
                   color: 'from-emerald-600 to-teal-500',
@@ -56,7 +57,7 @@ const PackagesPage = () => {
                   id: 'luxury',
                   name: 'Luxury Healing Journey',
                   tagline: 'World-class care, unmatched luxury',
-                  price: 'From $15,999',
+                  basePrice: 15999,
                   duration: '21-28 days',
                   image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
                   color: 'from-amber-600 to-orange-500',
@@ -78,10 +79,10 @@ const PackagesPage = () => {
       ];
 
       const addons = [
-            { icon: Users, name: 'Companion Package', price: '+$1,500', desc: 'Accommodation & meals for 1 companion' },
-            { icon: Plane, name: 'Business Class Upgrade', price: '+$2,000', desc: 'Comfortable long-haul travel' },
-            { icon: Sparkles, name: 'Extended Wellness', price: '+$800', desc: '7-day spa & yoga retreat' },
-            { icon: Globe, name: 'Medical Tourism Visa', price: 'Included', desc: 'Complete documentation support' }
+            { icon: Users, name: 'Companion Package', priceAmount: 1500, desc: 'Accommodation & meals for 1 companion' },
+            { icon: Plane, name: 'Business Class Upgrade', priceAmount: 2000, desc: 'Comfortable long-haul travel' },
+            { icon: Sparkles, name: 'Extended Wellness', priceAmount: 800, desc: '7-day spa & yoga retreat' },
+            { icon: Globe, name: 'Medical Tourism Visa', priceText: 'Included', desc: 'Complete documentation support' }
       ];
 
       return (
@@ -158,7 +159,9 @@ const PackagesPage = () => {
                                                 <div className="p-6">
                                                       <div className="flex items-end justify-between mb-6">
                                                             <div>
-                                                                  <div className="text-3xl font-bold text-gray-800">{pkg.price}</div>
+                                                                  <div className="text-3xl font-bold text-gray-800">
+                                                                        From <ConvertedPrice amount={pkg.basePrice} fromCurrency="USD" />
+                                                                  </div>
                                                                   <div className="text-gray-500">{pkg.duration}</div>
                                                             </div>
                                                             <div className="flex gap-2">
@@ -200,7 +203,13 @@ const PackagesPage = () => {
                                           <div key={i} className="bg-gray-50 rounded-2xl p-6 text-center hover:bg-gray-100 transition-colors">
                                                 <addon.icon className="w-10 h-10 text-emerald-600 mx-auto mb-4" />
                                                 <h4 className="font-bold text-gray-800 mb-1">{addon.name}</h4>
-                                                <div className="text-emerald-600 font-semibold mb-2">{addon.price}</div>
+                                                <div className="text-emerald-600 font-semibold mb-2">
+                                                      {addon.priceAmount ? (
+                                                            <>+<ConvertedPrice amount={addon.priceAmount} fromCurrency="USD" /></>
+                                                      ) : (
+                                                            addon.priceText
+                                                      )}
+                                                </div>
                                                 <p className="text-gray-500 text-sm">{addon.desc}</p>
                                           </div>
                                     ))}

@@ -1,7 +1,6 @@
 "use client";
 
-import EditableText from '@/app/components/admin/EditableText';
-import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
+// Simplified WhyPondicherry: render static content
 import { WhyPondicherrySectionConfig } from '@/app/types/homeConfig.types';
 import { getIcon } from '@/app/utils/iconMap';
 import Image from 'next/image';
@@ -11,34 +10,14 @@ interface DynamicWhyPondicherryProps {
 }
 
 export default function DynamicWhyPondicherry({ config }: DynamicWhyPondicherryProps) {
-    const homeConfig = useHomeConfigOptional();
-    const isEditing = homeConfig?.isEditing ?? false;
-
-    const handleContentUpdate = (path: string, value: string) => {
-        if (homeConfig) {
-            homeConfig.updateSectionContent(config.id, path, value);
-        }
-    };
 
     return (
         <section className="py-24 bg-gradient-to-r from-amber-600 to-orange-500 text-white overflow-hidden">
             <div className="container mx-auto px-4">
                 <div className="grid md:grid-cols-2 gap-16 items-center">
                     <div>
-                        <EditableText
-                            value={config.content.title}
-                            onSave={(v) => handleContentUpdate('content.title', v)}
-                            isEditing={isEditing}
-                            className="text-4xl md:text-5xl font-bold mb-6"
-                            as="h2"
-                        />
-                        <EditableText
-                            value={config.content.subtitle}
-                            onSave={(v) => handleContentUpdate('content.subtitle', v)}
-                            isEditing={isEditing}
-                            className="text-xl text-amber-100 mb-8"
-                            as="p"
-                        />
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6">{config.content.title}</h2>
+                        <p className="text-xl text-amber-100 mb-8">{config.content.subtitle}</p>
 
                         {/* Features List */}
                         <div className="space-y-4">

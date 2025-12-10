@@ -1,10 +1,10 @@
 "use client";
 
-import React from 'react';
+import { ChevronRight, Flower2, Heart, Leaf, MapPin, MoonStar, Sparkles, Star, Sun, TreePine, Waves } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Leaf, Sparkles, Sun, Heart, MapPin, Star, Clock, Users, ChevronRight, Waves, TreePine, Flower2, MoonStar } from 'lucide-react';
-import { Header, Footer } from '../components/common';
+import { Footer, Header } from '../components/common';
+import { ConvertedPrice } from '../components/common/ConvertedPrice';
 import { useScrolled } from '../hooks';
 
 const WellnessPage = () => {
@@ -17,7 +17,8 @@ const WellnessPage = () => {
                   duration: '7 days',
                   location: 'Traditional Wellness Centre',
                   image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
-                  price: '$1,200-1,500',
+                  priceMin: 1200,
+                  priceMax: 1500,
                   rating: 4.9,
                   reviews: 230,
                   includes: ['Daily Abhyanga Massage', 'Panchakarma Treatments', 'Shirodhara Therapy', 'Sattvic Diet (Pure Foods)', 'Daily Meditation'],
@@ -30,7 +31,8 @@ const WellnessPage = () => {
                   duration: '14 days',
                   location: 'Sri Aurobindo Ashram',
                   image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
-                  price: '$1,500-2,000',
+                  priceMin: 1500,
+                  priceMax: 2000,
                   rating: 4.9,
                   reviews: 312,
                   includes: ['2hr Morning Yoga', '1hr Evening Yoga', 'Ashram Meditation', 'Philosophy Teachings', 'Beach Walks', 'Cultural Tours'],
@@ -43,7 +45,8 @@ const WellnessPage = () => {
                   duration: '21 days',
                   location: 'Quiet Healing Centre, Auroville',
                   image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
-                  price: '$2,500-3,500',
+                  priceMin: 2500,
+                  priceMax: 3500,
                   rating: 4.9,
                   reviews: 145,
                   includes: ['Ayurveda + Yoga + Naturopathy', 'Intensive Daily Schedule', 'Lifestyle Coaching', 'Complete Transformation', 'Expert Consultations'],
@@ -56,7 +59,8 @@ const WellnessPage = () => {
                   duration: '14 days',
                   location: 'Beach Resort, ECR',
                   image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800',
-                  price: '$2,000-2,500',
+                  priceMin: 2000,
+                  priceMax: 2500,
                   rating: 4.8,
                   reviews: 167,
                   includes: ['Aquatic Therapy', 'Physiotherapy', 'Gentle Yoga', 'Organic Meals', 'Spa Treatments'],
@@ -68,7 +72,8 @@ const WellnessPage = () => {
                   duration: '7-14 days',
                   location: 'Auroville Community',
                   image: 'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=800',
-                  price: '$1,200-1,800',
+                  priceMin: 1200,
+                  priceMax: 1800,
                   rating: 4.8,
                   reviews: 198,
                   includes: ['Eco-friendly Stay', 'Organic Farm Tours', 'Sustainable Living Workshops', 'Forest Walks', 'Community Dining'],
@@ -80,7 +85,8 @@ const WellnessPage = () => {
                   duration: '7 days',
                   location: 'Heritage Hotel, White Town',
                   image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800',
-                  price: '$1,500-2,000',
+                  priceMin: 1500,
+                  priceMax: 2000,
                   rating: 4.9,
                   reviews: 89,
                   includes: ['Colonial Villa Stay', 'French Cuisine', 'Beach Walks', 'Cultural Tours', 'Spa Access'],
@@ -278,7 +284,9 @@ const WellnessPage = () => {
 
                                                       <div className="flex items-center justify-between pt-4 border-t">
                                                             <div>
-                                                                  <span className="text-2xl font-bold text-orange-600">{pkg.price}</span>
+                                                                  <span className="text-2xl font-bold text-orange-600 flex gap-1 items-center">
+                                                                        <ConvertedPrice amount={pkg.priceMin} fromCurrency="USD" /> - <ConvertedPrice amount={pkg.priceMax} fromCurrency="USD" />
+                                                                  </span>
                                                             </div>
                                                             <Link
                                                                   href={`/wellness/${pkg.id}`}
@@ -315,7 +323,9 @@ const WellnessPage = () => {
                                                 </div>
                                                 <div className="p-4">
                                                       <div className="flex items-center justify-between">
-                                                            <span className="text-xl font-bold text-orange-600">{pkg.price}</span>
+                                                            <span className="text-xl font-bold text-orange-600 flex gap-1 items-center">
+                                                                  <ConvertedPrice amount={pkg.priceMin} fromCurrency="USD" /> - <ConvertedPrice amount={pkg.priceMax} fromCurrency="USD" />
+                                                            </span>
                                                             <div className="flex items-center gap-1 text-sm text-gray-500">
                                                                   <Star className="w-4 h-4 text-yellow-500 fill-current" />
                                                                   {pkg.rating} ({pkg.reviews})
