@@ -131,11 +131,11 @@ const hospitalData: Record<string, any> = {
             { id: 6, name: 'PIMS', specialty: 'Orthopedics', distance: '5.5 km' }
         ],
         touristPlaces: [
-            { name: 'Promenade Beach', distance: '3.1 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/promenade_beach_1765435308827.png' },
-            { name: 'Auroville', distance: '10 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/aurovill_community_1765435371629.png' },
-            { name: 'Paradise Beach', distance: '8.5 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/paradise_beach_1765435394672.png' },
-            { name: 'French Quarter', distance: '2.5 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/french_quarter_1765435419521.png' },
-            { name: 'Sri Aurobindo Ashram', distance: '4.5 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/sri_auro_bindo_ashram_1765435443216.png' },
+            { name: 'Promenade Beach', distance: '3.1 km', image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400' },
+            { name: 'Auroville', distance: '10 km', image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400' },
+            { name: 'Paradise Beach', distance: '8.5 km', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400' },
+            { name: 'French Quarter', distance: '2.5 km', image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=400' },
+            { name: 'Sri Aurobindo Ashram', distance: '4.5 km', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=400' },
             { name: 'Botanical Garden', distance: '5 km', image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400' },
             { name: 'Manakula Vinayagar Temple', distance: '4 km', image: 'https://images.unsplash.com/photo-1623945939223-93d39587428f?w=400' },
             { name: 'Chunnambar Boat House', distance: '9 km', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400' }
@@ -257,7 +257,7 @@ const hospitalData: Record<string, any> = {
             { name: 'Serenity Beach', distance: '8 km', image: 'https://images.unsplash.com/photo-1519046904884-53103b34b606?w=400' },
             { name: 'Botanical Garden', distance: '6.5 km', image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400' },
             { name: 'Sri Aurobindo Ashram', distance: '4.8 km', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=400' },
-            { name: 'Auroville Matrimandir', distance: '12 km', image: 'file:///C:/Users/pgsin/.gemini/antigravity/brain/b4fb08e6-4b30-48b0-8a52-93f49c4645b4/aurovill_matrimandir_1765435332821.png' },
+            { name: 'Auroville Matrimandir', distance: '12 km', image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400' },
             { name: 'Pondicherry Museum', distance: '5.5 km', image: 'https://images.unsplash.com/photo-1545564850-c6504b2c05fc?w=400' },
             { name: 'Ousteri Lake', distance: '12 km', image: 'https://images.unsplash.com/photo-1493246318656-5bfd4cfb29b8?w=400' },
             { name: 'Bharathi Park', distance: '5 km', image: 'https://images.unsplash.com/photo-1596716075908-011467406c1c?w=400' }
