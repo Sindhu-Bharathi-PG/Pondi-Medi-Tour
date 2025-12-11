@@ -10,6 +10,7 @@ import {
     Clock,
     DollarSign,
     Droplets,
+    Headphones,
     Heart,
     Leaf,
     LucideIcon,
@@ -51,7 +52,8 @@ const iconMap: Record<string, LucideIcon> = {
     TreePine,
     Moon,
     Wind,
-    Droplets
+    Droplets,
+    Headphones
 };
 
 export function getIcon(iconName: string): LucideIcon | null {

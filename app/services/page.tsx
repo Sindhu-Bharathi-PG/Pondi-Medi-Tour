@@ -1,10 +1,9 @@
 "use client";
 
-import React from 'react';
+import { Activity, ArrowRight, Award, Baby, Bone, Brain, ChevronRight, Clock, DollarSign, Eye, Heart, Scissors, Shield, Stethoscope } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Bone, Baby, Eye, Brain, Stethoscope, Scissors, Activity, ChevronRight, Shield, Clock, DollarSign, Award, ArrowRight } from 'lucide-react';
-import { Header, Footer } from '../components/common';
+import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
 
 const ServicesPage = () => {
@@ -149,12 +148,6 @@ const ServicesPage = () => {
                                           Our Services
                                           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
                                                 Complete Care Support
-                                          </span>
-                                    </h1>
-                                    <p className="text-xl md:text-2xl text-emerald-100 leading-relaxed max-w-3xl mx-auto mb-8">
-                                          We are your local guardians. From the moment you land at Chennai or Pondicherry airport, we handle your transport, language translation (French/English/Arabic), and daily needs.
-                                    </p>
-                                                Unmatched Value
                                           </span>
                                     </h1>
                                     <p className="text-xl md:text-2xl text-emerald-100 leading-relaxed max-w-3xl mx-auto">

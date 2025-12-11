@@ -18,7 +18,7 @@
                     "line1": "World-Class",
                     "line2": "Healthcare"
                 },
-                "subtitle": "The Healing Coast of India. Whether you need world-class surgery or a soul-searching retreat, Pondicherry offers the perfect balance of Science and Serenity. Plan your medical journey with us.",
+                "subtitle": "Save up to 70% on medical procedures at India's top NABH-accredited hospitals. From heart surgery to fertility treatments, with complete travel support.",
                 "primaryCTA": {
                     "text": "Free Consultation",
                     "link": "/booking",
@@ -38,28 +38,27 @@
             },
             "stats": [
                 {
-                    "value": "15,000+",
-                    "label": "Patients Treated",
-                    "icon": "Users",
-                    "animateValue": 15000
+                    "value": "150+",
+                    "label": "Procedures Offered",
+                    "icon": "Stethoscope",
+                    "animateValue": 150
                 },
                 {
                     "value": "70%",
-                    "label": "Cost Savings",
+                    "label": "Average Savings",
                     "icon": "DollarSign",
                     "animateValue": 70
                 },
                 {
                     "value": "50+",
-                    "label": "NABH Hospitals",
+                    "label": "Accredited Hospitals",
                     "icon": "Building2",
                     "animateValue": 50
                 },
                 {
-                    "value": "500+",
-                    "label": "Specialists",
-                    "icon": "Stethoscope",
-                    "animateValue": 500
+                    "value": "24/7",
+                    "label": "Support Available",
+                    "icon": "Headphones"
                 }
             ]
         },
