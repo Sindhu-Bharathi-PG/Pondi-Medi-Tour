@@ -157,8 +157,8 @@ const ServicesPage = () => {
                         </div>
 
                         {/* Stats floating cards */}
-                        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2">
-                              <div className="container mx-auto px-4">
+                        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 top-100">
+                              <div className="container mx-auto px-4 mt-30">
                                     <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                                           {[
                                                 { icon: Shield, value: '150+', label: 'Procedures Offered' },
