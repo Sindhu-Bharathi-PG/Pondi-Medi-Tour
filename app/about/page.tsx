@@ -44,7 +44,7 @@ const AboutPage = () => {
                   <Header />
 
                   {/* Hero Section - Unique: Our Mission */}
-                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                  <section className="relative pt-24 md:pt-24 md:pb-24 overflow-hidden hero-premium">
                         <div className="absolute inset-0 opacity-15">
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=1600')] bg-cover bg-center" />
                         </div>
@@ -57,7 +57,7 @@ const AboutPage = () => {
                                     <span className="text-white">About Us</span>
                               </nav>
 
-                              <div className="max-w-4xl">
+                              <div className="max-w-4xl mx-auto">
                                     <div className="gov-seal mb-6">
                                           <span>Government-Recognized Portal</span>
                                     </div>

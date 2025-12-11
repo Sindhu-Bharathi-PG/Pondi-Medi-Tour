@@ -124,7 +124,7 @@ const DestinationPage = () => {
                   <Header />
 
                   {/* Hero Section */}
-                  <section className="relative min-h-[70vh] flex items-center pt-20">
+                  <section className="relative min-h-[70vh] flex items-center p-21">
                         <div className="absolute inset-0">
                               <Image
                                     src="/images/generated/dest_hero_french_quarters_1765431332425.png"

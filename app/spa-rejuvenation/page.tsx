@@ -169,7 +169,7 @@ const SpaRejuvenationPage = () => {
                         </div>
 
                         <div className="relative container mx-auto px-6 lg:px-8">
-                              <div className="max-w-4xl">
+                              <div className="max-w-4xl p-32">
                                     <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/20">
                                           <Gem className="w-5 h-5 text-pink-300" />
                                           <span className="text-white text-sm font-medium">

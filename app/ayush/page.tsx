@@ -127,7 +127,7 @@ const AyushPage = () => {
                         </div>
 
                         <div className="relative container mx-auto px-6 lg:px-8">
-                              <div className="max-w-4xl">
+                              <div className="max-w-4xl p-20">
                                     {/* Official Badge */}
                                     <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full mb-8 border border-white/20">
                                           <Shield className="w-5 h-5 text-amber-400" />
