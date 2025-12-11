@@ -4,7 +4,7 @@ import { CURRENCIES, useCurrency } from '@/app/context/CurrencyContext';
 import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
 import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, DollarSign, Globe, Leaf, Menu, Search, Stethoscope, X } from 'lucide-react';
+import { Bath, Building2, Calculator, ChevronDown, Compass, DollarSign, Globe, Home, Leaf, MapPin, Menu, Package, Search, Sparkles, Stethoscope, Tent, UserRound, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -15,7 +15,26 @@ function cn(...inputs: ClassValue[]) {
       return twMerge(clsx(inputs));
 }
 
-// Language options with flags (mapped to LanguageContext types)
+// Icon mapping
+const iconMap: Record<string, React.ElementType> = {
+      Home,
+      MapPin,
+      Stethoscope,
+      Building2,
+      UserRound,
+      Package,
+      Calculator,
+      Tent,
+      Sparkles,
+      Bath,
+      Compass,
+      FlowerLotus: Sparkles, // Fallback since FlowerLotus might not exist
+};
+
+// Language type definition
+type Language = 'en' | 'hi' | 'ta' | 'ml' | 'te' | 'fr' | 'de' | 'es' | 'it' | 'pt' | 'ja' | 'zh';
+
+// Language options with flags
 const LANGUAGES: Array<{ code: Language; name: string; flag: string }> = [
       { code: 'en', name: 'English', flag: '🇺🇸' },
       { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
@@ -206,24 +225,39 @@ const Header: React.FC<HeaderProps> = ({
                               {/* ----------------------------------------------------------------------
                                   Center: Navigation 
                               ---------------------------------------------------------------------- */}
-                              <div className="hidden lg:flex items-center justify-center flex-1 px-4">
+                              <div className={cn(
+                                    "hidden lg:flex items-center flex-1 px-4 transition-all duration-300",
+                                    searchOpen ? "justify-start" : "justify-center"
+                              )}>
                                     <ul className="flex items-center gap-1">
                                           {navLinks.map((link) => {
                                                 const isActive = isActiveLink(link.href);
+                                                const IconComponent = link.icon ? iconMap[link.icon] : null;
                                                 return (
-                                                      <li key={link.href} className="relative">
+                                                      <li key={link.href} className="relative group">
                                                             <Link
                                                                   href={link.href}
                                                                   onMouseEnter={() => setHoveredLink(link.href)}
                                                                   onMouseLeave={() => setHoveredLink(null)}
                                                                   className={cn(
-                                                                        "relative z-10 block px-4 py-2 text-sm font-medium transition-colors duration-200",
+                                                                        "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300",
                                                                         isActive
                                                                               ? (hasScrolled ? "text-white" : "text-white")
                                                                               : (hasScrolled ? "text-gray-600 hover:text-gray-900" : "text-white/80 hover:text-white")
                                                                   )}
                                                             >
-                                                                  {link.label}
+                                                                  {IconComponent && (
+                                                                        <IconComponent className={cn(
+                                                                              "w-4 h-4 transition-all duration-300",
+                                                                              searchOpen ? "w-5 h-5" : ""
+                                                                        )} />
+                                                                  )}
+                                                                  <span className={cn(
+                                                                        "transition-all duration-300 overflow-hidden whitespace-nowrap",
+                                                                        searchOpen ? "w-0 opacity-0" : "w-auto opacity-100"
+                                                                  )}>
+                                                                        {link.label}
+                                                                  </span>
                                                             </Link>
 
                                                             {/* Active Indicator (Pill) */}
@@ -253,6 +287,13 @@ const Header: React.FC<HeaderProps> = ({
                                                                         transition={{ type: "spring", bounce: 0, duration: 0.2 }}
                                                                   />
                                                             )}
+
+                                                            {/* Tooltip when icon-only mode */}
+                                                            {searchOpen && (
+                                                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                                        {link.label}
+                                                                  </div>
+                                                            )}
                                                       </li>
                                                 );
                                           })}
@@ -270,10 +311,11 @@ const Header: React.FC<HeaderProps> = ({
                                                 {searchOpen && (
                                                       <motion.div
                                                             initial={{ width: 0, opacity: 0 }}
-                                                            animate={{ width: 200, opacity: 1 }}
+                                                            animate={{ width: 280, opacity: 1 }}
                                                             exit={{ width: 0, opacity: 0 }}
                                                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                            className="overflow-hidden"
+                                                            className="absolute right-10 top-1/2 -translate-y-1/2 overflow-hidden"
+                                                            style={{ marginRight: '0.5rem' }}
                                                       >
                                                             <input
                                                                   ref={searchInputRef}
@@ -290,8 +332,8 @@ const Header: React.FC<HeaderProps> = ({
                                                                   className={cn(
                                                                         "w-full px-4 py-2 text-sm rounded-full border outline-none transition-all",
                                                                         hasScrolled
-                                                                              ? "bg-gray-50 border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-300"
-                                                                              : "bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-white/40"
+                                                                              ? "bg-white border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-300 shadow-lg"
+                                                                              : "bg-white/95 border-white/20 text-gray-700 placeholder-gray-500 focus:border-white/40 shadow-xl backdrop-blur-xl"
                                                                   )}
                                                             />
                                                       </motion.div>
@@ -306,7 +348,7 @@ const Header: React.FC<HeaderProps> = ({
                                                       setSearchOpen(!searchOpen);
                                                 }}
                                                 className={cn(
-                                                      "p-2 rounded-full transition-colors",
+                                                      "p-2 rounded-full transition-colors relative z-10",
                                                       hasScrolled
                                                             ? "hover:bg-gray-100 text-gray-600"
                                                             : "hover:bg-white/10 text-white/80"
@@ -581,7 +623,7 @@ const Header: React.FC<HeaderProps> = ({
                                                                                           <button
                                                                                                 key={lang.code}
                                                                                                 onClick={() => {
-                                                                                                      setLanguage(lang.code);
+                                                                                                      setSelectedLanguage(lang);
                                                                                                       setLanguageDropdownOpen(false);
                                                                                                 }}
                                                                                                 className={cn(

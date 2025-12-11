@@ -73,26 +73,26 @@ export const useSiteMode = () => {
 
 // Navigation links for each mode
 export const MEDICAL_NAV_LINKS = [
-      { href: '/', label: 'Home' },
-      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
-      { href: '/services', label: 'Treatments' },
-      { href: '/hospital', label: 'Hospitals' },
-      { href: '/doctor', label: 'Doctors' },
-      { href: '/packages', label: 'Packages' },
-      { href: '/cost-calculator', label: 'Cost Tool' },
+      { href: '/', label: 'Home', icon: 'Home' },
+      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular', icon: 'MapPin' },
+      { href: '/services', label: 'Treatments', icon: 'Stethoscope' },
+      { href: '/hospital', label: 'Hospitals', icon: 'Building2' },
+      { href: '/doctor', label: 'Doctors', icon: 'UserRound' },
+      { href: '/packages', label: 'Packages', icon: 'Package' },
+      { href: '/cost-calculator', label: 'Cost Tool', icon: 'Calculator' },
 ] as const;
 
 // ============================================================================
 // SECTION 2: WELLNESS & LIFESTYLE - Simple holistic navigation
 // ============================================================================
 export const WELLNESS_NAV_LINKS = [
-      { href: '/', label: 'Home' },
-      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
-      { href: '/wellness', label: 'Retreats' },
-      { href: '/ayush', label: 'AYUSH' },
-      { href: '/yoga-meditation', label: 'Yoga' },
-      { href: '/spa-rejuvenation', label: 'Spa' },
-      { href: '/destination', label: 'Explore' },
+      { href: '/', label: 'Home', icon: 'Home' },
+      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular', icon: 'MapPin' },
+      { href: '/wellness', label: 'Retreats', icon: 'Tent' },
+      { href: '/ayush', label: 'AYUSH', icon: 'Sparkles' },
+      { href: '/yoga-meditation', label: 'Yoga', icon: 'FlowerLotus' },
+      { href: '/spa-rejuvenation', label: 'Spa', icon: 'Bath' },
+      { href: '/destination', label: 'Explore', icon: 'Compass' },
 ] as const;
 
 // Educational content links (Chapter 1)
