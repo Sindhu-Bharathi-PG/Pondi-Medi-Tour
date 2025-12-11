@@ -155,7 +155,7 @@ const HospitalPage = () => {
                                           </span>
                                     </h1>
                                     <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto mb-8">
-                                          Explore our network of NABH-accredited hospitals offering advanced medical care at 60-80% lower costs.
+                                          Our network is strictly curated. We partner only with hospitals that meet NABH (National Accreditation Board for Hospitals) standards. From the heritage-rich general hospitals to modern super-specialty centers on East Coast Road, every facility is vetted for hygiene, technology, and patient safety.
                                     </p>
 
                                     {/* Search Bar */}

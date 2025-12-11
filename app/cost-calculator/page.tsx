@@ -44,7 +44,7 @@ const CostCalculatorPage = () => {
                                     <span className="text-sm font-medium">Save 60-80% on Medical Procedures</span>
                               </div>
                               <h1 className="text-5xl md:text-7xl font-bold mb-6">Compare Costs<span className="block text-green-300">See Your Savings</span></h1>
-                              <p className="text-xl text-emerald-100 max-w-3xl mx-auto">Calculate the all-inclusive cost of your treatment in Pondicherry.</p>
+                              <p className="text-xl text-emerald-100 max-w-3xl mx-auto">Medical bills shouldn't be a mystery. Use our estimator to budget your trip. We account for the procedure, hospital stay (ward vs. private suite), post-op medication, and physiotherapy.</p>
                         </div>
                   </section>
 

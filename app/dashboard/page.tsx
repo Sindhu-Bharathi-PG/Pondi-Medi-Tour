@@ -60,7 +60,7 @@ const DashboardPage = () => {
                                     {/* Main Content */}
                                     <div className="flex-1">
                                           <div className="flex items-center justify-between mb-8">
-                                                <div><h1 className="text-3xl font-bold text-gray-800">Welcome back, John!</h1><p className="text-gray-500">Here&apos;s your health journey overview</p></div>
+                                                <div><h1 className="text-3xl font-bold text-gray-800">Welcome back, John!</h1><p className="text-gray-500">Manage your journey. View your upcoming appointments, download visa invitation letters, and chat with your assigned case manager.</p></div>
                                                 <button className="relative p-3 bg-white rounded-xl shadow hover:shadow-md">
                                                       <Bell className="w-6 h-6 text-gray-600" />
                                                       <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />

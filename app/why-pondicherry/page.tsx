@@ -91,7 +91,7 @@ export default function WhyPondicherryPage() {
                                           Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-300">Pondicherry</span>
                                     </h1>
                                     <p className="text-xl text-emerald-100 mb-10 max-w-3xl mx-auto">
-                                          World-class care at 40-60% lower cost than India&apos;s metros, and 70% less than developed countries.
+                                          Why come here? 1. French Charm: Clean, walkable streets in White Town. 2. Safety: One of the safest cities in India for tourists. 3. Connectivity: Just 3 hours from Chennai International Airport.
                                     </p>
                                     <div className="flex flex-wrap justify-center gap-4">
                                           <Link href="/booking" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl transition-all inline-flex items-center gap-2">

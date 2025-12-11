@@ -102,10 +102,10 @@ export default function MedicalTourismPage() {
                                           <span className="text-blue-100 text-sm font-medium">Global Healthcare Movement</span>
                                     </div>
                                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                                          Understanding <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300">Medical Tourism</span>
+                                          Medical Excellence in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300">Pondicherry</span>
                                     </h1>
                                     <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
-                                          14+ million people cross borders annually for quality healthcare. Learn how you can access world-class treatment while saving up to 70%.
+                                          Pondicherry is more than a coastal getaway; it is a hidden capital of medical excellence in South India. With a doctor-to-population ratio significantly higher than the national average and institutions like JIPMER setting global benchmarks, we offer elite medical care without the metropolitan price tag.
                                     </p>
                               </div>
                         </div>

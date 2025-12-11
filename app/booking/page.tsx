@@ -40,7 +40,7 @@ const BookingPage = () => {
                                     <span className="text-sm font-medium">Free Consultation • No Obligations</span>
                               </div>
                               <h1 className="text-5xl md:text-7xl font-bold mb-6">Book Your<span className="block text-purple-300">Medical Journey</span></h1>
-                              <p className="text-xl text-purple-100 max-w-3xl mx-auto">Get a free personalized treatment plan and cost estimate within 24 hours.</p>
+                              <p className="text-xl text-purple-100 max-w-3xl mx-auto">Secure your slot. Whether it's a doctor's appointment or a room in a wellness resort, book it here with zero booking fees.</p>
                         </div>
                   </section>
 

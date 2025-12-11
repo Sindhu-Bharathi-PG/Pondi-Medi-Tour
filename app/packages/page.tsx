@@ -98,14 +98,14 @@ const PackagesPage = () => {
                         <div className="relative container mx-auto px-4 text-center text-white">
                               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
                                     <Award className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm font-medium">All-Inclusive Medical Tourism Packages</span>
+                                    <span className="text-sm font-medium">Bundled Medical Care Packages</span>
                               </div>
                               <h1 className="text-5xl md:text-7xl font-bold mb-6">
                                     Complete Care
                                     <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-300">Packages</span>
                               </h1>
                               <p className="text-xl md:text-2xl text-emerald-100 max-w-3xl mx-auto">
-                                    From treatment to recovery, travel to wellness - we handle everything so you can focus on healing.
+                                    Simplify your payment with all-inclusive medical bundles. These packages cover the surgery, surgeon fees, nursing charges, and airport transfers. No surprise line items.
                               </p>
                         </div>
                   </section>

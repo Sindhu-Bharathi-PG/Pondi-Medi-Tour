@@ -84,8 +84,7 @@ const AboutPage = () => {
                                           </span>
                                     </h1>
                                     <p className="text-xl md:text-2xl text-emerald-100 leading-relaxed max-w-3xl mx-auto">
-                                          Pondy HealthPort bridges world-class medical excellence with the serene healing environment of Pondicherry.
-                                          We transform healthcare into a transformative experience.
+                                          We are the official facilitators connecting global patients to Pondicherry's healthcare ecosystem. We bridge the gap between you and the doctors, handling the logistics so you can focus on getting better.
                                     </p>
                               </div>
                         </div>

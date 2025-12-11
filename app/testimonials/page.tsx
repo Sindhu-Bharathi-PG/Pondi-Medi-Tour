@@ -133,14 +133,14 @@ const TestimonialsPage = () => {
                         <div className="container mx-auto px-4 text-center text-white">
                               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
                                     <Heart className="w-5 h-5 text-pink-300" />
-                                    <span className="text-sm font-medium">Real Patients, Real Stories</span>
+                                    <span className="text-sm font-medium">Real Stories from Real Patients</span>
                               </div>
                               <h1 className="text-5xl md:text-7xl font-bold mb-6">
                                     Patient
                                     <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-300">Success Stories</span>
                               </h1>
                               <p className="text-xl text-rose-100 max-w-3xl mx-auto">
-                                    Join thousands of international patients who found world-class care and a life-changing experience in Pondicherry.
+                                    Real stories from real patients. See how a trip to Pondicherry changed their health.
                               </p>
                         </div>
                   </section>

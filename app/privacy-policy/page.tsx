@@ -32,7 +32,7 @@ const PrivacyPolicyPage = () => {
                         <div className="container mx-auto px-4 max-w-4xl">
                               <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
                                     <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-                                          At Pondy HealthPort, we take your privacy seriously. This policy explains how we collect, use, and protect your personal and medical information when you use our medical tourism services.
+                                          Your medical records are encrypted. We strictly follow data privacy laws and never share your clinical history with third parties without consent.
                                     </p>
 
                                     <div className="space-y-8">

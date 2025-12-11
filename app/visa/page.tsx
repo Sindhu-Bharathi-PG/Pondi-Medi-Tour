@@ -64,7 +64,7 @@ const VisaPage = () => {
                                     <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300">Made Simple</span>
                               </h1>
                               <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-                                    We handle all your visa documentation and provide official invitation letters from our partner hospitals.
+                                    Entering India for medical care requires specific documentation. We streamline the process for the Indian Medical Visa (M-Visa) and Medical Attendant Visa (MX-Visa). We provide the critical 'Letter of Invitation' from the hospital required by Indian embassies.
                               </p>
                               <div className="flex flex-wrap justify-center gap-4">
                                     <Link href="/booking" className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2">

@@ -34,7 +34,7 @@ const TelemedicinePage = () => {
                                     <span className="text-sm font-medium">Consult From Anywhere in the World</span>
                               </div>
                               <h1 className="text-5xl md:text-7xl font-bold mb-6">Virtual<span className="block text-cyan-300">Medical Consultations</span></h1>
-                              <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">Get expert medical opinions from Pondicherry&apos;s top specialists without leaving your home.</p>
+                              <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">Bridge the distance before you board the plane. Share your reports (MRI, CT, Blood work) securely with Pondicherry's top consultants. Get a confirmed diagnosis and a tentative treatment plan remotely, saving you time and uncertainty upon arrival.</p>
                               <div className="flex flex-wrap justify-center gap-4">
                                     <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2">
                                           <Calendar className="w-5 h-5" />Book Consultation</button>

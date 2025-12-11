@@ -159,7 +159,7 @@ const DoctorPage = () => {
                                           </span>
                                     </h1>
                                     <p className="text-xl md:text-2xl text-purple-100 leading-relaxed max-w-3xl mx-auto mb-8">
-                                          Connect with world-class specialists trained at premier global institutions, right here in Pondicherry.
+                                          Meet doctors who have shaped medical textbooks. Pondicherry's medical community is unique—many specialists here double as professors at prestigious medical colleges. This academic depth ensures your treatment is based on the absolute latest research and techniques.
                                     </p>
 
                                     {/* Search Bar */}

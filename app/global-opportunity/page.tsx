@@ -73,7 +73,7 @@ export default function GlobalOpportunityPage() {
                                           The Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">Opportunity</span>
                                     </h1>
                                     <p className="text-xl text-purple-100 mb-10 max-w-3xl mx-auto">
-                                          Discover why Pondicherry is positioned to become Asia&apos;s most trusted, affordable, and holistic healing destination by 2030.
+                                          Let's partner to heal. We invite medical travel facilitators, insurance companies, and corporate wellness officers to collaborate with Pondicherry's healthcare providers.
                                     </p>
                               </div>
                         </div>

@@ -8,6 +8,8 @@ import MedicalHome from './components/home/MedicalHome';
 import WellnessHome from './components/home/WellnessHome';
 import SeaWaveTransition from './components/common/SeaWaveTransition';
 import WaveTransition from './components/common/WaveTransition';
+// import MedicalTourismPage from './medical-tourism/page';
+// import WellnessTourismPage from './wellness-tourism/page';
 
 export default function Home() {
   const scrolled = useScrolled(50);

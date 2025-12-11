@@ -36,7 +36,7 @@ const TermsOfServicePage = () => {
                                     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-xl">
                                           <div className="flex items-center gap-3">
                                                 <AlertTriangle className="w-6 h-6 text-yellow-600" />
-                                                <p className="text-yellow-800 font-medium">Please read these terms carefully before using our services.</p>
+                                                <p className="text-yellow-800 font-medium">Defining our role as facilitators. We connect you to care providers but do not provide medical advice directly.</p>
                                           </div>
                                     </div>
 

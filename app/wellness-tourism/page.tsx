@@ -86,10 +86,10 @@ export default function WellnessTourismPage() {
                                           <span className="text-amber-100 text-sm font-medium">Holistic Healing Journey</span>
                                     </div>
                                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                                          Understanding <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-300">Wellness Tourism</span>
+                                          Wellness Tourism in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-300">Pondicherry</span>
                                     </h1>
                                     <p className="text-xl text-amber-100 mb-10 max-w-3xl mx-auto">
-                                          India ranks 7th globally in wellness tourism with $16.3 billion annual revenue. Discover ancient healing traditions in the spiritual haven of Pondicherry.
+                                          Pondicherry is the intersection of French serenity and Tamil spirituality. Home to the Sri Aurobindo Ashram and the experimental township of Auroville, this is one of the few places on earth dedicated entirely to human unity and inner peace. Here, healing is a cultural practice, not just a service.
                                     </p>
                               </div>
                         </div>

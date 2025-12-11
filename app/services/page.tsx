@@ -146,8 +146,14 @@ const ServicesPage = () => {
                                           <span className="text-sm font-medium">150+ Advanced Medical Procedures</span>
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                                          World-Class Treatments
+                                          Our Services
                                           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
+                                                Complete Care Support
+                                          </span>
+                                    </h1>
+                                    <p className="text-xl md:text-2xl text-emerald-100 leading-relaxed max-w-3xl mx-auto mb-8">
+                                          We are your local guardians. From the moment you land at Chennai or Pondicherry airport, we handle your transport, language translation (French/English/Arabic), and daily needs.
+                                    </p>
                                                 Unmatched Value
                                           </span>
                                     </h1>

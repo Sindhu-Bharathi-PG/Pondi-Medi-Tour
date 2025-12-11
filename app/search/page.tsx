@@ -31,7 +31,8 @@ const SearchPage = () => {
                   <section className="pt-32 pb-8 bg-gradient-to-br from-emerald-800 to-teal-700">
                         <div className="container mx-auto px-4">
                               <div className="max-w-3xl mx-auto">
-                                    <h1 className="text-4xl font-bold text-white text-center mb-8">Find Your Care</h1>
+                                    <h1 className="text-4xl font-bold text-white text-center mb-4">Find Your Care</h1>
+                                    <p className="text-emerald-100 text-center mb-8">Find exactly what you need. Filter by specialty, price range, or location.</p>
                                     <div className="relative">
                                           <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
                                           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
