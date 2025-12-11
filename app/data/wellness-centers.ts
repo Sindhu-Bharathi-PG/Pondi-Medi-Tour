@@ -1,0 +1,445 @@
+import { Award, Building2, Heart, Leaf, Shield, Sparkles, Star, Sun, Users } from 'lucide-react';
+
+export interface WellnessCenter {
+      id: number | string;
+      name: string;
+      fullName: string;
+      slug: string;
+      image: string;
+      heroImage: string;
+      gallery: string[];
+      rating: number;
+      reviewsCount: number;
+      specialties: string[]; // AYUSH modalities
+      type: 'Government' | 'Private' | 'Ashram' | 'Community';
+      accreditation: string[];
+      location: string;
+      established: number;
+      featured: boolean;
+      tagline: string;
+      description: string;
+      about: string;
+      highlights: string[];
+      therapies: string[];
+      facilities: string[];
+      contact: {
+            phone: string;
+            email: string;
+            website: string;
+      };
+      stats?: Array<{
+            value: string;
+            label: string;
+            icon: typeof Building2;
+      }>;
+}
+
+export const wellnessCenters: WellnessCenter[] = [
+      {
+            id: 1,
+            name: 'Central Research Institute for Siddha',
+            fullName: 'Central Research Institute for Siddha (CRIS)',
+            slug: 'cris-siddha',
+            image: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
+                  'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800',
+                  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+            ],
+            rating: 4.8,
+            reviewsCount: 320,
+            specialties: ['Siddha Medicine', 'Traditional Tamil Medicine', 'Varmam Therapy', 'Kayakalpa'],
+            type: 'Government',
+            accreditation: ['Ministry of AYUSH', 'CCRAS'],
+            location: 'Anna Nagar, Pondicherry',
+            established: 1970,
+            featured: true,
+            tagline: 'Premier Siddha Research Institution',
+            description: 'The Central Research Institute for Siddha is a premier government institution dedicated to research and clinical practice of authentic Siddha medicine, the ancient Tamil healing tradition.',
+            about: 'CRIS is under the Central Council for Research in Ayurvedic Sciences (CCRAS) and Ministry of AYUSH. It serves as the nodal center for Siddha research in India, offering authentic treatments rooted in 10,000+ years of Tamil medical tradition. The institute combines traditional wisdom with modern research methodologies.',
+            highlights: [
+                  'Authentic Siddha diagnosis (Naadi Pariksha)',
+                  'Traditional Varmam therapy',
+                  'Kayakalpa rejuvenation programs',
+                  'Government-subsidized treatments',
+                  'Research-backed protocols',
+            ],
+            therapies: ['Naadi Pariksha', 'Varmam', 'Thokkanam', 'Purgation Therapy', 'External Therapies', 'Kayakalpa'],
+            facilities: ['Inpatient Ward', 'Pharmacy', 'Research Lab', 'Library', 'Herbal Garden'],
+            contact: {
+                  phone: '+91-413-2203441',
+                  email: 'cris.pondy@gov.in',
+                  website: 'https://ccras.nic.in',
+            },
+            stats: [
+                  { value: '50+', label: 'Years of Research', icon: Building2 },
+                  { value: '10000+', label: 'Patients Treated/Year', icon: Users },
+                  { value: '100+', label: 'Research Publications', icon: Award },
+            ],
+      },
+      {
+            id: 2,
+            name: 'Quiet Healing Centre',
+            fullName: 'Quiet Healing Centre, Auroville',
+            slug: 'quiet-healing-auroville',
+            image: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
+                  'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800',
+                  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+            ],
+            rating: 4.9,
+            reviewsCount: 580,
+            specialties: ['Ayurveda', 'Yoga', 'Naturopathy', 'Watsu', 'Craniosacral Therapy'],
+            type: 'Community',
+            accreditation: ['Auroville Foundation', 'NABH'],
+            location: 'Auroville, Pondicherry',
+            established: 1992,
+            featured: true,
+            tagline: 'Holistic Healing in Auroville',
+            description: 'A serene wellness sanctuary in the heart of Auroville offering integrated healing therapies combining Eastern wisdom with Western bodywork techniques.',
+            about: 'Quiet Healing Centre is a unique wellness destination in Auroville that combines traditional AYUSH therapies with innovative healing modalities. Set amidst lush greenery, it offers a tranquil environment for deep healing and personal transformation. The center is known for introducing Watsu (water-based therapy) to India.',
+            highlights: [
+                  'Pioneer of Watsu therapy in India',
+                  'Integrative healing approach',
+                  'Experienced international therapists',
+                  'Eco-friendly infrastructure',
+                  'Residential healing retreats',
+            ],
+            therapies: ['Panchakarma', 'Shirodhara', 'Abhyanga', 'Watsu', 'Yoga Therapy', 'Meditation', 'Craniosacral'],
+            facilities: ['Warm Water Pool', 'Treatment Rooms', 'Yoga Hall', 'Organic Garden', 'Accommodation', 'Vegetarian Café'],
+            contact: {
+                  phone: '+91-413-2622329',
+                  email: 'quiet@auroville.org.in',
+                  website: 'https://quiethealingcentre.info',
+            },
+            stats: [
+                  { value: '30+', label: 'Years of Healing', icon: Heart },
+                  { value: '25+', label: 'Therapy Types', icon: Sparkles },
+                  { value: '4.9', label: 'Rating', icon: Star },
+            ],
+      },
+      {
+            id: 3,
+            name: 'Santé Ayurveda Centre',
+            fullName: 'Santé Ayurvedic Wellness Centre',
+            slug: 'sante-ayurveda',
+            image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800',
+                  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
+            ],
+            rating: 4.7,
+            reviewsCount: 245,
+            specialties: ['Ayurveda', 'Panchakarma', 'Kerala Ayurveda', 'Marma Therapy'],
+            type: 'Private',
+            accreditation: ['NABH', 'Kerala Ayurveda Board'],
+            location: 'White Town, Pondicherry',
+            established: 2008,
+            featured: true,
+            tagline: 'Authentic Kerala Ayurveda',
+            description: 'Experience authentic Kerala-style Ayurveda in the French Quarter. Santé offers traditional Panchakarma treatments with premium Kerala oils and expert therapists.',
+            about: 'Santé brings the essence of Kerala Ayurveda to Pondicherry. Founded by Ayurvedic physicians from Kerala, the center offers comprehensive Panchakarma programs, rejuvenation therapies, and lifestyle consultations. Located in a heritage building in White Town, it combines traditional healing with colonial charm.',
+            highlights: [
+                  'Kerala-trained therapists',
+                  'Premium medicinal oils from Kerala',
+                  '14/21-day Panchakarma programs',
+                  'Heritage property setting',
+                  'Personalized treatment protocols',
+            ],
+            therapies: ['Abhyanga', 'Shirodhara', 'Pizhichil', 'Njavarakizhi', 'Elakizhi', 'Nasya', 'Basti'],
+            facilities: ['AC Treatment Rooms', 'Steam Bath', 'Consultation Room', 'Pharmacy', 'Relaxation Lounge'],
+            contact: {
+                  phone: '+91-413-2227766',
+                  email: 'info@santeayurveda.in',
+                  website: 'https://santeayurveda.in',
+            },
+            stats: [
+                  { value: '15+', label: 'Years Experience', icon: Award },
+                  { value: '5000+', label: 'Happy Guests', icon: Users },
+                  { value: '20+', label: 'Therapies', icon: Leaf },
+            ],
+      },
+      {
+            id: 4,
+            name: 'Auroville Health Centre',
+            fullName: 'Auroville Health Centre',
+            slug: 'auroville-health-centre',
+            image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800',
+                  'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800',
+            ],
+            rating: 4.6,
+            reviewsCount: 410,
+            specialties: ['Ayurveda', 'Homeopathy', 'Acupuncture', 'Physiotherapy', 'Yoga Therapy'],
+            type: 'Community',
+            accreditation: ['Auroville Foundation'],
+            location: 'Aspiration, Auroville',
+            established: 1972,
+            featured: false,
+            tagline: 'Integrated Healthcare for Auroville',
+            description: 'The primary healthcare center for Auroville community, offering integrated AYUSH therapies alongside conventional medicine.',
+            about: 'Auroville Health Centre serves as the main healthcare facility for Aurovilians and visitors. It integrates multiple healing systems including Ayurveda, Homeopathy, Acupuncture, and conventional medicine. The center emphasizes preventive care and holistic well-being aligned with Auroville\'s vision.',
+            highlights: [
+                  'Multi-system integrated care',
+                  'Affordable treatments',
+                  'Experienced practitioners',
+                  'Preventive health focus',
+                  'Community-oriented approach',
+            ],
+            therapies: ['Ayurvedic Consultation', 'Homeopathy', 'Acupuncture', 'Physiotherapy', 'Yoga Classes'],
+            facilities: ['Consultation Rooms', 'Treatment Rooms', 'Pharmacy', 'Laboratory', 'Emergency Services'],
+            contact: {
+                  phone: '+91-413-2622123',
+                  email: 'health@auroville.org.in',
+                  website: 'https://auroville.org/health',
+            },
+      },
+      {
+            id: 5,
+            name: 'Government Siddha Hospital',
+            fullName: 'Government Siddha Hospital Pondicherry',
+            slug: 'govt-siddha-hospital',
+            image: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800',
+            ],
+            rating: 4.4,
+            reviewsCount: 180,
+            specialties: ['Siddha Medicine', 'Varma Therapy', 'Traditional Tamil Medicine'],
+            type: 'Government',
+            accreditation: ['Govt. of Puducherry', 'AYUSH Ministry'],
+            location: 'Lawspet, Pondicherry',
+            established: 1985,
+            featured: false,
+            tagline: 'Free Siddha Healthcare for All',
+            description: 'Government-run Siddha hospital providing free authentic Siddha treatments to the public. Ideal for those seeking affordable traditional Tamil medicine.',
+            about: 'This government hospital is dedicated to providing Siddha medicine services to the people of Puducherry. It offers OPD and IPD facilities with qualified Siddha physicians. All basic treatments are provided free of cost, making traditional medicine accessible to everyone.',
+            highlights: [
+                  'Free treatment for all',
+                  'Government-certified physicians',
+                  'Inpatient facilities',
+                  'Traditional Siddha pharmacy',
+                  'Accessible location',
+            ],
+            therapies: ['Siddha Consultation', 'Varmam', 'External Therapies', 'Purgation', 'Herbal Medicines'],
+            facilities: ['OPD', 'IPD', 'Pharmacy', 'Panchakarma Unit'],
+            contact: {
+                  phone: '+91-413-2272456',
+                  email: 'siddha.pondy@gov.in',
+                  website: 'https://health.py.gov.in',
+            },
+      },
+      {
+            id: 6,
+            name: 'Sri Aurobindo Ashram Health',
+            fullName: 'Sri Aurobindo Ashram Health & Healing',
+            slug: 'sri-aurobindo-ashram-health',
+            image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800',
+                  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
+            ],
+            rating: 4.8,
+            reviewsCount: 650,
+            specialties: ['Yoga Therapy', 'Integral Yoga', 'Meditation', 'Pranic Healing'],
+            type: 'Ashram',
+            accreditation: ['Sri Aurobindo Ashram Trust'],
+            location: 'White Town, Pondicherry',
+            established: 1926,
+            featured: true,
+            tagline: 'Healing Through Integral Yoga',
+            description: 'Experience transformative healing through the practice of Integral Yoga at the historic Sri Aurobindo Ashram, one of India\'s most revered spiritual centers.',
+            about: 'The Sri Aurobindo Ashram offers a unique approach to wellness through Integral Yoga developed by Sri Aurobindo and The Mother. The healing services focus on harmonizing body, mind, and spirit through yoga, meditation, and spiritual practices. The serene ashram environment itself is deeply therapeutic.',
+            highlights: [
+                  'Historic spiritual center',
+                  'Integral Yoga tradition',
+                  'Experienced yoga teachers',
+                  'Meditation sessions',
+                  'Spiritual guidance',
+            ],
+            therapies: ['Integral Yoga', 'Meditation', 'Pranayama', 'Pranic Healing', 'Spiritual Counseling'],
+            facilities: ['Yoga Halls', 'Meditation Spaces', 'Library', 'Dining Hall', 'Gardens'],
+            contact: {
+                  phone: '+91-413-2233656',
+                  email: 'ashram@sriaurobindoashram.org',
+                  website: 'https://sriaurobindoashram.org',
+            },
+            stats: [
+                  { value: '98', label: 'Years of Service', icon: Sun },
+                  { value: '2000+', label: 'Daily Visitors', icon: Users },
+                  { value: '∞', label: 'Spiritual Legacy', icon: Sparkles },
+            ],
+      },
+      {
+            id: 7,
+            name: 'Arka Wellness Centre',
+            fullName: 'Arka Wellness & Healing Centre',
+            slug: 'arka-wellness',
+            image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
+                  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+            ],
+            rating: 4.7,
+            reviewsCount: 320,
+            specialties: ['Ayurveda', 'Naturopathy', 'Yoga', 'Acupuncture'],
+            type: 'Private',
+            accreditation: ['NABH', 'Yoga Alliance'],
+            location: 'ECR Road, Pondicherry',
+            established: 2015,
+            featured: false,
+            tagline: 'Modern AYUSH Wellness',
+            description: 'A contemporary wellness center on East Coast Road combining traditional AYUSH therapies with modern wellness practices in a luxurious beachside setting.',
+            about: 'Arka Wellness Centre offers a premium wellness experience on the scenic East Coast Road. The center combines authentic Ayurveda and Naturopathy with yoga programs and modern spa treatments. With sea views and serene surroundings, it\'s perfect for wellness retreats.',
+            highlights: [
+                  'Beachside location',
+                  'Luxury wellness suites',
+                  'International clientele',
+                  'Wellness packages',
+                  'Yoga teacher training',
+            ],
+            therapies: ['Panchakarma', 'Naturopathy Detox', 'Yoga Retreats', 'Acupuncture', 'Spa Treatments'],
+            facilities: ['Treatment Suites', 'Yoga Shala', 'Swimming Pool', 'Organic Restaurant', 'Accommodation'],
+            contact: {
+                  phone: '+91-413-2655890',
+                  email: 'info@arkawellness.com',
+                  website: 'https://arkawellness.com',
+            },
+      },
+      {
+            id: 8,
+            name: 'IGMC Homeopathy Hospital',
+            fullName: 'Indira Gandhi Government Homeopathy Medical College & Hospital',
+            slug: 'igmc-homeopathy',
+            image: 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=1600&q=80',
+            gallery: [],
+            rating: 4.3,
+            reviewsCount: 280,
+            specialties: ['Homeopathy', 'Constitutional Treatment', 'Chronic Disease Management'],
+            type: 'Government',
+            accreditation: ['Govt. of Puducherry', 'CCH'],
+            location: 'Gorimedu, Pondicherry',
+            established: 1969,
+            featured: false,
+            tagline: 'Excellence in Homeopathy Education & Care',
+            description: 'The premier government institution for Homeopathy education and treatment in Puducherry, offering free homeopathic consultations and medicines.',
+            about: 'IGMC Homeopathy is a government medical college and hospital providing quality homeopathic education and healthcare. It offers both undergraduate and postgraduate programs in Homeopathy while serving patients with free consultations and medicines.',
+            highlights: [
+                  'Free homeopathic treatment',
+                  'Expert faculty physicians',
+                  'Research and education',
+                  'Chronic disease specialty',
+                  'Government certified',
+            ],
+            therapies: ['Constitutional Homeopathy', 'Acute Treatment', 'Preventive Care', 'Chronic Disease Management'],
+            facilities: ['OPD', 'IPD', 'Pharmacy', 'Research Department', 'Library'],
+            contact: {
+                  phone: '+91-413-2272789',
+                  email: 'igmcpondy@gov.in',
+                  website: 'https://health.py.gov.in/homeopathy',
+            },
+      },
+      {
+            id: 9,
+            name: 'Verite Wellness',
+            fullName: 'Verite Living & Learning Centre',
+            slug: 'verite-wellness',
+            image: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+                  'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800',
+            ],
+            rating: 4.8,
+            reviewsCount: 420,
+            specialties: ['Yoga', 'Meditation', 'Wellness Retreats', 'Personal Development'],
+            type: 'Community',
+            accreditation: ['Auroville Foundation', 'Yoga Alliance'],
+            location: 'Auroville',
+            established: 2000,
+            featured: true,
+            tagline: 'Living Well, Learning Always',
+            description: 'A holistic learning and wellness center in Auroville offering transformative programs, yoga retreats, and personal development workshops.',
+            about: 'Verite is a vibrant center for learning, healing, and growth in Auroville. It offers a diverse range of programs from yoga and meditation to personal development and therapeutic bodywork. The center emphasizes conscious living and self-discovery in a supportive community environment.',
+            highlights: [
+                  'Diverse workshop programs',
+                  'International facilitators',
+                  'Residential retreats',
+                  'Beautiful forest setting',
+                  'Organic cuisine',
+            ],
+            therapies: ['Yoga Programs', 'Meditation Retreats', 'Therapeutic Massage', 'Healing Workshops', 'Dance Therapy'],
+            facilities: ['Yoga Halls', 'Therapy Rooms', 'Guest Rooms', 'Dining Hall', 'Garden Spaces'],
+            contact: {
+                  phone: '+91-413-2622045',
+                  email: 'verite@auroville.org.in',
+                  website: 'https://verite.in',
+            },
+            stats: [
+                  { value: '24+', label: 'Years of Service', icon: Heart },
+                  { value: '100+', label: 'Programs/Year', icon: Sparkles },
+                  { value: '50+', label: 'Facilitators', icon: Users },
+            ],
+      },
+      {
+            id: 10,
+            name: 'Ananda Spa & Wellness',
+            fullName: 'Ananda Spa & Wellness Centre',
+            slug: 'ananda-spa-wellness',
+            image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1600&q=80',
+            gallery: [
+                  'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
+                  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
+            ],
+            rating: 4.6,
+            reviewsCount: 290,
+            specialties: ['Ayurveda', 'Spa Treatments', 'Yoga', 'Wellness Retreats'],
+            type: 'Private',
+            accreditation: ['Wellness Tourism Board'],
+            location: 'Serenity Beach, Pondicherry',
+            established: 2018,
+            featured: false,
+            tagline: 'Blissful Beachside Wellness',
+            description: 'A boutique wellness spa near Serenity Beach offering Ayurvedic treatments, yoga sessions, and rejuvenation programs with ocean views.',
+            about: 'Ananda Spa brings together the best of traditional Ayurveda and modern spa luxury. Located near the peaceful Serenity Beach, it offers personalized wellness programs, daily yoga classes, and authentic Ayurvedic treatments in a tranquil setting.',
+            highlights: [
+                  'Ocean-view treatment rooms',
+                  'Personalized wellness programs',
+                  'Daily yoga and meditation',
+                  'Organic skincare products',
+                  'Beach access',
+            ],
+            therapies: ['Abhyanga Massage', 'Shirodhara', 'Facial Treatments', 'Body Wraps', 'Yoga Sessions', 'Meditation'],
+            facilities: ['Spa Suites', 'Yoga Deck', 'Steam Room', 'Relaxation Lounge', 'Juice Bar'],
+            contact: {
+                  phone: '+91-413-2655123',
+                  email: 'hello@anandaspapondy.com',
+                  website: 'https://anandaspapondy.com',
+            },
+      },
+];
+
+// Filter utilities
+export const wellnessCenterTypes = ['All', 'Government', 'Private', 'Ashram', 'Community'] as const;
+
+export const ayushSpecialties = [
+      'All',
+      'Ayurveda',
+      'Yoga',
+      'Siddha Medicine',
+      'Homeopathy',
+      'Naturopathy',
+      'Meditation',
+      'Panchakarma',
+] as const;

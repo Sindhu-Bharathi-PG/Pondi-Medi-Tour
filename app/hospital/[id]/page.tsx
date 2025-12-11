@@ -687,6 +687,49 @@ export default function HospitalDetailPage() {
                                 </div>
                             </motion.div>
 
+                            {/* Related Treatments - Links to Services */}
+                            <motion.div
+                                initial={{ y: 50, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                className="bg-gradient-to-br from-[var(--medical-navy)] to-[var(--medical-dark-teal)] rounded-2xl shadow-lg p-8 text-white"
+                            >
+                                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                                    <Stethoscope className="w-6 h-6" />
+                                    Explore Treatments at {hospital.name}
+                                </h2>
+                                <p className="text-white/80 mb-6">
+                                    View detailed information about procedures, costs, and recovery times for treatments available at this hospital.
+                                </p>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {[
+                                        { name: 'Orthopedics', slug: 'orthopedics' },
+                                        { name: 'Cardiology', slug: 'cardiology' },
+                                        { name: 'Neurology', slug: 'neurology' },
+                                        { name: 'Oncology', slug: 'oncology' },
+                                        { name: 'IVF & Fertility', slug: 'ivf' },
+                                        { name: 'Eye Surgery', slug: 'ophthalmology' },
+                                    ].filter(t => hospital.specialties.some((s: string) =>
+                                        s.toLowerCase().includes(t.name.toLowerCase().split(' ')[0]) ||
+                                        t.name.toLowerCase().includes(s.toLowerCase().split(' ')[0])
+                                    )).slice(0, 6).map((treatment, i) => (
+                                        <Link
+                                            key={i}
+                                            href={`/services/${treatment.slug}`}
+                                            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-3 rounded-lg text-center font-medium transition-all hover:scale-105"
+                                        >
+                                            {treatment.name}
+                                        </Link>
+                                    ))}
+                                    <Link
+                                        href="/services"
+                                        className="bg-[var(--medical-gold)] text-[var(--medical-navy)] px-4 py-3 rounded-lg text-center font-bold transition-all hover:scale-105 col-span-2 md:col-span-1"
+                                    >
+                                        View All Treatments →
+                                    </Link>
+                                </div>
+                            </motion.div>
+
                             {/* Departments with Images */}
                             <motion.div
                                 initial={{ y: 50, opacity: 0 }}
@@ -931,7 +974,7 @@ export default function HospitalDetailPage() {
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-6 pt-6 border-t">
                                     <Link
                                         href="/booking"
-                                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all text-center block"
+                                        className="w-full bg-gradient-to-r from-[var(--medical-teal)] to-[var(--medical-dark-teal)] text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all text-center block"
                                     >
                                         Book Consultation
                                     </Link>
@@ -943,7 +986,7 @@ export default function HospitalDetailPage() {
                                 initial={{ x: 50, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.6 }}
-                                className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white"
+                                className="bg-gradient-to-br from-[var(--medical-teal)] to-[var(--medical-dark-teal)] rounded-2xl shadow-lg p-6 text-white"
                             >
                                 <h3 className="text-xl font-bold mb-4">Quick Facts</h3>
                                 <div className="space-y-3">

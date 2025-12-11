@@ -90,6 +90,7 @@ export const WELLNESS_NAV_LINKS = [
       { href: '/about', label: 'About', badge: 'Popular', icon: 'MapPin' },
       { href: '/wellness', label: 'Retreats', icon: 'Tent' },
       { href: '/ayush', label: 'AYUSH', icon: 'Sparkles' },
+      { href: '/wellness-center', label: 'Centers', icon: 'Building2' },
       { href: '/yoga-meditation', label: 'Yoga', icon: 'FlowerLotus' },
       { href: '/spa-rejuvenation', label: 'Spa', icon: 'Bath' },
       { href: '/destination', label: 'Explore', icon: 'Compass' },
