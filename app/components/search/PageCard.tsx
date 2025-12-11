@@ -40,7 +40,8 @@ export default function PageCard({ card, variant = 'default', onClick }: PageCar
 
   // Get icon name and use it directly in JSX
   const iconName = card.icon || 'FileText';
-  const Icon = (Icons as Record<string, React.ComponentType<{ className?: string }>>)[iconName] || Icons.FileText;
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
+  const Icon = IconComponent || Icons.FileText;
 
   if (variant === 'compact') {
     return (
@@ -79,8 +80,8 @@ export default function PageCard({ card, variant = 'default', onClick }: PageCar
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-700"
             />
-        ) : (
-          <div className={`w-full h-full bg-linear-to-br ${getCategoryColor(card.category)}`} />
+          ) : (
+            <div className={`w-full h-full bg-linear-to-br ${getCategoryColor(card.category)}`} />
           )}
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />          {/* Badge */}
           {card.badge && (
@@ -134,7 +135,7 @@ export default function PageCard({ card, variant = 'default', onClick }: PageCar
           <div className={`w-full h-full bg-linear-to-br ${getCategoryColor(card.category)}`} />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-        
+
         {/* Badge */}
         {card.badge && (
           <div className="absolute top-4 right-4">

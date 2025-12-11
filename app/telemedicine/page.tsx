@@ -23,22 +23,37 @@ const TelemedicinePage = () => {
       ];
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  <section className="relative pt-32 pb-24 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-900 via-blue-800 to-indigo-900" />
-                        <div className="relative container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
-                                    <Video className="w-5 h-5 text-cyan-400" />
-                                    <span className="text-sm font-medium">Consult From Anywhere in the World</span>
-                              </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">Virtual<span className="block text-cyan-300">Medical Consultations</span></h1>
-                              <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">Bridge the distance before you board the plane. Share your reports (MRI, CT, Blood work) securely with Pondicherry's top consultants. Get a confirmed diagnosis and a tentative treatment plan remotely, saving you time and uncertainty upon arrival.</p>
-                              <div className="flex flex-wrap justify-center gap-4">
-                                    <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2">
-                                          <Calendar className="w-5 h-5" />Book Consultation</button>
-                                    <button className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all">How It Works</button>
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Telemedicine</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>HIPAA Compliant Consultations</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+                                          Virtual Medical
+                                          <span className="block text-[#bf9b30]">Consultations</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-8">
+                                          Connect with Pondicherry&apos;s top specialists from anywhere in the world. Share reports securely and get a confirmed diagnosis before you travel.
+                                    </p>
+                                    <div className="flex flex-wrap gap-4">
+                                          <button className="inline-flex items-center gap-2 bg-[var(--medical-gold)] text-[var(--medical-navy)] px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-all">
+                                                <Calendar className="w-5 h-5" />Book Consultation
+                                          </button>
+                                          <button className="inline-flex items-center gap-2 bg-white/10 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/20">
+                                                How It Works
+                                          </button>
+                                    </div>
                               </div>
                         </div>
                   </section>

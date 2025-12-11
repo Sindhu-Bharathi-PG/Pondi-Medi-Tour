@@ -1,5 +1,6 @@
 "use client";
 
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
 import { HYBRID_PACKAGES } from '@/app/utils/constants';
 import Image from 'next/image';
 import React from 'react';

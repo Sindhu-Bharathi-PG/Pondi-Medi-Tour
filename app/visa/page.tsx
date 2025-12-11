@@ -57,25 +57,31 @@ const VisaPage = () => {
       const countries = ['USA', 'UK', 'Canada', 'Australia', 'UAE', 'Saudi Arabia', 'Singapore', 'Germany', 'France'];
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
                   {/* Hero */}
-                  <section className="relative pt-32 pb-20 bg-gradient-to-br from-blue-900 via-indigo-800 to-blue-900">
-                        <div className="container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                    <FileText className="w-5 h-5 text-blue-300" />
-                                    <span className="text-sm font-medium">Complete Visa Assistance</span>
-                              </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">
-                                    Medical Visa
-                                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300">Made Simple</span>
-                              </h1>
-                              <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-                                    Entering India for medical care requires specific documentation. We streamline the process for the Indian Medical Visa (M-Visa), the new <span className="text-amber-300 font-semibold">AYUSH Visa (AY)</span> for wellness travelers, and Medical Attendant Visa (MX-Visa). We provide the critical 'Letter of Invitation' required by Indian embassies.
-                              </p>
-                              <div className="flex flex-wrap justify-center gap-4">
-                                    <Link href="/booking" className="bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2">
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 hero-premium">
+                        <div className="container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Visa Assistance</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>Official Invitation Letter Provider</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
+                                          Medical Visa
+                                          <span className="block text-[#bf9b30]">Made Simple</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-8">
+                                          We streamline the M-Visa, AYUSH Visa, and Medical Attendant Visa process. We provide the critical &apos;Letter of Invitation&apos; required by Indian embassies.
+                                    </p>
+                                    <Link href="/booking" className="inline-flex items-center gap-2 bg-[var(--medical-gold)] text-[var(--medical-navy)] px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-all">
                                           Get Invitation Letter <ChevronRight className="w-5 h-5" />
                                     </Link>
                               </div>

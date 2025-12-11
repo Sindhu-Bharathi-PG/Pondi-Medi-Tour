@@ -9,12 +9,12 @@ const BookingPage = () => {
       const scrolled = useScrolled(50);
       const [step, setStep] = useState(1);
       const [formData, setFormData] = useState({ name: '', email: '', phone: '', country: '', treatment: '', message: '' });
-      const [errors, setErrors] = useState<{[key:string]: string}>({});
+      const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
       const treatments = ['Orthopedics', 'IVF & Fertility', 'Cardiology', 'Ophthalmology', 'Dental', 'Gastroenterology', 'Neurology', 'Oncology'];
 
       const handleStep1Next = () => {
-            const newErrors: {[key:string]: string} = {};
+            const newErrors: { [key: string]: string } = {};
             if (!formData.name.trim()) newErrors.name = 'Please enter your full name';
             if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Please enter a valid email address';
             if (!formData.phone.trim()) newErrors.phone = 'Please enter a phone number';
@@ -29,35 +29,47 @@ const BookingPage = () => {
       };
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  <section className="relative pt-32 pb-20 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-800 to-indigo-900" />
-                        <div className="relative container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
-                                    <Calendar className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm font-medium">Free Consultation • No Obligations</span>
+                  <section className="relative pt-28 pb-12 md:pt-32 md:pb-16 overflow-hidden hero-premium">
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Book Consultation</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>Free Consultation • No Obligations</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+                                          Book Your
+                                          <span className="block text-[#bf9b30]">Medical Journey</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl">
+                                          Secure your slot with zero booking fees. Whether it&apos;s a doctor&apos;s appointment or a wellness retreat, book it here.
+                                    </p>
                               </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">Book Your<span className="block text-purple-300">Medical Journey</span></h1>
-                              <p className="text-xl text-purple-100 max-w-3xl mx-auto">Secure your slot. Whether it's a doctor's appointment or a room in a wellness resort, book it here with zero booking fees.</p>
                         </div>
                   </section>
 
-                  <section className="py-16 -mt-8 relative z-10">
-                        <div className="container mx-auto px-4">
+                  <section className="py-12 relative z-10">
+                        <div className="container-premium">
                               <div className="max-w-4xl mx-auto">
                                     {/* Progress Steps */}
-                                    <div className="flex items-center justify-center gap-4 mb-12">
+                                    <div className="flex items-center justify-center gap-4 mb-10">
                                           {[1, 2, 3].map((s) => (
                                                 <div key={s} className="flex items-center gap-2">
-                                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'}`}>{s}</div>
-                                                      {s < 3 && <div className={`w-16 h-1 ${step > s ? 'bg-indigo-600' : 'bg-gray-200'}`} />}
+                                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s ? 'bg-[var(--medical-teal)] text-white' : 'bg-gray-200 text-gray-500'}`}>{s}</div>
+                                                      {s < 3 && <div className={`w-16 h-1 ${step > s ? 'bg-[var(--medical-teal)]' : 'bg-gray-200'}`} />}
                                                 </div>
                                           ))}
                                     </div>
 
-                                    <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+                                    <div className="card-premium p-8 md:p-12">
                                           {step === 1 && (
                                                 <div>
                                                       <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>

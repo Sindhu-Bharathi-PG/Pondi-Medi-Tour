@@ -136,42 +136,47 @@ const DoctorPage = () => {
             : doctors.filter(d => d.specialty === activeSpecialty);
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  {/* Hero Section */}
-                  <section className="relative pt-32 pb-20 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900" />
-                        <div className="absolute inset-0 opacity-20">
+                  {/* Hero Section - Unique: World-Class Medical Specialists */}
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                        <div className="absolute inset-0 opacity-15">
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1600')] bg-cover bg-center" />
                         </div>
 
-                        <div className="relative container mx-auto px-4">
-                              <div className="max-w-4xl mx-auto text-center text-white">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                          <GraduationCap className="w-5 h-5 text-yellow-400" />
-                                          <span className="text-sm font-medium">200+ Internationally Trained Specialists</span>
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <Link href="/" className="hover:text-white">Home</Link>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Specialist Doctors</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>200+ Verified Specialists</span>
                                     </div>
-                                    <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                                          Expert Doctors
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
-                                                Personalized Care
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
+                                          World-Class Medical
+                                          <span className="block text-[#bf9b30]">
+                                                Specialists
                                           </span>
                                     </h1>
-                                    <p className="text-xl md:text-2xl text-purple-100 leading-relaxed max-w-3xl mx-auto mb-8">
-                                          Meet doctors who have shaped medical textbooks. Pondicherry's medical community is unique—many specialists here double as professors at prestigious medical colleges. This academic depth ensures your treatment is based on the absolute latest research and techniques.
+                                    <p className="text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl mb-8">
+                                          Every doctor in our network holds verified international credentials. Many are professors at prestigious medical colleges, ensuring your treatment is based on the latest research.
                                     </p>
 
                                     {/* Search Bar */}
-                                    <div className="max-w-2xl mx-auto relative">
-                                          <div className="flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
-                                                <Search className="w-6 h-6 text-gray-400 ml-6" />
+                                    <div className="max-w-xl">
+                                          <div className="flex items-center bg-white rounded-xl shadow-xl overflow-hidden">
+                                                <Search className="w-5 h-5 text-gray-400 ml-4" />
                                                 <input
                                                       type="text"
-                                                      placeholder="Search by doctor name, specialty, or condition..."
-                                                      className="flex-1 px-4 py-5 text-gray-800 focus:outline-none"
+                                                      placeholder="Search by doctor name, specialty..."
+                                                      className="flex-1 px-4 py-4 text-gray-800 focus:outline-none"
                                                 />
-                                                <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-5 font-semibold hover:shadow-lg transition-all">
+                                                <button className="bg-[var(--medical-teal)] text-white px-6 py-4 font-semibold hover:bg-[var(--medical-dark-teal)] transition-all">
                                                       Search
                                                 </button>
                                           </div>
@@ -181,9 +186,9 @@ const DoctorPage = () => {
                   </section>
 
                   {/* Stats Bar */}
-                  <section className="bg-white py-8 shadow-lg relative z-10 -mt-4">
-                        <div className="container mx-auto px-4">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  <section className="bg-white py-6 shadow-md relative z-10 border-b border-gray-100">
+                        <div className="container-premium">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                                     {[
                                           { value: '200+', label: 'Expert Doctors', icon: Stethoscope },
                                           { value: '50K+', label: 'Successful Surgeries', icon: Award },
@@ -191,12 +196,12 @@ const DoctorPage = () => {
                                           { value: '4.8', label: 'Average Rating', icon: Star },
                                     ].map((stat, index) => (
                                           <div key={index} className="flex items-center justify-center gap-3">
-                                                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                                      <stat.icon className="w-6 h-6 text-purple-600" />
+                                                <div className="w-10 h-10 bg-[var(--medical-light-teal)] rounded-lg flex items-center justify-center">
+                                                      <stat.icon className="w-5 h-5 text-[var(--medical-teal)]" />
                                                 </div>
                                                 <div className="text-left">
-                                                      <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
-                                                      <div className="text-gray-600 text-sm">{stat.label}</div>
+                                                      <div className="text-xl font-bold text-[var(--medical-navy)]">{stat.value}</div>
+                                                      <div className="text-xs text-[var(--medical-slate)]">{stat.label}</div>
                                                 </div>
                                           </div>
                                     ))}
@@ -214,8 +219,8 @@ const DoctorPage = () => {
                                                 key={specialty.id}
                                                 onClick={() => setActiveSpecialty(specialty.id)}
                                                 className={`px-6 py-3 rounded-full font-medium transition-all ${activeSpecialty === specialty.id
-                                                            ? 'bg-purple-600 text-white shadow-lg'
-                                                            : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
+                                                      ? 'bg-purple-600 text-white shadow-lg'
+                                                      : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
                                                       }`}
                                           >
                                                 {specialty.label}

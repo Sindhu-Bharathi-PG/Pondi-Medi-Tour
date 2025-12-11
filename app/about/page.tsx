@@ -40,56 +40,61 @@ const AboutPage = () => {
       ];
 
       return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  {/* Hero Section */}
-                  <section className="relative pt-32 pb-20 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-900" />
-                        <div className="absolute inset-0 opacity-20">
+                  {/* Hero Section - Unique: Our Mission */}
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                        <div className="absolute inset-0 opacity-15">
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=1600')] bg-cover bg-center" />
                         </div>
 
-                        <div className="relative container mx-auto px-4">
-                              <div className="max-w-4xl mx-auto text-center text-white">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                          <Globe className="w-5 h-5 text-yellow-400" />
-                                          <span className="text-sm font-medium">India: Global Healthcare Destination</span>
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/" className="hover:text-white">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">About Us</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>Government-Recognized Portal</span>
                                     </div>
-                                    <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                                          World-Class Healthcare
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
-                                                at Unbeatable Value
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
+                                          Our Mission:
+                                          <span className="block text-[#bf9b30]">
+                                                Accessible World-Class Care
                                           </span>
                                     </h1>
-                                    <p className="text-xl md:text-2xl text-emerald-100 leading-relaxed max-w-3xl mx-auto">
-                                          Discover why millions choose India for premium medical treatments and wellness experiences. Save up to 70% while receiving internationally accredited care in serene coastal settings.
+                                    <p className="text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl">
+                                          Connecting international patients with India&apos;s finest healthcare institutions. Save up to 70% while receiving internationally accredited care in serene coastal settings.
                                     </p>
                               </div>
                         </div>
 
                         {/* Wave decoration */}
                         <div className="absolute bottom-0 left-0 right-0">
-                              <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white" />
+                              <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 80L60 70C120 60 240 40 360 30C480 20 600 20 720 25C840 30 960 40 1080 45C1200 50 1320 50 1380 50L1440 50V80H0Z" fill="var(--medical-cream)" />
                               </svg>
                         </div>
                   </section>
 
-                  {/* Stats Section */}
-                  <section className="py-16 -mt-8 relative z-10">
-                        <div className="container mx-auto px-4">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {/* Mission Stats Section */}
+                  <section className="py-12 relative z-10">
+                        <div className="container-premium">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {stats.map((stat, index) => (
                                           <div
                                                 key={index}
-                                                className="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+                                                className="card-premium p-6 text-center"
                                           >
-                                                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center">
-                                                      <stat.icon className="w-8 h-8 text-white" />
+                                                <div className="w-12 h-12 mx-auto mb-3 bg-[var(--medical-light-teal)] rounded-xl flex items-center justify-center">
+                                                      <stat.icon className="w-6 h-6 text-[var(--medical-teal)]" />
                                                 </div>
-                                                <div className="text-4xl font-bold text-gray-800 mb-2">{stat.value}</div>
-                                                <div className="text-gray-600 font-medium">{stat.label}</div>
+                                                <div className="text-2xl font-bold text-[var(--medical-navy)] mb-1">{stat.value}</div>
+                                                <div className="text-sm text-[var(--medical-slate)]">{stat.label}</div>
                                           </div>
                                     ))}
                               </div>

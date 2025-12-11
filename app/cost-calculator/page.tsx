@@ -34,17 +34,29 @@ const CostCalculatorPage = () => {
       const savingsPercent = homePrice > 0 ? Math.round((savings / homePrice) * 100) : 0;
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
-                  <section className="relative pt-32 pb-20 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-emerald-800 to-teal-900" />
-                        <div className="relative container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
-                                    <TrendingDown className="w-5 h-5 text-green-400" />
-                                    <span className="text-sm font-medium">Save 60-80% on Medical Procedures</span>
+                  <section className="relative pt-28 pb-12 md:pt-32 md:pb-16 overflow-hidden hero-premium">
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Cost Calculator</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>No Hidden Fees Guarantee</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+                                          Cost Transparency
+                                          <span className="block text-[#bf9b30]">Calculator</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl">
+                                          Get accurate cost estimates for your treatment. We account for hospital stay, medications, and post-op care—complete transparency.
+                                    </p>
                               </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">Compare Costs<span className="block text-green-300">See Your Savings</span></h1>
-                              <p className="text-xl text-emerald-100 max-w-3xl mx-auto">Medical bills shouldn't be a mystery. Use our estimator to budget your trip. We account for the procedure, hospital stay (ward vs. private suite), post-op medication, and physiotherapy.</p>
                         </div>
                   </section>
 

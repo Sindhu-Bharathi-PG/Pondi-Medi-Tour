@@ -45,24 +45,31 @@ const PatientSupportPage = () => {
       ];
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
                   {/* Hero Section */}
-                  <section className="relative pt-32 pb-20 bg-gradient-to-br from-indigo-900 to-blue-800 text-white">
-                        <div className="container mx-auto px-4 text-center">
-                              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                    <HeadphonesIcon className="w-5 h-5 text-indigo-300" />
-                                    <span className="text-sm font-medium">Patient First Support</span>
-                              </div>
-                              <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                                    We Are Here For You
-                              </h1>
-                              <p className="text-xl text-indigo-100 max-w-2xl mx-auto mb-8">
-                                    From arrival to recovery, our dedicated support team ensures your safety, comfort, and satisfaction. Aligned with India&apos;s National Medical Value Travel Strategy.
-                              </p>
-                              <div className="flex justify-center gap-4">
-                                    <button className="bg-white text-indigo-900 px-8 py-3 rounded-full font-bold hover:shadow-lg transition">
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 hero-premium text-white">
+                        <div className="container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Patient Support</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>24/7 Dedicated Support Team</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                                          We Are Here
+                                          <span className="block text-[#bf9b30]">For You</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-8">
+                                          From arrival to recovery, our dedicated support team ensures your safety, comfort, and satisfaction. Aligned with India&apos;s National Medical Value Travel Strategy.
+                                    </p>
+                                    <button className="inline-flex items-center gap-2 bg-[var(--medical-gold)] text-[var(--medical-navy)] px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-all">
                                           Contact Support
                                     </button>
                               </div>

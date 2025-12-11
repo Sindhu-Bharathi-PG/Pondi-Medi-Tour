@@ -1,4 +1,5 @@
-import { Language } from '../context/LanguageContext';
+// Language type definition (since LanguageContext doesn't exist yet)
+type Language = 'en' | 'fr' | 'ta' | 'hi' | 'ar' | 'ru' | 'es';
 
 interface TranslationParams {
   text: string;
@@ -16,7 +17,7 @@ class TranslationService {
   private static instance: TranslationService;
   private cache: Map<string, string> = new Map();
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): TranslationService {
     if (!TranslationService.instance) {

@@ -86,27 +86,34 @@ const PackagesPage = () => {
       ];
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  {/* Hero */}
-                  <section className="relative pt-32 pb-24 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-900" />
-                        <div className="absolute inset-0 opacity-30">
+                  {/* Hero - Unique: Complete Medical Care Packages */}
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                        <div className="absolute inset-0 opacity-20">
                               <Image src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1600" alt="Wellness" fill className="object-cover" />
                         </div>
-                        <div className="relative container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                    <Award className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm font-medium">Bundled Medical Care Packages</span>
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <Link href="/">Home</Link>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Care Packages</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>All-Inclusive Transparent Pricing</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
+                                          Complete Care
+                                          <span className="block text-[#bf9b30]">Packages</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-8">
+                                          Simplify your medical journey with all-inclusive bundles. Surgery, hospital stay, accommodation, and transfers—no hidden fees, no surprises.
+                                    </p>
                               </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">
-                                    Complete Care
-                                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-300">Packages</span>
-                              </h1>
-                              <p className="text-xl md:text-2xl text-emerald-100 max-w-3xl mx-auto">
-                                    Simplify your payment with all-inclusive medical bundles. These packages cover the surgery, surgeon fees, nursing charges, and airport transfers. No surprise line items.
-                              </p>
                         </div>
                   </section>
 

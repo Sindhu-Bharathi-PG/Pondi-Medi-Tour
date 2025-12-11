@@ -132,42 +132,47 @@ const HospitalPage = () => {
             : hospitals.filter(h => h.type === activeFilter);
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
-                  {/* Hero Section */}
-                  <section className="relative pt-32 pb-20 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900" />
-                        <div className="absolute inset-0 opacity-20">
+                  {/* Hero Section - Unique: Certified Healthcare Infrastructure */}
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden hero-premium">
+                        <div className="absolute inset-0 opacity-15">
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600')] bg-cover bg-center" />
                         </div>
 
-                        <div className="relative container mx-auto px-4">
-                              <div className="max-w-4xl mx-auto text-center text-white">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                          <Shield className="w-5 h-5 text-yellow-400" />
-                                          <span className="text-sm font-medium">50+ NABH Accredited Hospitals</span>
+                        <div className="relative container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <Link href="/" className="hover:text-white">Home</Link>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Partner Hospitals</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>50+ NABH Accredited Facilities</span>
                                     </div>
-                                    <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                                          World-Class Hospitals
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-                                                International Standards
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
+                                          Certified Healthcare
+                                          <span className="block text-[#bf9b30]">
+                                                Infrastructure
                                           </span>
                                     </h1>
-                                    <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto mb-8">
-                                          Our network is strictly curated. We partner only with hospitals that meet NABH (National Accreditation Board for Hospitals) standards. From the heritage-rich general hospitals to modern super-specialty centers on East Coast Road, every facility is vetted for hygiene, technology, and patient safety.
+                                    <p className="text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl mb-8">
+                                          Every partner hospital is rigorously vetted for NABH accreditation, cutting-edge technology, and international patient safety standards.
                                     </p>
 
                                     {/* Search Bar */}
-                                    <div className="max-w-2xl mx-auto relative">
-                                          <div className="flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
-                                                <Search className="w-6 h-6 text-gray-400 ml-6" />
+                                    <div className="max-w-xl">
+                                          <div className="flex items-center bg-white rounded-xl shadow-xl overflow-hidden">
+                                                <Search className="w-5 h-5 text-gray-400 ml-4" />
                                                 <input
                                                       type="text"
-                                                      placeholder="Search hospitals, specialties, or treatments..."
-                                                      className="flex-1 px-4 py-5 text-gray-800 focus:outline-none"
+                                                      placeholder="Search hospitals, specialties..."
+                                                      className="flex-1 px-4 py-4 text-gray-800 focus:outline-none"
                                                 />
-                                                <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-5 font-semibold hover:shadow-lg transition-all">
+                                                <button className="bg-[var(--medical-teal)] text-white px-6 py-4 font-semibold hover:bg-[var(--medical-dark-teal)] transition-all">
                                                       Search
                                                 </button>
                                           </div>
@@ -177,9 +182,9 @@ const HospitalPage = () => {
                   </section>
 
                   {/* Stats Bar */}
-                  <section className="bg-white py-8 shadow-lg relative z-10 -mt-4">
-                        <div className="container mx-auto px-4">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  <section className="bg-white py-6 shadow-md relative z-10 border-b border-gray-100">
+                        <div className="container-premium">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                                     {[
                                           { value: '50+', label: 'Partner Hospitals' },
                                           { value: '200+', label: 'Specialist Doctors' },
@@ -187,8 +192,8 @@ const HospitalPage = () => {
                                           { value: '99.2%', label: 'Success Rate' },
                                     ].map((stat, index) => (
                                           <div key={index}>
-                                                <div className="text-3xl font-bold text-blue-600">{stat.value}</div>
-                                                <div className="text-gray-600">{stat.label}</div>
+                                                <div className="text-2xl font-bold text-[var(--medical-teal)]">{stat.value}</div>
+                                                <div className="text-sm text-[var(--medical-slate)]">{stat.label}</div>
                                           </div>
                                     ))}
                               </div>

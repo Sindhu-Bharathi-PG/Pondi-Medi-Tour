@@ -5,9 +5,10 @@
  * and page registry in your components.
  */
 
-import { 
-  searchPages, 
-  getPageById, 
+import React, { useState } from 'react';
+import {
+  searchPages,
+  getPageById,
   getMedicalPages,
   getWellnessPages,
   getFeaturedPages,
@@ -30,15 +31,15 @@ export function BasicSearchExample() {
 
   return (
     <div>
-      <input 
-        value={query} 
+      <input
+        value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search..."
       />
       <button onClick={handleSearch}>Search</button>
-      
-      <SearchResults 
-        results={results} 
+
+      <SearchResults
+        results={results}
         query={query}
       />
     </div>
@@ -50,7 +51,7 @@ export function BasicSearchExample() {
 // =====================================
 export function MedicalPagesExample() {
   const medicalPages = getMedicalPages();
-  
+
   return (
     <div className="grid md:grid-cols-3 gap-6">
       {medicalPages.map((page) => (
@@ -65,14 +66,14 @@ export function MedicalPagesExample() {
 // =====================================
 export function FeaturedPagesExample() {
   const featuredPages = getFeaturedPages();
-  
+
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {featuredPages.map((page) => (
-        <PageCard 
-          key={page.id} 
-          card={page} 
-          variant="featured" 
+        <PageCard
+          key={page.id}
+          card={page}
+          variant="featured"
         />
       ))}
     </div>
@@ -84,13 +85,13 @@ export function FeaturedPagesExample() {
 // =====================================
 export function QuickActionsExample() {
   const quickActions = getQuickActionPages();
-  
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {quickActions.map((action) => (
-        <PageCard 
-          key={action.id} 
-          card={action} 
+        <PageCard
+          key={action.id}
+          card={action}
           variant="compact"
           onClick={() => console.log('Clicked:', action.title)}
         />
@@ -104,14 +105,14 @@ export function QuickActionsExample() {
 // =====================================
 export function RelatedPagesExample({ currentPageId }: { currentPageId: string }) {
   const relatedPages = getRelatedPages(currentPageId, 3);
-  
+
   return (
     <aside className="space-y-4">
       <h3 className="text-xl font-bold">You May Also Like</h3>
       {relatedPages.map((page) => (
-        <PageCard 
-          key={page.id} 
-          card={page} 
+        <PageCard
+          key={page.id}
+          card={page}
           variant="compact"
         />
       ))}
@@ -124,12 +125,12 @@ export function RelatedPagesExample({ currentPageId }: { currentPageId: string }
 // =====================================
 export function CategoryFilterExample() {
   const [category, setCategory] = useState<'all' | 'medical' | 'wellness'>('all');
-  
-  const pages = category === 'all' 
+
+  const pages = category === 'all'
     ? [...getMedicalPages(), ...getWellnessPages()]
     : category === 'medical'
-    ? getMedicalPages()
-    : getWellnessPages();
+      ? getMedicalPages()
+      : getWellnessPages();
 
   return (
     <div>
@@ -138,7 +139,7 @@ export function CategoryFilterExample() {
         <button onClick={() => setCategory('medical')}>Medical</button>
         <button onClick={() => setCategory('wellness')}>Wellness</button>
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-6">
         {pages.map((page) => (
           <PageCard key={page.id} card={page} />
@@ -153,12 +154,12 @@ export function CategoryFilterExample() {
 // =====================================
 export function SpecificPageExample() {
   const costCalculatorPage = getPageById('cost-calculator');
-  
+
   if (!costCalculatorPage) return null;
-  
+
   return (
-    <PageCard 
-      card={costCalculatorPage} 
+    <PageCard
+      card={costCalculatorPage}
       variant="featured"
     />
   );
@@ -183,16 +184,16 @@ export function AutoCompleteExample() {
 
   return (
     <div className="relative">
-      <input 
+      <input
         value={query}
         onChange={(e) => handleInput(e.target.value)}
         placeholder="Start typing..."
       />
-      
+
       {suggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-lg mt-2 p-4 space-y-2">
           {suggestions.map((suggestion) => (
-            <PageCard 
+            <PageCard
               key={suggestion.id}
               card={suggestion}
               variant="compact"
@@ -213,26 +214,26 @@ export function AutoCompleteExample() {
 // =====================================
 export function ModeToggleExample() {
   const [mode, setMode] = useState<'medical' | 'wellness'>('medical');
-  
+
   const pages = mode === 'medical' ? getMedicalPages() : getWellnessPages();
 
   return (
     <div>
       <div className="flex items-center gap-4 mb-8">
-        <button 
+        <button
           onClick={() => setMode('medical')}
           className={mode === 'medical' ? 'active' : ''}
         >
           🏥 Medical Tourism
         </button>
-        <button 
+        <button
           onClick={() => setMode('wellness')}
           className={mode === 'wellness' ? 'active' : ''}
         >
           🧘 Wellness Tourism
         </button>
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-6">
         {pages.map((page) => (
           <PageCard key={page.id} card={page} />

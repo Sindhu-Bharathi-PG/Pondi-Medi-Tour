@@ -125,34 +125,42 @@ const TestimonialsPage = () => {
             : testimonials.filter(t => t.category === activeFilter);
 
       return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--medical-cream)]">
                   <Header />
 
                   {/* Hero */}
-                  <section className="relative pt-32 pb-20 bg-gradient-to-br from-rose-900 via-pink-800 to-rose-900">
-                        <div className="container mx-auto px-4 text-center text-white">
-                              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                    <Heart className="w-5 h-5 text-pink-300" />
-                                    <span className="text-sm font-medium">Real Stories from Real Patients</span>
+                  <section className="relative pt-28 pb-16 md:pt-32 md:pb-20 hero-premium">
+                        <div className="container-premium">
+                              {/* Breadcrumb */}
+                              <nav className="breadcrumb text-white/70 mb-8">
+                                    <a href="/">Home</a>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-white">Patient Stories</span>
+                              </nav>
+
+                              <div className="max-w-4xl">
+                                    <div className="gov-seal mb-6">
+                                          <span>15,000+ Verified Patient Reviews</span>
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
+                                          Patient Success
+                                          <span className="block text-[#bf9b30]">Stories</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-white/80 max-w-2xl">
+                                          Real stories from real patients. See how medical tourism in Pondicherry changed their lives.
+                                    </p>
                               </div>
-                              <h1 className="text-5xl md:text-7xl font-bold mb-6">
-                                    Patient
-                                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-300">Success Stories</span>
-                              </h1>
-                              <p className="text-xl text-rose-100 max-w-3xl mx-auto">
-                                    Real stories from real patients. See how a trip to Pondicherry changed their health.
-                              </p>
                         </div>
                   </section>
 
                   {/* Stats */}
-                  <section className="py-8 bg-white shadow-lg relative z-10 -mt-8">
-                        <div className="container mx-auto px-4">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  <section className="py-6 bg-white shadow-md relative z-10 border-b border-gray-100">
+                        <div className="container-premium">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                                     {stats.map((stat, i) => (
                                           <div key={i}>
-                                                <div className="text-3xl font-bold text-rose-600">{stat.value}</div>
-                                                <div className="text-gray-600">{stat.label}</div>
+                                                <div className="text-2xl font-bold text-[var(--medical-teal)]">{stat.value}</div>
+                                                <div className="text-sm text-[var(--medical-slate)]">{stat.label}</div>
                                           </div>
                                     ))}
                               </div>
