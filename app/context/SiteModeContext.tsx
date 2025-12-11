@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 export type SiteMode = 'medical' | 'wellness';
 
@@ -16,6 +17,8 @@ const SiteModeContext = createContext<SiteModeContextType | undefined>(undefined
 
 export const SiteModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const [mode, setModeState] = useState<SiteMode>('medical');
+      const router = useRouter();
+      const pathname = usePathname();
 
       useEffect(() => {
             // Load saved preference
@@ -36,7 +39,13 @@ export const SiteModeProvider: React.FC<{ children: ReactNode }> = ({ children }
       };
 
       const toggleMode = () => {
-            setMode(mode === 'medical' ? 'wellness' : 'medical');
+            const newMode = mode === 'medical' ? 'wellness' : 'medical';
+            setMode(newMode);
+
+            // Navigate to home page to trigger wave animation
+            if (pathname !== '/') {
+                  router.push('/');
+            }
       };
 
       return (
@@ -64,26 +73,26 @@ export const useSiteMode = () => {
 
 // Navigation links for each mode
 export const MEDICAL_NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
-  { href: '/services', label: 'Treatments' },
-  { href: '/hospital', label: 'Hospitals' },
-  { href: '/doctor', label: 'Doctors' },
-  { href: '/packages', label: 'Packages' },
-  { href: '/cost-calculator', label: 'Cost Tool' },
+      { href: '/', label: 'Home' },
+      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
+      { href: '/services', label: 'Treatments' },
+      { href: '/hospital', label: 'Hospitals' },
+      { href: '/doctor', label: 'Doctors' },
+      { href: '/packages', label: 'Packages' },
+      { href: '/cost-calculator', label: 'Cost Tool' },
 ] as const;
 
 // ============================================================================
 // SECTION 2: WELLNESS & LIFESTYLE - Simple holistic navigation
 // ============================================================================
 export const WELLNESS_NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
-  { href: '/wellness', label: 'Retreats' },
-  { href: '/ayush', label: 'AYUSH' },
-  { href: '/yoga-meditation', label: 'Yoga' },
-  { href: '/spa-rejuvenation', label: 'Spa' },
-  { href: '/destination', label: 'Explore' },
+      { href: '/', label: 'Home' },
+      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular' },
+      { href: '/wellness', label: 'Retreats' },
+      { href: '/ayush', label: 'AYUSH' },
+      { href: '/yoga-meditation', label: 'Yoga' },
+      { href: '/spa-rejuvenation', label: 'Spa' },
+      { href: '/destination', label: 'Explore' },
 ] as const;
 
 // Educational content links (Chapter 1)
