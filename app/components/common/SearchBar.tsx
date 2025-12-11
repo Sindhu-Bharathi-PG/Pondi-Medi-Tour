@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface SearchBarProps {
@@ -19,14 +20,16 @@ export default function SearchBar({
     size = 'lg'
 }: SearchBarProps) {
     const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
 
     const handleSearch = () => {
-        if (searchQuery && onSearch) {
-            onSearch(searchQuery);
-        } else if (searchQuery) {
-            console.log('Searching for:', searchQuery);
-            // Default search logic - could redirect to search results page
-            window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+        if (searchQuery.trim()) {
+            if (onSearch) {
+                onSearch(searchQuery.trim());
+            } else {
+                // Navigate to search page with query
+                router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            }
         }
     };
 

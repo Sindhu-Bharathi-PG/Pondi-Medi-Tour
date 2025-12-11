@@ -74,7 +74,7 @@ export const useSiteMode = () => {
 // Navigation links for each mode
 export const MEDICAL_NAV_LINKS = [
       { href: '/', label: 'Home', icon: 'Home' },
-      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular', icon: 'MapPin' },
+      { href: '/about', label: 'About', badge: 'Popular', icon: 'MapPin' },
       { href: '/services', label: 'Treatments', icon: 'Stethoscope' },
       { href: '/hospital', label: 'Hospitals', icon: 'Building2' },
       { href: '/doctor', label: 'Doctors', icon: 'UserRound' },
@@ -87,7 +87,7 @@ export const MEDICAL_NAV_LINKS = [
 // ============================================================================
 export const WELLNESS_NAV_LINKS = [
       { href: '/', label: 'Home', icon: 'Home' },
-      { href: '/why-pondicherry', label: 'Why Pondy?', badge: 'Popular', icon: 'MapPin' },
+      { href: '/about', label: 'About', badge: 'Popular', icon: 'MapPin' },
       { href: '/wellness', label: 'Retreats', icon: 'Tent' },
       { href: '/ayush', label: 'AYUSH', icon: 'Sparkles' },
       { href: '/yoga-meditation', label: 'Yoga', icon: 'FlowerLotus' },

@@ -205,11 +205,6 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
                     >
                         <SearchBar
                             mode={mode}
-                            onSearch={(query) => {
-                                console.log('Searching for:', query);
-                                // Add your search logic here
-                                // For example: router.push(`/search?q=${encodeURIComponent(query)}`);
-                            }}
                         />
                     </div>
 

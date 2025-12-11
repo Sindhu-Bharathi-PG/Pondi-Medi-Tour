@@ -6,7 +6,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bath, Building2, Calculator, ChevronDown, Compass, DollarSign, Globe, Home, Leaf, MapPin, Menu, Package, Search, Sparkles, Stethoscope, Tent, UserRound, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -63,6 +63,7 @@ const Header: React.FC<HeaderProps> = ({
       const [hasScrolled, setHasScrolled] = useState(false);
       const [hoveredLink, setHoveredLink] = useState<string | null>(null);
       const pathname = usePathname();
+      const router = useRouter();
 
       // Get language from context
       // const { currentLanguage, setLanguage, isLoading, t } = useLanguage();
@@ -227,9 +228,12 @@ const Header: React.FC<HeaderProps> = ({
                               ---------------------------------------------------------------------- */}
                               <div className={cn(
                                     "hidden lg:flex items-center flex-1 px-4 transition-all duration-300",
-                                    searchOpen ? "justify-start" : "justify-center"
+                                    "justify-center"
                               )}>
-                                    <ul className="flex items-center gap-0.5">
+                                    <ul className={cn(
+                                          "flex items-center gap-0.5 transition-all duration-300",
+                                          searchOpen && "opacity-50 scale-95"
+                                    )}>
                                           {navLinks.map((link) => {
                                                 const isActive = isActiveLink(link.href);
                                                 const IconComponent = link.icon ? iconMap[link.icon] : null;
@@ -243,13 +247,11 @@ const Header: React.FC<HeaderProps> = ({
                                                                         "relative z-10 flex items-center px-2.5 py-1.5 text-xs font-semibold transition-all duration-300",
                                                                         isActive
                                                                               ? "text-white drop-shadow-sm"
-                                                                              : (hasScrolled ? "text-gray-700 hover:text-gray-900" : "text-white/85 hover:text-white drop-shadow-sm")
+                                                                              : (hasScrolled ? "text-gray-700 hover:text-gray-900" : "text-white/85 hover:text-white drop-shadow-sm"),
+                                                                        searchOpen && "pointer-events-none"
                                                                   )}
                                                             >
-                                                                  <span className={cn(
-                                                                        "transition-all duration-300 overflow-hidden whitespace-nowrap",
-                                                                        searchOpen ? "w-0 opacity-0" : "w-auto opacity-100"
-                                                                  )}>
+                                                                  <span className="transition-all duration-300 whitespace-nowrap">
                                                                         {link.label}
                                                                   </span>
                                                             </Link>
@@ -300,50 +302,85 @@ const Header: React.FC<HeaderProps> = ({
                                                             initial={{ width: 0, opacity: 0 }}
                                                             animate={{ width: 200, opacity: 1 }}
                                                             exit={{ width: 0, opacity: 0 }}
-                                                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                            className="absolute right-10 top-1/2 -translate-y-1/2 overflow-hidden"
-                                                            style={{ marginRight: '0.5rem' }}
+                                                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                            className="absolute right-12 top-1/2 -translate-y-1/2 overflow-hidden"
                                                       >
-                                                            <input
-                                                                  ref={searchInputRef}
-                                                                  type="text"
-                                                                  placeholder="Search..."
-                                                                  value={searchQuery}
-                                                                  onChange={(e) => setSearchQuery(e.target.value)}
-                                                                  onKeyDown={(e) => {
-                                                                        if (e.key === 'Escape') {
-                                                                              setSearchOpen(false);
-                                                                              setSearchQuery('');
-                                                                        } else if (e.key === 'Enter' && searchQuery) {
-                                                                              console.log('Searching for:', searchQuery);
-                                                                        }
-                                                                  }}
-                                                                  className={cn(
-                                                                        "w-full px-4 py-2 text-xs rounded-full border outline-none transition-all font-medium",
-                                                                        hasScrolled
-                                                                              ? "bg-white border-gray-200 text-gray-700 placeholder-gray-400 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 shadow-lg"
-                                                                              : "bg-white/95 border-white/30 text-gray-700 placeholder-gray-500 focus:border-white/50 shadow-xl backdrop-blur-xl"
+                                                            <div className="relative">
+                                                                  <input
+                                                                        ref={searchInputRef}
+                                                                        type="text"
+                                                                        placeholder="Search..."
+                                                                        value={searchQuery}
+                                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                                        onKeyDown={(e) => {
+                                                                              if (e.key === 'Escape') {
+                                                                                    setSearchOpen(false);
+                                                                                    setSearchQuery('');
+                                                                              } else if (e.key === 'Enter' && searchQuery.trim()) {
+                                                                                    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                                                                                    setSearchOpen(false);
+                                                                                    setSearchQuery('');
+                                                                              }
+                                                                        }}
+                                                                        className={cn(
+                                                                              "w-full px-4 py-2 text-xs rounded-full border outline-none transition-all duration-300 font-medium",
+                                                                              hasScrolled
+                                                                                    ? "bg-white border-gray-200 text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 shadow-lg hover:shadow-xl"
+                                                                                    : "bg-white/95 border-white/30 text-gray-700 placeholder-gray-500 focus:border-white/60 focus:ring-2 focus:ring-white/20 shadow-xl backdrop-blur-xl hover:bg-white"
+                                                                        )}
+                                                                  />
+                                                                  {/* Clear button */}
+                                                                  {searchQuery && (
+                                                                        <motion.div
+                                                                              initial={{ scale: 0, rotate: -180 }}
+                                                                              animate={{ scale: 1, rotate: 0 }}
+                                                                              exit={{ scale: 0, rotate: 180 }}
+                                                                              className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                                        >
+                                                                              <button
+                                                                                    onClick={() => setSearchQuery('')}
+                                                                                    className={cn(
+                                                                                          "p-0.5 rounded-full transition-all duration-200 hover:scale-110 active:scale-90",
+                                                                                          isMedical ? "hover:bg-emerald-100 text-emerald-600" : "hover:bg-amber-100 text-amber-600"
+                                                                                    )}
+                                                                              >
+                                                                                    <X className="w-3 h-3" />
+                                                                              </button>
+                                                                        </motion.div>
                                                                   )}
-                                                            />
+                                                            </div>
                                                       </motion.div>
                                                 )}
                                           </AnimatePresence>
                                           <button
                                                 onClick={() => {
-                                                      if (searchOpen && searchQuery) {
-                                                            console.log('Searching for:', searchQuery);
+                                                      if (searchOpen && searchQuery.trim()) {
+                                                            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                                                            setSearchOpen(false);
+                                                            setSearchQuery('');
+                                                      } else {
+                                                            setSearchOpen(!searchOpen);
                                                       }
-                                                      setSearchOpen(!searchOpen);
                                                 }}
                                                 aria-label="Search"
                                                 className={cn(
-                                                      "p-2 rounded-full transition-all relative z-10 hover:scale-105 active:scale-95",
+                                                      "p-2 rounded-full transition-all duration-300 relative z-10 group",
                                                       hasScrolled
-                                                            ? "hover:bg-gray-100 text-gray-600"
-                                                            : "hover:bg-white/10 text-white/90"
+                                                            ? "hover:bg-gray-100 text-gray-600 hover:scale-110 active:scale-95"
+                                                            : "hover:bg-white/20 text-white/90 hover:scale-110 active:scale-95",
+                                                      searchOpen && "scale-110"
                                                 )}
                                           >
-                                                <Search className="w-4 h-4" />
+                                                <Search className={cn(
+                                                      "w-4 h-4 transition-all duration-300",
+                                                      searchOpen && "rotate-90",
+                                                      "group-hover:scale-110"
+                                                )} />
+                                                {/* Glow effect on hover */}
+                                                <div className={cn(
+                                                      "absolute inset-0 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 blur-md",
+                                                      isMedical ? "bg-emerald-400/20" : "bg-amber-400/20"
+                                                )} />
                                           </button>
                                     </div>
 
@@ -355,16 +392,16 @@ const Header: React.FC<HeaderProps> = ({
                                                       setCurrencyDropdownOpen(false);
                                                 }}
                                                 className={cn(
-                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50",
+                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-all duration-300 group",
                                                       hasScrolled
-                                                            ? "hover:bg-gray-100 text-gray-600"
-                                                            : "hover:bg-white/10 text-white/80"
+                                                            ? "hover:bg-gray-100 text-gray-600 hover:scale-105 active:scale-95"
+                                                            : "hover:bg-white/20 text-white/80 hover:scale-105 active:scale-95"
                                                 )}
                                           >
-                                                <span className="text-sm">{selectedLanguage.flag}</span>
+                                                <span className="text-sm transition-transform duration-300 group-hover:scale-110">{selectedLanguage.flag}</span>
                                                 <ChevronDown className={cn(
-                                                      "w-3 h-3 transition-transform",
-                                                      languageDropdownOpen && "rotate-180"
+                                                      "w-3 h-3 transition-all duration-300",
+                                                      languageDropdownOpen && "rotate-180 scale-110"
                                                 )} />
                                           </button>
 
@@ -410,16 +447,16 @@ const Header: React.FC<HeaderProps> = ({
                                                       setLanguageDropdownOpen(false);
                                                 }}
                                                 className={cn(
-                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-all duration-300 group",
                                                       hasScrolled
-                                                            ? "hover:bg-gray-100 text-gray-600"
-                                                            : "hover:bg-white/10 text-white/80"
+                                                            ? "hover:bg-gray-100 text-gray-600 hover:scale-105 active:scale-95"
+                                                            : "hover:bg-white/20 text-white/80 hover:scale-105 active:scale-95"
                                                 )}
                                           >
-                                                <span className="text-xs font-bold">{selectedCurrency.code}</span>
+                                                <span className="text-xs font-bold transition-transform duration-300 group-hover:scale-110">{selectedCurrency.code}</span>
                                                 <ChevronDown className={cn(
-                                                      "w-3 h-3 transition-transform",
-                                                      currencyDropdownOpen && "rotate-180"
+                                                      "w-3 h-3 transition-all duration-300",
+                                                      currencyDropdownOpen && "rotate-180 scale-110"
                                                 )} />
                                           </button>
 
@@ -429,19 +466,22 @@ const Header: React.FC<HeaderProps> = ({
                                                             initial={{ opacity: 0, y: -10, scale: 0.95 }}
                                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                            transition={{ duration: 0.15 }}
-                                                            className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                                                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                                            className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50"
                                                       >
                                                             <div className="p-1">
-                                                                  {CURRENCIES.map((currency) => (
-                                                                        <button
+                                                                  {CURRENCIES.map((currency, index) => (
+                                                                        <motion.button
                                                                               key={currency.code}
+                                                                              initial={{ opacity: 0, x: -10 }}
+                                                                              animate={{ opacity: 1, x: 0 }}
+                                                                              transition={{ delay: index * 0.03 }}
                                                                               onClick={() => {
                                                                                     setSelectedCurrency(currency);
                                                                                     setCurrencyDropdownOpen(false);
                                                                               }}
                                                                               className={cn(
-                                                                                    "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
+                                                                                    "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
                                                                                     selectedCurrency.code === currency.code
                                                                                           ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
                                                                                           : "hover:bg-gray-50 text-gray-700"
@@ -450,7 +490,7 @@ const Header: React.FC<HeaderProps> = ({
                                                                               <span className="w-6 text-center font-medium">{currency.symbol}</span>
                                                                               <span>{currency.code}</span>
                                                                               <span className="text-gray-400 text-xs ml-auto">{currency.name}</span>
-                                                                        </button>
+                                                                        </motion.button>
                                                                   ))}
                                                             </div>
                                                       </motion.div>
@@ -493,11 +533,11 @@ const Header: React.FC<HeaderProps> = ({
                                     <button
                                           onClick={() => setMobileMenuOpen(true)}
                                           className={cn(
-                                                "lg:hidden p-2.5 rounded-full transition-colors",
+                                                "lg:hidden p-2.5 rounded-full transition-all duration-300 group hover:scale-110 active:scale-95",
                                                 hasScrolled ? "bg-gray-100 hover:bg-gray-200 text-gray-700" : "bg-white/10 hover:bg-white/20 text-white"
                                           )}
                                     >
-                                          <Menu className="w-5 h-5" />
+                                          <Menu className="w-5 h-5 transition-transform duration-300 group-hover:rotate-180" />
                                     </button>
                               </div>
                         </motion.nav>
@@ -582,6 +622,13 @@ const Header: React.FC<HeaderProps> = ({
                                                             placeholder="Search treatments, hospitals..."
                                                             value={searchQuery}
                                                             onChange={(e) => setSearchQuery(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                  if (e.key === 'Enter' && searchQuery.trim()) {
+                                                                        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                                                                        setMobileMenuOpen(false);
+                                                                        setSearchQuery('');
+                                                                  }
+                                                            }}
                                                             className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300"
                                                       />
                                                 </div>
