@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import { Footer, Header } from '@/app/components/common';
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+import { useScrolled } from '@/app/hooks';
+import { ChevronRight, Clock, Droplets, Heart, Moon, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, Droplets, Heart, Moon, Sun, Leaf, Clock, Star, ChevronRight, CheckCircle, MapPin } from 'lucide-react';
-import { Header, Footer } from '@/app/components/common';
-import { useScrolled } from '@/app/hooks';
 
 const SpaRejuvenationPage = () => {
       const scrolled = useScrolled(50);
@@ -14,7 +14,7 @@ const SpaRejuvenationPage = () => {
             {
                   name: 'Signature Ayurvedic Spa',
                   duration: '90 min',
-                  price: '$120',
+                  price: 10000,
                   image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
                   description: 'Full body Abhyanga massage with warm herbal oils followed by steam therapy.',
                   benefits: ['Deep relaxation', 'Toxin release', 'Improved circulation', 'Glowing skin']
@@ -22,7 +22,7 @@ const SpaRejuvenationPage = () => {
             {
                   name: 'Shirodhara Bliss',
                   duration: '60 min',
-                  price: '$80',
+                  price: 6500,
                   image: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800',
                   description: 'Continuous flow of warm oil on forehead for deep mental relaxation.',
                   benefits: ['Stress relief', 'Better sleep', 'Mental clarity', 'Hair nourishment']
@@ -30,7 +30,7 @@ const SpaRejuvenationPage = () => {
             {
                   name: 'Balinese Retreat',
                   duration: '120 min',
-                  price: '$150',
+                  price: 12500,
                   image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800',
                   description: 'Combines deep tissue massage, aromatherapy, and hot stone therapy.',
                   benefits: ['Muscle tension relief', 'Energy balance', 'Aromatherapy benefits', 'Full relaxation']
@@ -38,7 +38,7 @@ const SpaRejuvenationPage = () => {
             {
                   name: 'Ocean Detox Wrap',
                   duration: '75 min',
-                  price: '$95',
+                  price: 8000,
                   image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800',
                   description: 'Seaweed body wrap with mineral-rich ocean extracts for detoxification.',
                   benefits: ['Detoxification', 'Skin toning', 'Mineral absorption', 'Inch loss']
@@ -46,9 +46,9 @@ const SpaRejuvenationPage = () => {
       ];
 
       const packages = [
-            { name: 'Half Day Escape', duration: '4 hours', price: '$250', treatments: 3 },
-            { name: 'Full Day Bliss', duration: '8 hours', price: '$450', treatments: 5 },
-            { name: 'Weekend Retreat', duration: '2 days', price: '$800', treatments: 8 },
+            { name: 'Half Day Escape', duration: '4 hours', price: 20000, treatments: 3 },
+            { name: 'Full Day Bliss', duration: '8 hours', price: 37500, treatments: 5 },
+            { name: 'Weekend Retreat', duration: '2 days', price: 66000, treatments: 8 },
       ];
 
       return (
@@ -122,7 +122,9 @@ const SpaRejuvenationPage = () => {
                                                 <div className="flex-1 p-6">
                                                       <div className="flex items-center justify-between mb-2">
                                                             <h3 className="text-xl font-bold text-gray-800">{treatment.name}</h3>
-                                                            <span className="text-2xl font-bold text-purple-600">{treatment.price}</span>
+                                                            <span className="text-2xl font-bold text-purple-600">
+                                                                  <ConvertedPrice amount={treatment.price} fromCurrency="INR" />
+                                                            </span>
                                                       </div>
                                                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                                                             <Clock className="w-4 h-4" />{treatment.duration}
@@ -151,7 +153,9 @@ const SpaRejuvenationPage = () => {
                                     {packages.map((pkg, i) => (
                                           <div key={i} className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all">
                                                 <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
-                                                <div className="text-3xl font-bold text-pink-300 mb-2">{pkg.price}</div>
+                                                <div className="text-3xl font-bold text-pink-300 mb-2">
+                                                      <ConvertedPrice amount={pkg.price} fromCurrency="INR" />
+                                                </div>
                                                 <p className="text-purple-100 mb-4">{pkg.duration} • {pkg.treatments} treatments</p>
                                                 <Link href="/booking" className="block w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:shadow-lg transition-all">
                                                       Book Package

@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import { Footer, Header } from '@/app/components/common';
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+import { useScrolled } from '@/app/hooks';
+import { Award, Building2, Camera, Car, ChevronRight, Globe, Heart, Hotel, MapPin, Plane, Sparkles, Sun, Utensils, Waves } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, Sun, Utensils, Camera, Waves, TreePine, Building2, Sparkles, Heart, Star, Calendar, Clock, Plane, Hotel, Car, ChevronRight, Globe, Award } from 'lucide-react';
-import { Header, Footer } from '@/app/components/common';
-import { useScrolled } from '@/app/hooks';
 
 const DestinationPage = () => {
       const scrolled = useScrolled(50);
@@ -67,21 +67,24 @@ const DestinationPage = () => {
                   name: 'Heritage Boutique Hotels',
                   type: 'Luxury',
                   image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',
-                  priceRange: '$150-400/night',
+                  priceMin: 12525,
+                  priceMax: 33400,
                   features: ['French Colonial Style', 'Private Gardens', 'Fine Dining']
             },
             {
                   name: 'Beach Resorts',
                   type: 'Premium',
                   image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600',
-                  priceRange: '$100-250/night',
+                  priceMin: 8350,
+                  priceMax: 20875,
                   features: ['Ocean Views', 'Pools', 'Spa Services']
             },
             {
                   name: 'Recovery Retreats',
                   type: 'Wellness',
                   image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600',
-                  priceRange: '$80-180/night',
+                  priceMin: 6680,
+                  priceMax: 15030,
                   features: ['Medical Support', 'Healthy Cuisine', 'Therapy Sessions']
             }
       ];
@@ -316,7 +319,9 @@ const DestinationPage = () => {
                                                 </div>
                                                 <div className="p-6">
                                                       <h3 className="text-xl font-bold text-gray-800 mb-2">{acc.name}</h3>
-                                                      <div className="text-2xl font-bold text-amber-600 mb-4">{acc.priceRange}</div>
+                                                      <div className="text-2xl font-bold text-amber-600 mb-4">
+                                                            <ConvertedPrice amount={acc.priceMin} fromCurrency="INR" /> - <ConvertedPrice amount={acc.priceMax} fromCurrency="INR" />/night
+                                                      </div>
                                                       <div className="flex flex-wrap gap-2">
                                                             {acc.features.map((f, j) => (
                                                                   <span key={j} className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">

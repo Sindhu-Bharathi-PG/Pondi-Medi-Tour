@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export interface Currency {
     code: string;
@@ -34,8 +34,28 @@ let exchangeRatesCache: { rates: Record<string, number>; timestamp: number } | n
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    // Default to INR, but try to load from localStorage on mount
     const [selectedCurrency, setSelectedCurrency] = useState<Currency>(CURRENCIES[3]); // Default to INR
     const [isConverting, setIsConverting] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Initialize from localStorage
+    useEffect(() => {
+        const savedCurrencyCode = localStorage.getItem('pondy_currency');
+        if (savedCurrencyCode) {
+            const savedCurrency = CURRENCIES.find(c => c.code === savedCurrencyCode);
+            if (savedCurrency) {
+                setSelectedCurrency(savedCurrency);
+            }
+        }
+        setIsInitialized(true);
+    }, []);
+
+    // Update localStorage when currency changes
+    const handleSetCurrency = (currency: Currency) => {
+        setSelectedCurrency(currency);
+        localStorage.setItem('pondy_currency', currency.code);
+    };
 
     // Fetch exchange rates from API
     const fetchExchangeRates = async (): Promise<Record<string, number>> => {
@@ -120,11 +140,17 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return `${currency.symbol}${formatted}`;
     };
 
+    // Prevent hydration mismatch by not rendering specific currency reliant UI until initialized if needed
+    // However, since we default to INR for SSR, this is fine. 
+    // Just ensuring we don't have hydration errors if local storage differs from server default?
+    // Actually, for a perfect match, we should render children, but the context values might update after mount.
+    // This is standard React behavior.
+
     return (
         <CurrencyContext.Provider
             value={{
                 selectedCurrency,
-                setSelectedCurrency,
+                setSelectedCurrency: handleSetCurrency,
                 convertAmount,
                 formatCurrency,
                 isConverting,

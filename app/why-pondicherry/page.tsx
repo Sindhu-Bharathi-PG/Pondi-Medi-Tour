@@ -1,22 +1,35 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import {
+      ArrowRight,
+      Award,
+      Building2,
+      CheckCircle,
+      ChevronRight,
+      DollarSign,
+      FileCheck,
+      Globe,
+      Heart,
+      Leaf,
+      Plane, Shield,
+      Star,
+      Stethoscope,
+      Users,
+      Waves
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Header, Footer } from '../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../components/common';
+import { ConvertedPrice } from '../components/common/ConvertedPrice';
 import { useScrolled } from '../hooks';
-import {
-      DollarSign, Building2, Stethoscope, Award, Leaf, Waves, Plane, Shield,
-      Star, ChevronRight, ArrowRight, CheckCircle, Users, Heart, Globe,
-      FileCheck, Quote, Download
-} from 'lucide-react';
 
 // Data
 const costData = [
-      { procedure: 'Hip Replacement', pondicherry: 8500, delhi: 10000, mumbai: 12000, singapore: 25000, us: 35000 },
-      { procedure: 'Cardiac Bypass', pondicherry: 12000, delhi: 14000, mumbai: 16000, singapore: 30000, us: 50000 },
-      { procedure: 'IVF Cycle', pondicherry: 3500, delhi: 4000, mumbai: 5000, singapore: 15000, us: 18000 },
-      { procedure: 'Dental Implant', pondicherry: 600, delhi: 700, mumbai: 800, singapore: 2500, us: 4000 },
+      { procedure: 'Hip Replacement', pondicherry: 710000, delhi: 835000, mumbai: 1002000, singapore: 2087500, us: 2922500 },
+      { procedure: 'Cardiac Bypass', pondicherry: 1002000, delhi: 1169000, mumbai: 1336000, singapore: 2505000, us: 4175000 },
+      { procedure: 'IVF Cycle', pondicherry: 292250, delhi: 334000, mumbai: 417500, singapore: 1252500, us: 1503000 },
+      { procedure: 'Dental Implant', pondicherry: 50100, delhi: 58450, mumbai: 66800, singapore: 208750, us: 334000 },
 ];
 
 const hospitals = [
@@ -40,9 +53,9 @@ const metrics = [
 ];
 
 const testimonials = [
-      { name: 'Robert Mitchell', country: 'USA', procedure: 'Hip Replacement', saved: '$26,500', spent: '$9,000', result: 'Walking 5 miles daily', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200' },
-      { name: 'Sarah Thompson', country: 'UK', procedure: 'Cardiac Bypass', saved: '$38,000', spent: '$12,000', result: 'Full recovery in 8 weeks', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200' },
-      { name: 'Michael Chen', country: 'Australia', procedure: 'IVF Treatment', saved: '$14,500', spent: '$3,500', result: 'Successful first cycle', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200' },
+      { name: 'Robert Mitchell', country: 'USA', procedure: 'Hip Replacement', saved: 2213500, spent: 751500, result: 'Walking 5 miles daily', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200' },
+      { name: 'Sarah Thompson', country: 'UK', procedure: 'Cardiac Bypass', saved: 3173000, spent: 1002000, result: 'Full recovery in 8 weeks', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200' },
+      { name: 'Michael Chen', country: 'Australia', procedure: 'IVF Treatment', saved: 1210750, spent: 292250, result: 'Successful first cycle', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200' },
 ];
 
 export default function WhyPondicherryPage() {
@@ -130,11 +143,11 @@ export default function WhyPondicherryPage() {
                                                 {costData.map((row, i) => (
                                                       <tr key={i} className={`border-b ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-emerald-50`}>
                                                             <td className="px-6 py-4 font-medium">{row.procedure}</td>
-                                                            <td className="px-6 py-4 text-center"><span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold">${row.pondicherry.toLocaleString()}</span></td>
-                                                            <td className="px-6 py-4 text-center text-gray-600">${row.delhi.toLocaleString()}</td>
-                                                            <td className="px-6 py-4 text-center text-gray-600">${row.mumbai.toLocaleString()}</td>
-                                                            <td className="px-6 py-4 text-center text-gray-600">${row.singapore.toLocaleString()}</td>
-                                                            <td className="px-6 py-4 text-center text-gray-600">${row.us.toLocaleString()}</td>
+                                                            <td className="px-6 py-4 text-center"><span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold"><ConvertedPrice amount={row.pondicherry} fromCurrency="INR" /></span></td>
+                                                            <td className="px-6 py-4 text-center text-gray-600"><ConvertedPrice amount={row.delhi} fromCurrency="INR" /></td>
+                                                            <td className="px-6 py-4 text-center text-gray-600"><ConvertedPrice amount={row.mumbai} fromCurrency="INR" /></td>
+                                                            <td className="px-6 py-4 text-center text-gray-600"><ConvertedPrice amount={row.singapore} fromCurrency="INR" /></td>
+                                                            <td className="px-6 py-4 text-center text-gray-600"><ConvertedPrice amount={row.us} fromCurrency="INR" /></td>
                                                       </tr>
                                                 ))}
                                           </tbody>
@@ -329,11 +342,11 @@ export default function WhyPondicherryPage() {
                                                             <div className="flex gap-4">
                                                                   <div className="bg-white rounded-xl p-3">
                                                                         <span className="text-sm text-gray-500 block">Spent</span>
-                                                                        <span className="text-xl font-bold">{t.spent}</span>
+                                                                        <span className="text-xl font-bold"><ConvertedPrice amount={t.spent} fromCurrency="INR" /></span>
                                                                   </div>
                                                                   <div className="bg-emerald-600 text-white rounded-xl p-3">
                                                                         <span className="text-sm text-emerald-100 block">Saved</span>
-                                                                        <span className="text-xl font-bold">{t.saved}</span>
+                                                                        <span className="text-xl font-bold"><ConvertedPrice amount={t.saved} fromCurrency="INR" /></span>
                                                                   </div>
                                                             </div>
                                                       </div>

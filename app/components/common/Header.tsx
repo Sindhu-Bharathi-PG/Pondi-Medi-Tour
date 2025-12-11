@@ -1,7 +1,7 @@
 "use client";
 
+import { CURRENCIES, useCurrency } from '@/app/context/CurrencyContext';
 import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
-// import { useLanguage, type Language } from '@/app/context/LanguageContext';
 import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, DollarSign, Globe, Leaf, Menu, Search, Stethoscope, X } from 'lucide-react';
@@ -31,17 +31,7 @@ const LANGUAGES: Array<{ code: Language; name: string; flag: string }> = [
       { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
-// Currency options
-const CURRENCIES = [
-      { code: 'USD', symbol: '$', name: 'US Dollar' },
-      { code: 'EUR', symbol: '€', name: 'Euro' },
-      { code: 'GBP', symbol: '£', name: 'British Pound' },
-      { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-      { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
-      { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
-      { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
-      { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
-];
+
 
 interface HeaderProps {
       highContrast?: boolean;
@@ -60,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({
 
       // New state for language, currency, and search
       const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
-      const [selectedCurrency, setSelectedCurrency] = useState(CURRENCIES[0]);
+      const { selectedCurrency, setSelectedCurrency } = useCurrency();
       const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
       const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
       const [searchOpen, setSearchOpen] = useState(false);
@@ -367,12 +357,12 @@ const Header: React.FC<HeaderProps> = ({
                                                                                     // setLanguage(lang.code);
                                                                                     setLanguageDropdownOpen(false);
                                                                               }}
-                                                                              // className={cn(
-                                                                              //       "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
-                                                                              //       // currentLanguage === lang.code
-                                                                              //             ? "bg-blue-500 text-white"
-                                                                              //             : "hover:bg-gray-100 text-gray-700"
-                                                                              // )}
+                                                                        // className={cn(
+                                                                        //       "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
+                                                                        //       // currentLanguage === lang.code
+                                                                        //             ? "bg-blue-500 text-white"
+                                                                        //             : "hover:bg-gray-100 text-gray-700"
+                                                                        // )}
                                                                         >
                                                                               <span className="mr-2">{lang.flag}</span>
                                                                               {lang.name}
