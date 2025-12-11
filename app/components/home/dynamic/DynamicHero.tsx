@@ -4,8 +4,9 @@ import EditableText from '@/app/components/admin/EditableText';
 import { useHomeConfigOptional } from '@/app/context/HomeConfigContext';
 import { HeroSectionConfig } from '@/app/types/homeConfig.types';
 import { getIcon } from '@/app/utils/iconMap';
-import { Phone, Search, Star } from 'lucide-react';
+import { Phone, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface DynamicHeroProps {
@@ -19,11 +20,81 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
     const [isVisible, setIsVisible] = useState(false);
     const [countUp, setCountUp] = useState<Record<string, number>>({});
-    const [searchQuery, setSearchQuery] = useState('');
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [slideAnimating, setSlideAnimating] = useState(false);
+
+    // Image slider configuration
+    const sliderImages = mode === 'medical' ? [
+        {
+            src: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1920',
+            alt: 'Modern Hospital Facilities'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920',
+            alt: 'Advanced Medical Technology'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920',
+            alt: 'Expert Medical Team'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1920',
+            alt: 'Pondicherry Beach'
+        }
+    ] : [
+        {
+            src: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1920',
+            alt: 'Yoga & Meditation'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1920',
+            alt: 'Wellness Retreat'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1920',
+            alt: 'Ayurvedic Spa'
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1920',
+            alt: 'Auroville Meditation'
+        }
+    ];
+
+    const nextSlide = () => {
+        setSlideAnimating(true);
+        setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+            setSlideAnimating(false);
+        }, 300);
+    };
+
+    const prevSlide = () => {
+        setSlideAnimating(true);
+        setTimeout(() => {
+            setCurrentSlide((prev) => (prev - 1 + sliderImages.length) % sliderImages.length);
+            setSlideAnimating(false);
+        }, 300);
+    };
 
     useEffect(() => {
         // Use setTimeout to defer state update to avoid hydration issues
         const visibilityTimer = setTimeout(() => setIsVisible(true), 0);
+
+        // Auto-advance slider every 5 seconds
+        const sliderTimer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+        }, 5000);
+
+        // Keyboard navigation
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
 
         // Count up animation for stats
         if (config.stats) {
@@ -49,12 +120,18 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
             return () => {
                 clearTimeout(visibilityTimer);
+                clearInterval(sliderTimer);
                 clearInterval(timer);
+                window.removeEventListener('keydown', handleKeyPress);
             };
         }
 
-        return () => clearTimeout(visibilityTimer);
-    }, [config.stats]);
+        return () => {
+            clearTimeout(visibilityTimer);
+            clearInterval(sliderTimer);
+            window.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [config.stats, sliderImages.length, nextSlide, prevSlide]);
 
     const handleContentUpdate = (path: string, value: string) => {
         if (homeConfig) {
@@ -87,21 +164,74 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
     return (
         <section className="relative h-screen min-h-[800px] flex items-center overflow-hidden">
-            {/* Background */}
+            {/* Background Image Slider */}
             <div className="absolute inset-0">
-                <Image
-                    src={config.content.backgroundImage}
-                    alt={mode === 'medical' ? 'Medical Tourism' : 'Wellness in Pondicherry'}
-                    fill
-                    className="object-cover brightness-90"
-                    priority
-                    quality={100}
-                />
-                <div className={`absolute inset-0 bg-gradient-to-r ${config.content.gradientColors} opacity-70`} />
+                {sliderImages.map((image, index) => (
+                    <div
+                        key={index}
+                        className={`absolute inset-0 transition-opacity duration-1000 ${
+                            index === currentSlide ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    >
+                        <Image
+                            src={image.src}
+                            alt={image.alt}
+                            fill
+                            className={`object-cover transition-transform duration-[8000ms] ${
+                                index === currentSlide ? 'scale-105' : 'scale-100'
+                            }`}
+                            priority={index === 0}
+                        />
+                    </div>
+                ))}
+                <div className={`absolute inset-0 bg-gradient-to-r ${config.content.gradientColors}`} />
+
+                {/* Slider Controls */}
+                <div className="absolute inset-0 flex items-center justify-between px-8 z-10">
+                    <button
+                        onClick={prevSlide}
+                        className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center group"
+                        aria-label="Previous slide"
+                    >
+                        <ChevronLeft className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                    <button
+                        onClick={nextSlide}
+                        className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center group"
+                        aria-label="Next slide"
+                    >
+                        <ChevronRight className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                </div>
+
+                {/* Slider Indicators with Caption */}
+                <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10">
+                    <div className={`text-white text-center mb-3 transition-opacity duration-500 ${
+                        isVisible ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                        <p className="text-sm font-medium bg-black/20 backdrop-blur-sm px-4 py-1 rounded-full inline-block">
+                            {sliderImages[currentSlide].alt}
+                        </p>
+                    </div>
+                    <div className="flex gap-2 justify-center">
+                        {sliderImages.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentSlide(index)}
+                                className={`transition-all ${
+                                    index === currentSlide
+                                        ? 'w-8 h-2 bg-white'
+                                        : 'w-2 h-2 bg-white/40 hover:bg-white/60'
+                                } rounded-full`}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
 
                 {/* Animated elements */}
                 {mode === 'medical' ? (
-                    <div className="absolute right-[10%] lg:right-[15%] top-1/2 transform -translate-y-1/2 hidden md:block">
+                    <div className="absolute right-1/4 top-1/2 transform -translate-y-1/2 hidden lg:block">
                         <div className="relative">
                             {[...Array(3)].map((_, i) => (
                                 <div
@@ -120,7 +250,7 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
                         </div>
                     </div>
                 ) : (
-                    <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
                         {[...Array(20)].map((_, i) => (
                             <div
                                 key={i}
@@ -138,11 +268,17 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
             </div>
 
             <div className="relative container mx-auto px-4">
-                <div className="max-w-3xl pr-4 md:pr-0 ">
+                <div className="max-w-3xl">
                     {/* Badge */}
                     <div
-                        className={`inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-5 mt-25 rounded-full mb-8 transition-all duration-700 delay-200 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
-                            }`}
+                        className={`inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full mb-8 transition-all duration-500 ${
+                            slideAnimating 
+                                ? 'translate-x-10 opacity-0' 
+                                : isVisible 
+                                    ? 'translate-x-0 opacity-100' 
+                                    : '-translate-x-10 opacity-0'
+                        }`}
+                        style={{ transitionDelay: slideAnimating ? '0ms' : '200ms' }}
                     >
                         {BadgeIcon && <BadgeIcon className={`w-5 h-5 ${themeColors.accentText}`} />}
                         <EditableText
@@ -164,8 +300,14 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
                     {/* Title */}
                     <h1
-                        className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-5 leading-tight transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                            }`}
+                        className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight transition-all duration-500 ${
+                            slideAnimating 
+                                ? 'translate-y-10 opacity-0' 
+                                : isVisible 
+                                    ? 'translate-y-0 opacity-100' 
+                                    : 'translate-y-10 opacity-0'
+                        }`}
+                        style={{ transitionDelay: slideAnimating ? '0ms' : '300ms' }}
                     >
                         <EditableText
                             value={config.content.title.line1}
@@ -185,62 +327,72 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
                     {/* Subtitle */}
                     <div
-                        className={`transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                            }`}
+                        className={`transition-all duration-500 ${
+                            slideAnimating 
+                                ? 'translate-y-10 opacity-0' 
+                                : isVisible 
+                                    ? 'translate-y-0 opacity-100' 
+                                    : 'translate-y-10 opacity-0'
+                        }`}
+                        style={{ transitionDelay: slideAnimating ? '0ms' : '500ms' }}
                     >
                         <EditableText
                             value={config.content.subtitle}
                             onSave={(v) => handleContentUpdate('content.subtitle', v)}
                             isEditing={isEditing}
-                            className={`text-lg md:text-xl ${themeColors.accentBg} leading-relaxed mb-8 max-w-2xl`}
+                            className={`text-xl md:text-2xl ${themeColors.accentBg} leading-relaxed mb-10 max-w-2xl`}
                             as="p"
                             multiline
                         />
                     </div>
 
-                    {/* Search Bar */}
+                    {/* CTAs */}
                     <div
-                        className={`max-w-2xl transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                            }`}
+                        className={`flex flex-wrap gap-4 transition-all duration-500 ${
+                            slideAnimating 
+                                ? 'translate-y-10 opacity-0' 
+                                : isVisible 
+                                    ? 'translate-y-0 opacity-100' 
+                                    : 'translate-y-10 opacity-0'
+                        }`}
+                        style={{ transitionDelay: slideAnimating ? '0ms' : '700ms' }}
                     >
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                            <div className="relative flex items-center gap-3 bg-white/95 backdrop-blur-xl rounded-2xl px-6 py-4 shadow-2xl border border-white/20">
-                                <Search className={`w-6 h-6 ${mode === 'medical' ? 'text-emerald-500' : 'text-amber-500'} flex-shrink-0`} />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={mode === 'medical' ? 'Search treatments, hospitals, doctors...' : 'Search wellness programs, therapies...'}
-                                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 text-base md:text-lg outline-none"
-                                />
-                                <button
-                                    onClick={() => {
-                                        if (searchQuery) {
-                                            console.log('Searching for:', searchQuery);
-                                            // Add search logic here
-                                        }
-                                    }}
-                                    className={`px-6 py-2.5 bg-gradient-to-r ${themeColors.buttonGradient} text-white rounded-xl font-semibold text-sm hover:shadow-lg ${themeColors.buttonShadow} transition-all duration-300 flex-shrink-0`}
-                                >
-                                    Search
-                                </button>
-                            </div>
-                        </div>
+                        <Link
+                            href={config.content.primaryCTA.link}
+                            className={`group bg-gradient-to-r ${themeColors.buttonGradient} text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl ${themeColors.buttonShadow} transition-all duration-300 inline-flex items-center gap-2`}
+                        >
+                            {config.content.primaryCTA.text}
+                            {PrimaryCTAIcon && <PrimaryCTAIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                        </Link>
+                        <Link
+                            href={config.content.secondaryCTA.link}
+                            className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 inline-flex items-center gap-2"
+                        >
+                            {SecondaryCTAIcon && <SecondaryCTAIcon className="w-5 h-5" />}
+                            {config.content.secondaryCTA.text}
+                        </Link>
                     </div>
 
                     {/* Helpline (Medical mode) */}
                     {config.content.helpline && (
                         <div
-                            className={`mt-8 inline-flex items-center gap-4 bg-white/15 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20 transition-all duration-700 delay-900 hover:bg-white/20 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                                }`}
+                            className={`mt-10 flex items-center gap-6 transition-all duration-500 ${
+                                slideAnimating 
+                                    ? 'translate-y-10 opacity-0' 
+                                    : isVisible 
+                                        ? 'translate-y-0 opacity-100' 
+                                        : 'translate-y-10 opacity-0'
+                            }`}
+                            style={{ transitionDelay: slideAnimating ? '0ms' : '900ms' }}
                         >
-                            <div className={`w-14 h-14 bg-gradient-to-br ${themeColors.buttonGradient} rounded-full flex items-center justify-center shadow-lg`}>
-                                <Phone className="w-6 h-6 text-white" />
-                            </div>
-                            <div className="text-white">
-                                <div className={`text-sm font-medium ${themeColors.accentBg} mb-1`}>{config.content.helpline.label}</div>
-                                <div className="text-2xl font-bold tracking-wide">{config.content.helpline.number}</div>
+                            <div className="flex items-center gap-3 text-white">
+                                <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center">
+                                    <Phone className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className={`text-xs ${themeColors.accentBg}`}>{config.content.helpline.label}</div>
+                                    <div className="font-semibold">{config.content.helpline.number}</div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -252,8 +404,14 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
                 <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-md">
                     <div className="container mx-auto px-4 py-6">
                         <div
-                            className={`grid grid-cols-2 md:grid-cols-4 gap-8 transition-all duration-700 delay-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                                }`}
+                            className={`grid grid-cols-2 md:grid-cols-4 gap-8 transition-all duration-500 ${
+                                slideAnimating 
+                                    ? 'translate-y-10 opacity-0' 
+                                    : isVisible 
+                                        ? 'translate-y-0 opacity-100' 
+                                        : 'translate-y-10 opacity-0'
+                            }`}
+                            style={{ transitionDelay: slideAnimating ? '0ms' : '1000ms' }}
                         >
                             {config.stats.map((stat, i) => {
                                 const StatIcon = getIcon(stat.icon);
