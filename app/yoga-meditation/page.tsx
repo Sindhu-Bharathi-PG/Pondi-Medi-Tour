@@ -1,174 +1,348 @@
 "use client";
 
-import { Footer, Header } from '@/app/components/common';
-import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
-import { useScrolled } from '@/app/hooks';
-import { CheckCircle, ChevronRight, Clock, Heart, Moon, Sun, Wind } from 'lucide-react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+      Sun, Moon, Wind, Heart, ChevronRight, CheckCircle, Clock,
+      MapPin, Users, Star, Calendar, GraduationCap, Award,
+      BookOpen, Sparkles, ArrowRight
+} from 'lucide-react';
+import { Footer, Header } from '@/app/components/common';
+import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+
+// Yoga Traditions/Lineages
+const yogaStyles = [
+      {
+            name: 'Hatha Yoga',
+            icon: Sun,
+            description: 'Classical poses for physical balance and mental focus',
+            intensity: 'Gentle to Moderate',
+            bestFor: 'Beginners, All levels',
+            color: 'from-amber-500 to-orange-500',
+      },
+      {
+            name: 'Ashtanga Vinyasa',
+            icon: Wind,
+            description: 'Dynamic flowing sequences synchronized with breath',
+            intensity: 'Moderate to Intense',
+            bestFor: 'Intermediate, Athletes',
+            color: 'from-blue-500 to-indigo-500',
+      },
+      {
+            name: 'Kundalini Yoga',
+            icon: Sparkles,
+            description: 'Awakening spiritual energy through kriyas and meditation',
+            intensity: 'Varies',
+            bestFor: 'Spiritual seekers',
+            color: 'from-purple-500 to-pink-500',
+      },
+      {
+            name: 'Yin Yoga',
+            icon: Moon,
+            description: 'Deep stretching with long-held poses for flexibility',
+            intensity: 'Gentle',
+            bestFor: 'Recovery, Flexibility',
+            color: 'from-teal-500 to-cyan-500',
+      },
+];
+
+// Ashrams & Spiritual Centers
+const spiritualCenters = [
+      {
+            name: 'Sri Aurobindo Ashram',
+            type: 'Spiritual Community',
+            image: '/images/generated/yoga_ashram_courtyard_1765431282553.png',
+            description: 'World-renowned spiritual center founded by Sri Aurobindo. Offers meditation, integral yoga, and spiritual development programs.',
+            programs: ['Morning meditation', 'Evening collective prayers', 'Karma yoga', 'Study circles'],
+            location: 'White Town, Pondicherry',
+            established: '1926',
+      },
+      {
+            name: 'Auroville Yoga Centers',
+            type: 'Experimental Township',
+            image: '/images/generated/yoga_auroville_center_1765431301870.png',
+            description: 'Multiple yoga and meditation centers within UNESCO-recognized Auroville. Focus on integral yoga and conscious living.',
+            programs: ['Pitanga Cultural Centre', 'Quiet Healing Centre', 'Savitri Bhawan', 'Matrimandir meditation'],
+            location: 'Auroville (12 km from city)',
+            established: '1968',
+      },
+      {
+            name: 'Traditional Yoga Shalas',
+            type: 'Authentic Studios',
+            image: '/images/generated/ayush_grid_yoga_practice_1765431210782.png',
+            description: 'Local studios offering daily drop-in classes and short-term intensives in various yoga traditions.',
+            programs: ['Morning Mysore', 'Evening Hatha', 'Weekend workshops', 'Private sessions'],
+            location: 'Throughout Pondicherry',
+            established: 'Various',
+      },
+];
+
+// Teacher Training Programs
+const teacherTraining = [
+      {
+            title: '200-Hour Teacher Training',
+            duration: '28 days',
+            certification: 'Yoga Alliance RYT-200',
+            priceFrom: 2500,
+            includes: ['Comprehensive curriculum', 'Anatomy & physiology', 'Teaching methodology', 'Practicum', 'Accommodation & meals'],
+            nextBatch: 'Monthly',
+      },
+      {
+            title: '300-Hour Advanced Training',
+            duration: '45 days',
+            certification: 'Yoga Alliance RYT-500',
+            priceFrom: 3800,
+            includes: ['Advanced asanas', 'Yoga therapy', 'Ayurveda basics', 'Business of yoga', 'Mentorship'],
+            nextBatch: 'Quarterly',
+      },
+      {
+            title: 'Meditation Teacher Training',
+            duration: '21 days',
+            certification: 'Certified Meditation Instructor',
+            priceFrom: 1800,
+            includes: ['Multiple techniques', 'Neuroscience of meditation', 'Guided practice', 'Teaching skills'],
+            nextBatch: 'Bi-monthly',
+      },
+];
+
+// Meditation & Pranayama
+const meditationPractices = [
+      { name: 'Vipassana', desc: 'Insight meditation for self-observation' },
+      { name: 'Pranayama', desc: 'Breath control techniques' },
+      { name: 'Yoga Nidra', desc: 'Conscious sleep for deep relaxation' },
+      { name: 'Mantra Meditation', desc: 'Sound-based spiritual practice' },
+      { name: 'Walking Meditation', desc: 'Mindful movement practice' },
+      { name: 'Trataka', desc: 'Candle gazing for concentration' },
+];
 
 const YogaMeditationPage = () => {
-      const scrolled = useScrolled(50);
-
-      const programs = [
-            {
-                  name: 'Beginner Yoga Retreat',
-                  duration: '5 days',
-                  basePrice: 599,
-                  image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
-                  includes: ['Daily 2-hour yoga sessions', 'Pranayama classes', 'Meditation basics', 'Healthy vegetarian meals', 'Beach sunrise sessions'],
-                  level: 'Beginner'
-            },
-            {
-                  name: 'Advanced Ashtanga Intensive',
-                  duration: '10 days',
-                  basePrice: 1299,
-                  image: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=800',
-                  includes: ['5 hours daily practice', 'Mysore-style training', 'Philosophy lectures', 'One-on-one guidance', 'Certificate of completion'],
-                  level: 'Advanced'
-            },
-            {
-                  name: 'Silent Meditation Retreat',
-                  duration: '7 days',
-                  basePrice: 899,
-                  image: 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800',
-                  includes: ['Vipassana meditation', 'Noble silence practice', 'Walking meditation', 'Dharma talks', 'Ashram accommodation'],
-                  level: 'All Levels'
-            },
-            {
-                  name: 'Yoga Teacher Training (200hr)',
-                  duration: '28 days',
-                  basePrice: 2499,
-                  image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800',
-                  includes: ['Yoga Alliance certified', 'Anatomy & philosophy', 'Teaching methodology', 'Practicum sessions', 'Lifetime support'],
-                  level: 'Intermediate+'
-            },
-      ];
-
-      // ... (rest of the file until the map function)
-
-      {
-            programs.map((program, i) => (
-                  <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all flex flex-col md:flex-row">
-                        <div className="relative w-full md:w-1/3 h-48 md:h-auto">
-                              <Image src={program.image} alt={program.name} fill className="object-cover" />
-                              <div className="absolute top-4 left-4">
-                                    <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">{program.level}</span>
-                              </div>
-                        </div>
-                        <div className="flex-1 p-6">
-                              <h3 className="text-xl font-bold text-gray-800 mb-2">{program.name}</h3>
-                              <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
-                                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{program.duration}</span>
-                                    <span className="text-amber-600 font-semibold flex gap-1">
-                                          From <ConvertedPrice amount={program.basePrice} fromCurrency="USD" />
-                                    </span>
-                              </div>
-                              <ul className="space-y-2 mb-4">
-                                    {program.includes.slice(0, 4).map((item, j) => (
-                                          <li key={j} className="flex items-center gap-2 text-gray-600 text-sm">
-                                                <CheckCircle className="w-4 h-4 text-green-500" />{item}
-                                          </li>
-                                    ))}
-                              </ul>
-                              <Link href="/booking" className="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:shadow-lg transition-all">
-                                    Book Now
-                              </Link>
-                        </div>
-                  </div>
-            ))
-      }
-
-      const styles = [
-            { name: 'Hatha Yoga', icon: Sun, desc: 'Traditional poses for balance' },
-            { name: 'Ashtanga', icon: Wind, desc: 'Dynamic flowing sequences' },
-            { name: 'Yin Yoga', icon: Moon, desc: 'Deep stretch & relaxation' },
-            { name: 'Pranayama', icon: Heart, desc: 'Breath control techniques' },
-      ];
+      const [activeTab, setActiveTab] = useState<'programs' | 'training'>('programs');
 
       return (
             <div className="min-h-screen bg-white">
                   <Header />
 
-                  {/* Hero */}
-                  <section className="relative h-screen min-h-[700px] flex items-center">
+                  {/* Hero Section */}
+                  <section className="relative min-h-[70vh] flex items-center pt-20">
                         <div className="absolute inset-0">
-                              <Image src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1920" alt="Yoga" fill className="object-cover" priority />
-                              <div className="absolute inset-0 bg-gradient-to-r from-orange-900/90 via-orange-800/70 to-transparent" />
+                              <Image
+                                    src="/images/generated/yoga_hero_ocean_sunrise_1765431260796.png"
+                                    alt="Yoga Practice"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-r from-orange-900/95 via-orange-800/80 to-transparent" />
                         </div>
-                        <div className="relative container mx-auto px-4">
-                              <div className="max-w-3xl">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
-                                          <Sun className="w-5 h-5 text-amber-400" />
-                                          <span className="text-white text-sm font-medium">Birthplace of Yoga • Auroville & Ashram Programs</span>
+
+                        <div className="relative container mx-auto px-6 lg:px-8">
+                              <div className="max-w-4xl">
+                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/20">
+                                          <Sun className="w-5 h-5 text-amber-300" />
+                                          <span className="text-white text-sm font-medium">
+                                                Birthplace of Yoga • Authentic Lineages
+                                          </span>
                                     </div>
-                                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+
+                                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
                                           Yoga &
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-300">Meditation</span>
+                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-200">
+                                                Meditation
+                                          </span>
                                     </h1>
-                                    <p className="text-xl md:text-2xl text-orange-100 mb-8 max-w-2xl">
-                                          Transform your life through authentic yoga practices in Pondicherry&apos;s spiritual centers.
-                                          From beginner retreats to teacher training.
+
+                                    <p className="text-xl md:text-2xl text-orange-100 leading-relaxed mb-10 max-w-2xl">
+                                          Experience authentic yoga in Pondicherry&apos;s renowned spiritual centers.
+                                          From beginner retreats to advanced teacher training at Sri Aurobindo Ashram and Auroville.
                                     </p>
+
                                     <div className="flex flex-wrap gap-4">
-                                          <Link href="/booking" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2">
-                                                Book Retreat <ChevronRight className="w-5 h-5" />
+                                          <Link
+                                                href="#programs"
+                                                className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                                          >
+                                                View Programs
+                                                <ChevronRight className="w-5 h-5" />
+                                          </Link>
+                                          <Link
+                                                href="#training"
+                                                className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
+                                          >
+                                                Teacher Training
                                           </Link>
                                     </div>
                               </div>
                         </div>
                   </section>
 
-                  {/* Yoga Styles */}
-                  <section className="py-16 bg-gradient-to-b from-orange-50 to-white">
-                        <div className="container mx-auto px-4">
-                              <div className="grid md:grid-cols-4 gap-6">
-                                    {styles.map((style, i) => (
-                                          <div key={i} className="bg-white rounded-2xl shadow-xl p-6 text-center hover:shadow-2xl transition-all hover:-translate-y-2">
-                                                <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                                      <style.icon className="w-8 h-8 text-white" />
+                  {/* Yoga Styles Grid */}
+                  <section className="py-12 bg-gradient-to-b from-orange-50 to-white">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <div className="text-center mb-8">
+                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                                          Yoga Traditions We Offer
+                                    </h2>
+                                    <p className="text-gray-600 max-w-2xl mx-auto">
+                                          Explore various yoga styles taught by certified instructors in authentic lineages
+                                    </p>
+                              </div>
+
+                              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {yogaStyles.map((style, i) => (
+                                          <div key={i} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all group">
+                                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${style.color} flex items-center justify-center mb-4`}>
+                                                      <style.icon className="w-7 h-7 text-white" />
                                                 </div>
                                                 <h3 className="text-xl font-bold text-gray-800 mb-2">{style.name}</h3>
-                                                <p className="text-gray-600">{style.desc}</p>
+                                                <p className="text-gray-600 text-sm mb-4">{style.description}</p>
+                                                <div className="space-y-2 text-sm">
+                                                      <div className="flex justify-between">
+                                                            <span className="text-gray-500">Intensity:</span>
+                                                            <span className="font-medium text-gray-700">{style.intensity}</span>
+                                                      </div>
+                                                      <div className="flex justify-between">
+                                                            <span className="text-gray-500">Best for:</span>
+                                                            <span className="font-medium text-gray-700">{style.bestFor}</span>
+                                                      </div>
+                                                </div>
                                           </div>
                                     ))}
                               </div>
                         </div>
                   </section>
 
-                  {/* Programs */}
-                  <section className="py-20 bg-white">
-                        <div className="container mx-auto px-4">
-                              <div className="text-center mb-16">
-                                    <h2 className="text-4xl font-bold text-gray-800 mb-4">Yoga Programs & Retreats</h2>
-                                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">Choose from beginner-friendly retreats to advanced teacher training</p>
+                  {/* Spiritual Centers */}
+                  <section id="programs" className="py-12 bg-white">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <div className="text-center mb-8">
+                                    <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full mb-4">
+                                          <MapPin className="w-4 h-4" />
+                                          <span className="text-sm font-semibold">Sacred Spaces</span>
+                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                          Ashrams & Spiritual Centers
+                                    </h2>
+                                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                          Pondicherry is home to world-renowned spiritual institutions offering authentic yoga and meditation
+                                    </p>
                               </div>
-                              <div className="grid md:grid-cols-2 gap-8">
-                                    {programs.map((program, i) => (
-                                          <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all flex flex-col md:flex-row">
-                                                <div className="relative w-full md:w-1/3 h-48 md:h-auto">
-                                                      <Image src={program.image} alt={program.name} fill className="object-cover" />
-                                                      <div className="absolute top-4 left-4">
-                                                            <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">{program.level}</span>
+
+                              <div className="space-y-6">
+                                    {spiritualCenters.map((center, i) => (
+                                          <div
+                                                key={i}
+                                                className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all"
+                                          >
+                                                <div className="grid lg:grid-cols-2">
+                                                      <div className="relative h-64 lg:h-auto">
+                                                            <Image
+                                                                  src={center.image}
+                                                                  alt={center.name}
+                                                                  fill
+                                                                  className="object-cover"
+                                                            />
+                                                      </div>
+                                                      <div className="p-8 lg:p-10">
+                                                            <div className="flex items-center gap-2 text-sm text-amber-600 font-medium mb-2">
+                                                                  <Sparkles className="w-4 h-4" />
+                                                                  {center.type}
+                                                            </div>
+                                                            <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">{center.name}</h3>
+                                                            <p className="text-gray-600 mb-6">{center.description}</p>
+
+                                                            <div className="mb-6">
+                                                                  <h4 className="font-semibold text-gray-800 mb-3">Programs Offered:</h4>
+                                                                  <div className="flex flex-wrap gap-2">
+                                                                        {center.programs.map((program, j) => (
+                                                                              <span key={j} className="bg-orange-50 text-orange-700 px-3 py-1.5 rounded-full text-sm">
+                                                                                    {program}
+                                                                              </span>
+                                                                        ))}
+                                                                  </div>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-6 text-sm text-gray-500">
+                                                                  <div className="flex items-center gap-1">
+                                                                        <MapPin className="w-4 h-4" />
+                                                                        {center.location}
+                                                                  </div>
+                                                                  <div className="flex items-center gap-1">
+                                                                        <Calendar className="w-4 h-4" />
+                                                                        Est. {center.established}
+                                                                  </div>
+                                                            </div>
                                                       </div>
                                                 </div>
-                                                <div className="flex-1 p-6">
-                                                      <h3 className="text-xl font-bold text-gray-800 mb-2">{program.name}</h3>
-                                                      <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
-                                                            <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{program.duration}</span>
-                                                            <span className="text-amber-600 font-semibold flex gap-1">
-                                                                  From <ConvertedPrice amount={program.basePrice} fromCurrency="USD" />
-                                                            </span>
+                                          </div>
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* Teacher Training */}
+                  <section id="training" className="py-12 bg-gradient-to-b from-orange-50 to-white">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <div className="text-center mb-8">
+                                    <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full mb-4">
+                                          <GraduationCap className="w-4 h-4" />
+                                          <span className="text-sm font-semibold">Professional Certification</span>
+                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                                          Yoga Teacher Training
+                                    </h2>
+                                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                          Internationally recognized certifications in authentic yoga teaching
+                                    </p>
+                              </div>
+
+                              <div className="grid lg:grid-cols-3 gap-6">
+                                    {teacherTraining.map((program, i) => (
+                                          <div
+                                                key={i}
+                                                className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all"
+                                          >
+                                                <div className="flex items-center gap-2 text-amber-600 mb-4">
+                                                      <Award className="w-5 h-5" />
+                                                      <span className="text-sm font-medium">{program.certification}</span>
+                                                </div>
+
+                                                <h3 className="text-2xl font-bold text-gray-800 mb-2">{program.title}</h3>
+
+                                                <div className="flex items-center gap-4 mb-6 text-sm text-gray-500">
+                                                      <div className="flex items-center gap-1">
+                                                            <Clock className="w-4 h-4" />
+                                                            {program.duration}
                                                       </div>
-                                                      <ul className="space-y-2 mb-4">
-                                                            {program.includes.slice(0, 4).map((item, j) => (
-                                                                  <li key={j} className="flex items-center gap-2 text-gray-600 text-sm">
-                                                                        <CheckCircle className="w-4 h-4 text-green-500" />{item}
-                                                                  </li>
-                                                            ))}
-                                                      </ul>
-                                                      <Link href="/booking" className="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold hover:shadow-lg transition-all">
-                                                            Book Now
+                                                      <div className="flex items-center gap-1">
+                                                            <Calendar className="w-4 h-4" />
+                                                            {program.nextBatch}
+                                                      </div>
+                                                </div>
+
+                                                <ul className="space-y-3 mb-8">
+                                                      {program.includes.map((item, j) => (
+                                                            <li key={j} className="flex items-start gap-2 text-gray-600">
+                                                                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                                                                  {item}
+                                                            </li>
+                                                      ))}
+                                                </ul>
+
+                                                <div className="pt-6 border-t border-gray-100">
+                                                      <div className="flex items-center justify-between mb-4">
+                                                            <div>
+                                                                  <span className="text-sm text-gray-500">Starting from</span>
+                                                                  <div className="text-2xl font-bold text-amber-600">
+                                                                        <ConvertedPrice amount={program.priceFrom} fromCurrency="USD" />
+                                                                  </div>
+                                                            </div>
+                                                      </div>
+                                                      <Link
+                                                            href="/booking"
+                                                            className="block w-full text-center bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                                                      >
+                                                            Apply Now
                                                       </Link>
                                                 </div>
                                           </div>
@@ -177,16 +351,71 @@ const YogaMeditationPage = () => {
                         </div>
                   </section>
 
+                  {/* Meditation & Pranayama */}
+                  <section className="py-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <div className="grid lg:grid-cols-2 gap-8 items-center">
+                                    <div>
+                                          <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
+                                                <Moon className="w-4 h-4" />
+                                                <span className="text-sm font-medium">Inner Journey</span>
+                                          </div>
+                                          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                                                Meditation & Pranayama
+                                          </h2>
+                                          <p className="text-xl text-purple-100 mb-8">
+                                                Go beyond asanas into the deeper practices of yoga. Learn ancient breathing
+                                                and meditation techniques for lasting inner peace.
+                                          </p>
+
+                                          <div className="grid grid-cols-2 gap-4">
+                                                {meditationPractices.map((practice, i) => (
+                                                      <div key={i} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                                                            <h4 className="font-semibold mb-1">{practice.name}</h4>
+                                                            <p className="text-purple-200 text-sm">{practice.desc}</p>
+                                                      </div>
+                                                ))}
+                                          </div>
+                                    </div>
+
+                                    <div className="relative">
+                                          <Image
+                                                src="/images/generated/yoga_meditation_close_up_1765431316106.png"
+                                                alt="Meditation"
+                                                width={600}
+                                                height={500}
+                                                className="rounded-3xl shadow-2xl"
+                                          />
+                                    </div>
+                              </div>
+                        </div>
+                  </section>
+
                   {/* CTA */}
-                  <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-500 text-white">
-                        <div className="container mx-auto px-4 text-center">
-                              <h2 className="text-4xl font-bold mb-6">Find Your Inner Peace</h2>
-                              <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-                                    Join thousands who have transformed their lives through yoga in Pondicherry.
+                  <section className="py-12 bg-white">
+                        <div className="container mx-auto px-6 lg:px-8 text-center">
+                              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                                    Begin Your Yoga Journey
+                              </h2>
+                              <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                                    Whether you&apos;re a complete beginner or seeking advanced training,
+                                    Pondicherry offers the perfect environment for your practice.
                               </p>
-                              <Link href="/booking" className="bg-white text-orange-600 px-10 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all">
-                                    Start Your Journey
-                              </Link>
+                              <div className="flex flex-wrap justify-center gap-4">
+                                    <Link
+                                          href="/booking"
+                                          className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-10 py-5 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                                    >
+                                          Book a Program
+                                          <ArrowRight className="w-5 h-5" />
+                                    </Link>
+                                    <Link
+                                          href="/wellness"
+                                          className="bg-gray-100 text-gray-700 px-10 py-5 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all duration-300"
+                                    >
+                                          View Complete Packages
+                                    </Link>
+                              </div>
                         </div>
                   </section>
 

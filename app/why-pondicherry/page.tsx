@@ -85,7 +85,7 @@ export default function WhyPondicherryPage() {
                               <div className={`max-w-4xl mx-auto text-center transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                                     <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6">
                                           <Globe className="w-4 h-4 text-emerald-300" />
-                                          <span className="text-emerald-100 text-sm font-medium">India&apos;s Premier Medical Tourism Destination</span>
+                                          <span className="text-emerald-100 text-sm font-medium">India&apos;s Premier Medical Value Travel Hub • National Strategy Aligned</span>
                                     </div>
                                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
                                           Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-300">Pondicherry</span>
