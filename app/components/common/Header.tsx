@@ -177,47 +177,47 @@ const Header: React.FC<HeaderProps> = ({
                               layout
                               initial={false}
                               animate={{
-                                    width: hasScrolled ? "98%" : "95%",
-                                    maxWidth: hasScrolled ? 1400 : 1280,
-                                    backgroundColor: hasScrolled ? "rgba(255, 255, 255, 0.85)" : "rgba(10, 10, 10, 0.4)",
+                                    width: hasScrolled ? "96%" : "92%",
+                                    maxWidth: hasScrolled ? 1200 : 1100,
+                                    backgroundColor: hasScrolled ? "rgba(255, 255, 255, 0.92)" : "rgba(10, 10, 10, 0.35)",
                                     borderColor: hasScrolled
-                                          ? (isMedical ? "rgba(209, 250, 229, 0.5)" : "rgba(254, 243, 199, 0.5)")
-                                          : "rgba(255, 255, 255, 0.15)",
-                                    padding: hasScrolled ? "0.5rem 0.5rem" : "0.75rem 1.25rem",
+                                          ? (isMedical ? "rgba(209, 250, 229, 0.6)" : "rgba(254, 243, 199, 0.6)")
+                                          : "rgba(255, 255, 255, 0.2)",
+                                    padding: hasScrolled ? "0.4rem 0.6rem" : "0.6rem 1rem",
                               }}
-                              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                              transition={{ type: "spring", stiffness: 140, damping: 22 }}
                               className={cn(
-                                    "pointer-events-auto relative flex items-center justify-between px-2 py-2 rounded-full backdrop-blur-xl border transition-shadow duration-500",
+                                    "pointer-events-auto relative flex items-center justify-between rounded-full backdrop-blur-2xl border transition-shadow duration-500",
                                     glassBase,
-                                    hasScrolled && "shadow-[0_8px_32px_rgba(0,0,0,0.04)]"
+                                    hasScrolled && "shadow-[0_8px_32px_rgba(0,0,0,0.06)]"
                               )}
                         >
                               {/* ----------------------------------------------------------------------
                                   Left: Logo 
                               ---------------------------------------------------------------------- */}
-                              <Link href="/" className="flex items-center gap-3 pl-2 group shrink-0">
+                              <Link href="/" className="flex items-center gap-2 pl-1 group shrink-0">
                                     <div className={cn(
-                                          "w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:rotate-12",
+                                          "w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-12",
                                           isMedical
-                                                ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-500/20"
-                                                : "bg-gradient-to-br from-amber-400 to-orange-600 text-white shadow-amber-500/20"
+                                                ? "bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-emerald-500/30"
+                                                : "bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 text-white shadow-amber-500/30"
                                     )}>
-                                          {isMedical ? <Stethoscope className="w-5 h-5" /> : <Leaf className="w-5 h-5" />}
+                                          {isMedical ? <Stethoscope className="w-4 h-4 group-hover:scale-110 transition-transform" /> : <Leaf className="w-4 h-4 group-hover:scale-110 transition-transform" />}
                                     </div>
                                     <div className="hidden sm:flex flex-col">
                                           <span className={cn(
-                                                "text-lg font-bold tracking-tight leading-none",
+                                                "text-lg font-bold tracking-tight leading-none transition-all duration-300",
                                                 hasScrolled
-                                                      ? "bg-gradient-to-r bg-clip-text text-transparent from-gray-900 to-gray-600"
-                                                      : "text-white"
+                                                      ? "bg-gradient-to-r bg-clip-text text-transparent from-gray-900 via-gray-700 to-gray-600"
+                                                      : "text-white drop-shadow-lg"
                                           )}>
                                                 Pondy<span className={cn("font-extrabold", isMedical ? "text-emerald-500" : "text-amber-400")}>Health</span>
                                           </span>
                                           <span className={cn(
-                                                "text-[9px] font-medium tracking-widest uppercase opacity-80",
-                                                hasScrolled ? "text-gray-500" : "text-white/80"
+                                                "text-[9px] font-semibold tracking-wider uppercase transition-all duration-300",
+                                                hasScrolled ? "text-gray-500" : "text-white/90"
                                           )}>
-                                                {isMedical ? 'Medical Tourism' : 'Wellness & AYUSH'}
+                                                {isMedical ? '🏥 Medical' : '🧘 Wellness'}
                                           </span>
                                     </div>
                               </Link>
@@ -229,7 +229,7 @@ const Header: React.FC<HeaderProps> = ({
                                     "hidden lg:flex items-center flex-1 px-4 transition-all duration-300",
                                     searchOpen ? "justify-start" : "justify-center"
                               )}>
-                                    <ul className="flex items-center gap-1">
+                                    <ul className="flex items-center gap-0.5">
                                           {navLinks.map((link) => {
                                                 const isActive = isActiveLink(link.href);
                                                 const IconComponent = link.icon ? iconMap[link.icon] : null;
@@ -240,18 +240,12 @@ const Header: React.FC<HeaderProps> = ({
                                                                   onMouseEnter={() => setHoveredLink(link.href)}
                                                                   onMouseLeave={() => setHoveredLink(null)}
                                                                   className={cn(
-                                                                        "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300",
+                                                                        "relative z-10 flex items-center px-2.5 py-1.5 text-xs font-semibold transition-all duration-300",
                                                                         isActive
-                                                                              ? (hasScrolled ? "text-white" : "text-white")
-                                                                              : (hasScrolled ? "text-gray-600 hover:text-gray-900" : "text-white/80 hover:text-white")
+                                                                              ? "text-white drop-shadow-sm"
+                                                                              : (hasScrolled ? "text-gray-700 hover:text-gray-900" : "text-white/85 hover:text-white drop-shadow-sm")
                                                                   )}
                                                             >
-                                                                  {IconComponent && (
-                                                                        <IconComponent className={cn(
-                                                                              "w-4 h-4 transition-all duration-300",
-                                                                              searchOpen ? "w-5 h-5" : ""
-                                                                        )} />
-                                                                  )}
                                                                   <span className={cn(
                                                                         "transition-all duration-300 overflow-hidden whitespace-nowrap",
                                                                         searchOpen ? "w-0 opacity-0" : "w-auto opacity-100"
@@ -265,12 +259,12 @@ const Header: React.FC<HeaderProps> = ({
                                                                   <motion.div
                                                                         layoutId="activePill"
                                                                         className={cn(
-                                                                              "absolute inset-0 rounded-full shadow-md",
+                                                                              "absolute inset-0 rounded-full shadow-lg",
                                                                               isMedical
-                                                                                    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
-                                                                                    : "bg-gradient-to-r from-amber-500 to-orange-500"
+                                                                                    ? "bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 shadow-emerald-500/40"
+                                                                                    : "bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 shadow-amber-500/40"
                                                                         )}
-                                                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
                                                                   />
                                                             )}
 
@@ -287,13 +281,6 @@ const Header: React.FC<HeaderProps> = ({
                                                                         transition={{ type: "spring", bounce: 0, duration: 0.2 }}
                                                                   />
                                                             )}
-
-                                                            {/* Tooltip when icon-only mode */}
-                                                            {searchOpen && (
-                                                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                                                        {link.label}
-                                                                  </div>
-                                                            )}
                                                       </li>
                                                 );
                                           })}
@@ -303,7 +290,7 @@ const Header: React.FC<HeaderProps> = ({
                               {/* ----------------------------------------------------------------------
                                   Right: Actions 
                               ---------------------------------------------------------------------- */}
-                              <div className="flex items-center gap-1 md:gap-2 pr-1 shrink-0">
+                              <div className="flex items-center gap-0.5 md:gap-1 pr-1 shrink-0">
 
                                     {/* Search Bar */}
                                     <div className="relative hidden md:flex items-center">
@@ -311,7 +298,7 @@ const Header: React.FC<HeaderProps> = ({
                                                 {searchOpen && (
                                                       <motion.div
                                                             initial={{ width: 0, opacity: 0 }}
-                                                            animate={{ width: 280, opacity: 1 }}
+                                                            animate={{ width: 200, opacity: 1 }}
                                                             exit={{ width: 0, opacity: 0 }}
                                                             transition={{ duration: 0.3, ease: "easeInOut" }}
                                                             className="absolute right-10 top-1/2 -translate-y-1/2 overflow-hidden"
@@ -320,20 +307,22 @@ const Header: React.FC<HeaderProps> = ({
                                                             <input
                                                                   ref={searchInputRef}
                                                                   type="text"
-                                                                  placeholder="Search treatments..."
+                                                                  placeholder="Search..."
                                                                   value={searchQuery}
                                                                   onChange={(e) => setSearchQuery(e.target.value)}
                                                                   onKeyDown={(e) => {
                                                                         if (e.key === 'Escape') {
                                                                               setSearchOpen(false);
                                                                               setSearchQuery('');
+                                                                        } else if (e.key === 'Enter' && searchQuery) {
+                                                                              console.log('Searching for:', searchQuery);
                                                                         }
                                                                   }}
                                                                   className={cn(
-                                                                        "w-full px-4 py-2 text-sm rounded-full border outline-none transition-all",
+                                                                        "w-full px-4 py-2 text-xs rounded-full border outline-none transition-all font-medium",
                                                                         hasScrolled
-                                                                              ? "bg-white border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-300 shadow-lg"
-                                                                              : "bg-white/95 border-white/20 text-gray-700 placeholder-gray-500 focus:border-white/40 shadow-xl backdrop-blur-xl"
+                                                                              ? "bg-white border-gray-200 text-gray-700 placeholder-gray-400 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 shadow-lg"
+                                                                              : "bg-white/95 border-white/30 text-gray-700 placeholder-gray-500 focus:border-white/50 shadow-xl backdrop-blur-xl"
                                                                   )}
                                                             />
                                                       </motion.div>
@@ -342,16 +331,16 @@ const Header: React.FC<HeaderProps> = ({
                                           <button
                                                 onClick={() => {
                                                       if (searchOpen && searchQuery) {
-                                                            // Handle search submission
                                                             console.log('Searching for:', searchQuery);
                                                       }
                                                       setSearchOpen(!searchOpen);
                                                 }}
+                                                aria-label="Search"
                                                 className={cn(
-                                                      "p-2 rounded-full transition-colors relative z-10",
+                                                      "p-2 rounded-full transition-all relative z-10 hover:scale-105 active:scale-95",
                                                       hasScrolled
                                                             ? "hover:bg-gray-100 text-gray-600"
-                                                            : "hover:bg-white/10 text-white/80"
+                                                            : "hover:bg-white/10 text-white/90"
                                                 )}
                                           >
                                                 <Search className="w-4 h-4" />
@@ -359,23 +348,20 @@ const Header: React.FC<HeaderProps> = ({
                                     </div>
 
                                     {/* Language Selector */}
-                                    <div ref={languageDropdownRef} className="relative hidden md:block">
+                                    <div ref={languageDropdownRef} className="relative hidden lg:block">
                                           <button
                                                 onClick={() => {
                                                       setLanguageDropdownOpen(!languageDropdownOpen);
                                                       setCurrencyDropdownOpen(false);
                                                 }}
-                                                // disabled={isLoading}
                                                 className={cn(
-                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50",
+                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50",
                                                       hasScrolled
                                                             ? "hover:bg-gray-100 text-gray-600"
                                                             : "hover:bg-white/10 text-white/80"
                                                 )}
                                           >
-                                                <span className="text-base">{selectedLanguage.flag}</span>
-                                                <span className="hidden lg:inline text-xs">{selectedLanguage.code.toUpperCase()}</span>
-                                                {/* {isLoading && <span className="animate-spin">⟳</span>} */}
+                                                <span className="text-sm">{selectedLanguage.flag}</span>
                                                 <ChevronDown className={cn(
                                                       "w-3 h-3 transition-transform",
                                                       languageDropdownOpen && "rotate-180"
@@ -424,14 +410,13 @@ const Header: React.FC<HeaderProps> = ({
                                                       setLanguageDropdownOpen(false);
                                                 }}
                                                 className={cn(
-                                                      "flex items-center gap-1.5 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
+                                                      "flex items-center gap-1 px-2 py-1.5 rounded-full text-sm font-medium transition-colors",
                                                       hasScrolled
                                                             ? "hover:bg-gray-100 text-gray-600"
                                                             : "hover:bg-white/10 text-white/80"
                                                 )}
                                           >
-                                                <DollarSign className="w-4 h-4" />
-                                                <span className="text-xs">{selectedCurrency.code}</span>
+                                                <span className="text-xs font-bold">{selectedCurrency.code}</span>
                                                 <ChevronDown className={cn(
                                                       "w-3 h-3 transition-transform",
                                                       currencyDropdownOpen && "rotate-180"
@@ -474,22 +459,31 @@ const Header: React.FC<HeaderProps> = ({
                                     </div>
 
                                     {/* Medical/Wellness Toggle */}
-                                    <div className={cn(
-                                          "relative p-1 rounded-full flex cursor-pointer transition-colors duration-300",
-                                          hasScrolled ? "bg-gray-100" : "bg-white/10 border border-white/10"
-                                    )} onClick={toggleMode}>
+                                    <div 
+                                          className={cn(
+                                                "relative p-0.5 rounded-full flex cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95",
+                                                hasScrolled ? "bg-gray-100 shadow-inner" : "bg-white/15 border border-white/20"
+                                          )} 
+                                          onClick={toggleMode}
+                                    >
                                           <div className={cn(
-                                                "absolute inset-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-500 ease-out",
+                                                "absolute inset-0.5 w-[calc(50%-2px)] rounded-full shadow-lg transition-all duration-500 ease-out",
                                                 isMedical
-                                                      ? "left-1 bg-white"
-                                                      : "left-[calc(50%)] bg-white",
-                                                hasScrolled ? "shadow-md bg-white" : "shadow-none bg-white/20"
+                                                      ? "left-0.5 bg-gradient-to-r from-emerald-400 to-emerald-500"
+                                                      : "left-[calc(50%)] bg-gradient-to-r from-amber-400 to-amber-500",
+                                                hasScrolled ? "shadow-md" : "shadow-lg bg-white"
                                           )} />
-                                          <div className={cn("relative z-10 p-2 rounded-full transition-colors", isMedical ? (hasScrolled ? "text-emerald-600" : "text-white") : "opacity-50")}>
-                                                <Stethoscope className="w-4 h-4" />
+                                          <div className={cn(
+                                                "relative z-10 p-1.5 rounded-full transition-all duration-300", 
+                                                isMedical ? "text-white scale-110" : (hasScrolled ? "text-gray-400" : "text-white/50")
+                                          )}>
+                                                <Stethoscope className="w-3.5 h-3.5" />
                                           </div>
-                                          <div className={cn("relative z-10 p-2 rounded-full transition-colors", !isMedical ? (hasScrolled ? "text-amber-600" : "text-white") : "opacity-50")}>
-                                                <Leaf className="w-4 h-4" />
+                                          <div className={cn(
+                                                "relative z-10 p-1.5 rounded-full transition-all duration-300", 
+                                                !isMedical ? "text-white scale-110" : (hasScrolled ? "text-gray-400" : "text-white/50")
+                                          )}>
+                                                <Leaf className="w-3.5 h-3.5" />
                                           </div>
                                     </div>
 
@@ -525,9 +519,9 @@ const Header: React.FC<HeaderProps> = ({
                                           initial={{ x: "100%" }}
                                           animate={{ x: 0 }}
                                           exit={{ x: "100%" }}
-                                          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                                          transition={{ type: "spring", damping: 28, stiffness: 280 }}
                                           className={cn(
-                                                "absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl p-6 overflow-y-auto",
+                                                "absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-gradient-to-br from-white to-gray-50 shadow-2xl p-6 overflow-y-auto",
                                                 isMedical ? "border-l-4 border-emerald-500" : "border-l-4 border-amber-500"
                                           )}
                                           onClick={(e) => e.stopPropagation()}
