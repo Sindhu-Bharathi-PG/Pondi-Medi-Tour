@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { MapPin, Phone, Mail } from 'lucide-react';
 import { CONTACT_INFO } from '@/app/utils/constants';
+import { Mail, MapPin, Phone } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 const Footer: React.FC = () => {
       const currentYear = new Date().getFullYear();
@@ -76,6 +76,11 @@ const Footer: React.FC = () => {
                                           <li>
                                                 <Link href="/wellness" className="hover:text-emerald-400 transition">
                                                       Wellness Partners
+                                                </Link>
+                                          </li>
+                                          <li>
+                                                <Link href="/login/partner" className="hover:text-emerald-400 transition font-semibold">
+                                                      Partner Login
                                                 </Link>
                                           </li>
                                     </ul>

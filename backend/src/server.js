@@ -1,16 +1,7 @@
 require('dotenv').config();
 
 const fastify = require('fastify')({
-  logger: {
-    level: process.env.LOG_LEVEL || 'info',
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        translateTime: 'HH:MM:ss Z',
-        ignore: 'pid,hostname',
-      },
-    },
-  },
+  logger: true
 });
 
 // Register plugins
@@ -63,6 +54,11 @@ fastify.register(require('./modules/wellness/routes/wellnessRoutes'), { prefix: 
 fastify.register(require('./modules/payment/routes/paymentRoutes'), { prefix: '/api/payment' });
 fastify.register(require('./modules/notifications/routes/notificationRoutes'), { prefix: '/api/notifications' });
 fastify.register(require('./modules/admin/routes/adminRoutes'), { prefix: '/api/admin' });
+fastify.register(require('./modules/hospitals/routes/hospitalRoutes'), { prefix: '/api/hospitals' });
+fastify.register(require('./modules/doctors/routes/doctorRoutes'), { prefix: '/api/hospitals/me/doctors' });
+fastify.register(require('./modules/offerings/routes/offeringRoutes'), { prefix: '/api/hospitals/me/offerings' });
+fastify.register(require('./modules/inquiries/routes/inquiryRoutes'), { prefix: '/api/hospitals/me/inquiries' });
+fastify.register(require('./modules/appointments/routes/appointmentRoutes'), { prefix: '/api/hospitals/me/appointments' });
 
 // Health check route
 fastify.get('/health', async (request, reply) => {

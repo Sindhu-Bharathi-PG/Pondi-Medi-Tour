@@ -1,22 +1,60 @@
 "use client";
 
 import { ArrowLeft, Building2, Eye, EyeOff, ImageIcon, Lock, Mail, Upload, Users } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 const HospitalLoginPage = () => {
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Add your authentication logic here
-        setTimeout(() => {
+        setError('');
+
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Invalid email or password");
+                setIsLoading(false);
+                return;
+            }
+
+            // Successful login - check user role for redirect
+            // Fetch session to get user type
+            const response = await fetch('/api/auth/session');
+            const session = await response.json();
+
+            if (session?.user) {
+                const userType = session.user.userType;
+
+                // Super admin can access any portal
+                if (userType === 'superadmin') {
+                    router.push('/dashboard/superadmin');
+                } else if (userType === 'hospital') {
+                    router.push('/dashboard/hospital');
+                } else {
+                    setError('Access denied. This portal is for hospital partners only.');
+                    setIsLoading(false);
+                }
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setError("An error occurred during login");
             setIsLoading(false);
-        }, 2000);
+        }
     };
 
     return (
@@ -67,6 +105,11 @@ const HospitalLoginPage = () => {
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Email</label>
                             <div className="relative">

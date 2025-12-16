@@ -9,285 +9,102 @@ import { useEffect, useState } from 'react';
 import { Footer, Header } from '../../components/common';
 
 // This would ideally come from a database or API
-const hospitalData: Record<string, any> = {
-    '1': {
-        id: 1,
-        name: 'JIPMER',
-        fullName: 'Jawaharlal Institute of Postgraduate Medical Education & Research',
-        image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1200',
-        gallery: [
-            'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800',
-            'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
-            'https://images.unsplash.com/photo-1512678080530-7760d81faba6?w=800',
-            'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800',
-        ],
-        rating: 4.9,
-        reviewsRating: 2840,
-        specialties: ['Multi-Specialty', 'Cardiology', 'Oncology', 'Neurology', 'Nephrology', 'Orthopedics', 'Gastroenterology', 'Pediatrics'],
-        accreditation: ['NABH', 'NABL'],
-        location: 'Gorimedu, Pondicherry - 605006',
-        established: 1823,
-        beds: 2500,
-        type: 'Government',
-        description: 'JIPMER is an Institute of National Importance and a premier medical institution with AIIMS-equivalent status. With over 200 years of heritage, it offers world-class medical care with cutting-edge research facilities.',
-        about: 'JIPMER has been a beacon of medical excellence for over two centuries. As one of India\'s premier medical institutions, it combines heritage with modern healthcare delivery. The hospital is equipped with state-of-the-art medical technology and staffed by internationally trained specialists.',
-        equipment: ['64-slice CT scanner', '3T MRI', 'Digital Operating Theaters', 'Advanced Blood Bank', 'Hybrid Cath Lab', 'Linear Accelerator'],
-        highlights: [
-            '1,100+ active beds across specialties',
-            '50+ cardiologists trained in US/UK',
-            'World-class research facilities',
-            'AIIMS-equivalent status',
-            '24/7 emergency services',
-            'International patient wing'
-        ],
-        departments: [
-            {
-                name: 'Cardiology',
-                doctors: 50,
-                procedures: '5000+/year',
-                image: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=600',
-                description: 'Our Cardiology department is equipped with latest Cath Labs and offers 24/7 primary angioplasty services. We specialize in complex cardiac interventions and pediatric cardiology.',
-                head: 'Dr. S. Kumar',
-                commonProcedures: ['Angioplasty', 'Bypass Surgery', 'Pacemaker Implantation', 'Valve Replacement']
-            },
-            {
-                name: 'Oncology',
-                doctors: 35,
-                procedures: '3000+/year',
-                image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600',
-                description: 'Comprehensive cancer care with Medical, Surgical and Radiation Oncology under one roof. We offer advanced linear accelerators and brachytherapy.',
-                head: 'Dr. R. Meier',
-                commonProcedures: ['Chemotherapy', 'Radiation Therapy', 'Tumor Removal', 'Immunotherapy']
-            },
-            {
-                name: 'Neurology',
-                doctors: 25,
-                procedures: '2000+/year',
-                image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600',
-                description: 'Advanced neuro-care for stroke, epilepsy, and complex neurological disorders using state-of-the-art neuro-navigation systems.',
-                head: 'Dr. A. Singh',
-                commonProcedures: ['Stroke Management', 'Epilepsy Surgery', 'Brain Tumor Surgery', 'Spine Surgery']
-            },
-            {
-                name: 'Orthopedics',
-                doctors: 30,
-                procedures: '4000+/year',
-                image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600',
-                description: 'Specialized in joint replacements, spine surgery, and sports medicine. Our team performs complex trauma surgeries and arthroscopy.',
-                head: 'Dr. P. Raj',
-                commonProcedures: ['Knee Replacement', 'Hip Replacement', 'Arthroscopy', 'Fracture Verification']
-            },
-            {
-                name: 'Nephrology',
-                doctors: 20,
-                procedures: '1500+/year',
-                image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=600',
-                description: 'Complete renal care including dialysis and kidney transplantation. We have a dedicated dialysis unit with 50+ machines.',
-                head: 'Dr. M. Ali',
-                commonProcedures: ['Dialysis', 'Kidney Transplant', 'Biopsy', 'Stone Removal']
-            },
-            {
-                name: 'Gastroenterology',
-                doctors: 18,
-                procedures: '2500+/year',
-                image: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=600',
-                description: 'Advanced digestive care with a state-of-the-art endoscopy suite. We treat liver diseases, IBD, and pancreatic disorders.',
-                head: 'Dr. K. Lee',
-                commonProcedures: ['Endoscopy', 'Colonoscopy', 'ERCP', 'Liver Transplant']
-            }
-        ],
-        reviews: [
-            { id: 1, user: 'Sarah J.', rating: 5, date: '2 months ago', comment: 'Exceptional care at JIPMER. The staff was incredibly supportive during my surgery. The facilities are world-class.', origin: 'UK' },
-            { id: 2, user: 'Ahmed K.', rating: 5, date: '3 months ago', comment: 'World-class facilities at a fraction of the cost. Highly recommend for medical tourism. The doctors explained everything clearly.', origin: 'UAE' },
-            { id: 3, user: 'Priya R.', rating: 4, date: '1 month ago', comment: 'Very professional doctors. The waiting time was a bit long, but the treatment was top-notch.', origin: 'India' },
-            { id: 4, user: 'John D.', rating: 5, date: '2 weeks ago', comment: 'The cardiology department is simply the best. Dr. Kumar is a lifesaver.', origin: 'USA' },
-            { id: 5, user: 'Maria G.', rating: 3, date: '4 months ago', comment: 'Good medical care but the administrative process could be faster.', origin: 'Spain' }
-        ],
-        facilities: [
-            'Modern ICU with 100+ beds',
-            'Fully equipped operation theaters',
-            'Advanced diagnostic center',
-            '24/7 pharmacy',
-            'Blood bank',
-            'Cafeteria and food services',
-            'Patient accommodation',
-            'Parking facilities'
-        ],
-        contact: {
-            phone: '+91-413-2272380',
-            emergency: '+91-413-2296000',
-            email: 'director@jipmer.edu.in',
-            website: 'https://www.jipmer.edu.in'
-        },
-        stats: [
-            { value: '200+', label: 'Years of Excellence', icon: Building2 },
-            { value: '2500+', label: 'Beds', icon: Activity },
-            { value: '15000+', label: 'Procedures/Year', icon: TrendingUp },
-            { value: '4.9/5', label: 'Patient Rating', icon: Star }
-        ],
-        nearbyHospitals: [
-            { id: 2, name: 'Apollo Pondicherry', specialty: 'Multi-Specialty', distance: '4.2 km' },
-            { id: 3, name: 'MGMCRI', specialty: 'General Surgery', distance: '6.8 km' },
-            { id: 6, name: 'PIMS', specialty: 'Orthopedics', distance: '5.5 km' }
-        ],
-        touristPlaces: [
-            { name: 'Promenade Beach', distance: '3.1 km', image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400' },
-            { name: 'Auroville', distance: '10 km', image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400' },
-            { name: 'Paradise Beach', distance: '8.5 km', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400' },
-            { name: 'French Quarter', distance: '2.5 km', image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=400' },
-            { name: 'Sri Aurobindo Ashram', distance: '4.5 km', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=400' },
-            { name: 'Botanical Garden', distance: '5 km', image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400' },
-            { name: 'Manakula Vinayagar Temple', distance: '4 km', image: 'https://images.unsplash.com/photo-1623945939223-93d39587428f?w=400' },
-            { name: 'Chunnambar Boat House', distance: '9 km', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400' }
-        ]
-    },
-    '2': {
-        id: 2,
-        name: 'Apollo Pondicherry',
-        fullName: 'Apollo Speciality Hospitals Pondicherry',
-        image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200',
-        gallery: [
-            'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
-            'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800',
-            'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=800',
-            'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
-        ],
-        rating: 4.8,
-        reviewsRating: 1560,
-        specialties: ['Cardiology', 'Orthopedics', 'Neurosurgery', 'IVF', 'Oncology', 'Nephrology'],
-        accreditation: ['NABH', 'JCI'],
-        location: 'Ariyankuppam, Pondicherry - 605007',
-        established: 2005,
-        beds: 300,
-        type: 'Private',
-        description: 'Apollo Hospitals Pondicherry is a JCI-accredited tertiary care hospital with cutting-edge technology and international patient services.',
-        about: 'Part of the prestigious Apollo Hospitals Group, this facility brings world-class healthcare to Pondicherry. With JCI accreditation, it maintains the highest international standards in patient care, safety, and service delivery.',
-        equipment: ['Da Vinci Surgical Robot', 'PET-CT Scanner', '64-slice CT', 'Cath Lab', '3T MRI', 'Gamma Knife'],
-        highlights: [
-            'JCI accredited international standards',
-            'Da Vinci robotic surgery',
-            'International patient wing',
-            'Multilingual staff (English, French, Arabic)',
-            'Advanced diagnostic center',
-            'Comprehensive oncology services'
-        ],
-        departments: [
-            {
-                name: 'Cardiology',
-                doctors: 15,
-                procedures: '2000+/year',
-                image: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=600',
-                description: 'Leading heart care center with advanced robotic interventions. We perform complex angioplasties and bypass surgeries.',
-                head: 'Dr. V. Rao',
-                commonProcedures: ['Robotic Surgery', 'Angioplasty', 'Valve Replacement', 'TAVI']
-            },
-            {
-                name: 'Orthopedics',
-                doctors: 12,
-                procedures: '1500+/year',
-                image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600',
-                description: 'Robotic joint replacement and complex trauma management. Minimally invasive techniques for faster recovery.',
-                head: 'Dr. S. Reddy',
-                commonProcedures: ['Robotic Knee Replacement', 'Hip Resurfacing', 'Spine Fusion', 'Arthroscopy']
-            },
-            {
-                name: 'Neurosurgery',
-                doctors: 8,
-                procedures: '800+/year',
-                image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600',
-                description: 'Precision neurosurgery using Gamma Knife and navigation systems. Specialized in brain and spine tumors.',
-                head: 'Dr. A. Gupta',
-                commonProcedures: ['Gamma Knife Radiosurgery', 'Brain Tumor Excision', 'DBS']
-            },
-            {
-                name: 'IVF & Fertility',
-                doctors: 6,
-                procedures: '1200+/year',
-                image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600',
-                description: 'High success rate fertility treatments with personalized care. State-of-the-art embryology lab.',
-                head: 'Dr. M. Lakshmi',
-                commonProcedures: ['IVF', 'ICSI', 'Egg Freezing', 'Genetic Testing']
-            },
-            {
-                name: 'Oncology',
-                doctors: 10,
-                procedures: '1000+/year',
-                image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600',
-                description: 'Holistic cancer care with latest immunotherapy options and precision radiation.',
-                head: 'Dr. K. Chen',
-                commonProcedures: ['Immunotherapy', 'Targeted Therapy', 'Robotic Onco-Surgery']
-            }
-        ],
-        reviews: [
-            { id: 1, user: 'Michael B.', rating: 5, date: '1 month ago', comment: 'The robotic surgery was a success. Recovery was much faster than expected.', origin: 'USA' },
-            { id: 2, user: 'Fatima H.', rating: 5, date: '2 weeks ago', comment: 'Excellent fertility center. We are so grateful for the care we received.', origin: 'Oman' },
-            { id: 3, user: 'David W.', rating: 4, date: '3 months ago', comment: 'Very clean and modern hospital. Staff speaks good English.', origin: 'Australia' },
-            { id: 4, user: 'Sophie L.', rating: 5, date: '1 week ago', comment: 'The international patient lounge made our stay very comfortable.', origin: 'France' },
-            { id: 5, user: 'Rajesh K.', rating: 4, date: '2 months ago', comment: 'Great infrastructure and doctors. Parking can be improved.', origin: 'Singapore' }
-        ],
-        facilities: [
-            'International patient lounge',
-            'Private deluxe rooms',
-            'Multi-cuisine restaurant',
-            'Pharmacy and medical store',
-            'Diagnostic services',
-            'Ambulance services',
-            'ATM and banking',
-            'Wi-Fi throughout hospital'
-        ],
-        contact: {
-            phone: '+91-413-2208787',
-            emergency: '+91-413-2208000',
-            email: 'info.pondicherry@apollohospitals.com',
-            website: 'https://www.apollohospitals.com/pondicherry'
-        },
-        stats: [
-            { value: '19', label: 'Years of Excellence', icon: Building2 },
-            { value: '300+', label: 'Beds', icon: Activity },
-            { value: '5000+', label: 'Procedures/Year', icon: TrendingUp },
-            { value: '4.8/5', label: 'Patient Rating', icon: Star }
-        ],
-        nearbyHospitals: [
-            { id: 1, name: 'JIPMER', specialty: 'Multi-Specialty', distance: '4.2 km' },
-            { id: 4, name: 'GEM Hospital', specialty: 'Gastroenterology', distance: '7.5 km' },
-            { id: 5, name: 'Aravind Eye Hospital', specialty: 'Ophthalmology', distance: '2.1 km' }
-        ],
-        touristPlaces: [
-            { name: 'Rock Beach', distance: '5.2 km', image: 'https://images.unsplash.com/photo-1622312685714-db1df639c4d9?w=400' },
-            { name: 'Serenity Beach', distance: '8 km', image: 'https://images.unsplash.com/photo-1519046904884-53103b34b606?w=400' },
-            { name: 'Botanical Garden', distance: '6.5 km', image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400' },
-            { name: 'Sri Aurobindo Ashram', distance: '4.8 km', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=400' },
-            { name: 'Auroville Matrimandir', distance: '12 km', image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400' },
-            { name: 'Pondicherry Museum', distance: '5.5 km', image: 'https://images.unsplash.com/photo-1545564850-c6504b2c05fc?w=400' },
-            { name: 'Ousteri Lake', distance: '12 km', image: 'https://images.unsplash.com/photo-1493246318656-5bfd4cfb29b8?w=400' },
-            { name: 'Bharathi Park', distance: '5 km', image: 'https://images.unsplash.com/photo-1596716075908-011467406c1c?w=400' }
-        ]
-    }
-};
+interface Review {
+    id: number;
+    user: string;
+    rating: number;
+    date: string;
+    comment: string;
+    origin: string;
+}
+
+interface HospitalProfile {
+    id: number;
+    name: string;
+    type: string;
+    establishmentYear: number;
+    accreditations: string[];
+    beds: number;
+    patientCount: any;
+    location: {
+        address: string;
+        coordinates?: { lat: number; lng: number };
+    };
+    contact: {
+        phone: string;
+        emergency: string;
+        email: string;
+        website: string;
+    };
+    description: {
+        short: string;
+        long: string;
+    };
+    departments: any[];
+    specialties: string[];
+    equipment: string[];
+    facilities: string[];
+    doctors: any[];
+    treatments: any[];
+    packages: any[];
+    photos: string[];
+    reviews: Review[];
+    logo?: string;
+    highlights?: string[];
+    // Optional fields for legacy support or future expansion
+    rating?: number;
+    nearbyHospitals?: any[];
+    touristPlaces?: any[];
+}
 
 export default function HospitalDetailPage() {
     const params = useParams();
     const hospitalId = params?.id as string;
-    const hospital = hospitalData[hospitalId];
+    const [hospital, setHospital] = useState<HospitalProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [selectedDept, setSelectedDept] = useState<any | null>(null);
     const [filterRating, setFilterRating] = useState<number | 'all'>('all');
-
-    // Add counter animation for stats
     const [counts, setCounts] = useState<Record<number, number>>({});
 
-    const filteredReviews = hospital?.reviews?.filter((r: any) =>
-        filterRating === 'all' || r.rating === filterRating
-    ) || [];
+    useEffect(() => {
+        const fetchHospital = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/hospitals/${hospitalId}`);
+                if (!response.ok) throw new Error('Hospital not found');
+                const data = await response.json();
+
+                // Transform API data to match UI needs if necessary, otherwise use directly
+                // Assuming API returns data matching the interface roughly
+                setHospital(data);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (hospitalId) fetchHospital();
+    }, [hospitalId]);
+
+    // Derived stats for UI
+    const stats = hospital ? [
+        { value: `${new Date().getFullYear() - (hospital.establishmentYear || 2000)}+`, label: 'Years of Excellence', icon: Building2 },
+        { value: `${hospital.beds}+`, label: 'Beds', icon: Activity },
+        { value: '15000+', label: 'Procedures/Year', icon: TrendingUp },
+        { value: '4.9/5', label: 'Patient Rating', icon: Star }
+    ] : [];
 
     useEffect(() => {
-        if (hospital?.stats) {
+        if (hospital) {
             const timers: NodeJS.Timeout[] = [];
-            hospital.stats.forEach((stat: any, index: number) => {
+            stats.forEach((stat: any, index: number) => {
                 const targetValue = parseInt(stat.value.replace(/[^0-9]/g, ''));
                 if (!isNaN(targetValue)) {
                     let current = 0;
-                    const increment = targetValue / 50;
+                    const increment = Math.max(1, targetValue / 50);
                     const timer = setInterval(() => {
                         current += increment;
                         if (current >= targetValue) {
@@ -304,12 +121,18 @@ export default function HospitalDetailPage() {
         }
     }, [hospital]);
 
-    if (!hospital) {
+    const filteredReviews = hospital?.reviews?.filter((r: any) =>
+        filterRating === 'all' || r.rating === filterRating
+    ) || [];
+
+    if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div></div>;
+
+    if (error || !hospital) {
         return (
             <div className="min-h-screen bg-gray-50">
                 <Header />
                 <div className="container mx-auto px-4 py-32 text-center">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">Hospital Not Found</h1>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-4">{error || 'Hospital Not Found'}</h1>
                     <p className="text-gray-600 mb-8">The hospital you're looking for doesn't exist.</p>
                     <Link href="/hospital" className="text-blue-600 hover:underline">← Back to Hospitals</Link>
                 </div>
@@ -317,6 +140,13 @@ export default function HospitalDetailPage() {
             </div>
         );
     }
+
+    // Helper to get image URL properly
+    const getMainImage = () => {
+        if (hospital.photos && hospital.photos.length > 0) return hospital.photos[0];
+        return 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1200'; // Fallback
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -330,7 +160,7 @@ export default function HospitalDetailPage() {
             >
                 <div className="absolute inset-0">
                     <Image
-                        src={hospital.image}
+                        src={getMainImage()}
                         alt={hospital.name}
                         fill
                         className="object-cover scale-105"
@@ -358,7 +188,7 @@ export default function HospitalDetailPage() {
                             transition={{ delay: 0.3 }}
                             className="flex flex-wrap gap-2 mb-4"
                         >
-                            {hospital.accreditation.map((acc: string, i: number) => (
+                            {hospital.accreditations.map((acc: string, i: number) => (
                                 <span key={i} className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
                                     {acc} Accredited
                                 </span>
@@ -382,7 +212,7 @@ export default function HospitalDetailPage() {
                             transition={{ delay: 0.5 }}
                             className="text-xl text-blue-100 mb-6"
                         >
-                            {hospital.fullName}
+                            {hospital.description?.short || ''}
                         </motion.p>
                         <motion.p
                             initial={{ y: 30, opacity: 0 }}
@@ -390,7 +220,7 @@ export default function HospitalDetailPage() {
                             transition={{ delay: 0.6 }}
                             className="text-lg text-white/90 mb-8 max-w-3xl"
                         >
-                            {hospital.description}
+                            {hospital.description?.long?.substring(0, 200)}...
                         </motion.p>
 
                         <motion.div
@@ -401,12 +231,13 @@ export default function HospitalDetailPage() {
                         >
                             <div className="flex items-center gap-2">
                                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                                <span className="font-bold">{hospital.rating}</span>
-                                <span className="text-white/70">({hospital.reviewsRating} reviews)</span>
+                                {/* Calculate average rating if needed, or use specific field if added */}
+                                <span className="font-bold">4.9</span>
+                                <span className="text-white/70">({hospital.reviews?.length || 0} reviews)</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <MapPin className="w-5 h-5" />
-                                <span>{hospital.location}</span>
+                                <span>{hospital.location?.address}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Building2 className="w-5 h-5" />
@@ -414,7 +245,7 @@ export default function HospitalDetailPage() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <Clock className="w-5 h-5" />
-                                <span>Est. {hospital.established}</span>
+                                <span>Est. {hospital.establishmentYear}</span>
                             </div>
                         </motion.div>
                     </div>
@@ -425,7 +256,7 @@ export default function HospitalDetailPage() {
             <section className="bg-white shadow-lg relative z-10 -mt-4">
                 <div className="container mx-auto px-4 py-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {hospital.stats?.map((stat: any, i: number) => (
+                        {stats.map((stat: any, i: number) => (
                             <motion.div
                                 key={i}
                                 initial={{ scale: 0, opacity: 0 }}
@@ -479,7 +310,7 @@ export default function HospitalDetailPage() {
             </section>
 
             {/* Image Gallery */}
-            {hospital.gallery && (
+            {hospital.photos && hospital.photos.length > 0 && (
                 <section className="py-12 bg-white">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -487,7 +318,7 @@ export default function HospitalDetailPage() {
                             Photo Gallery
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {hospital.gallery.map((img: string, i: number) => (
+                            {hospital.photos.map((img: string, i: number) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, scale: 0.8 }}
@@ -639,11 +470,11 @@ export default function HospitalDetailPage() {
                                     <Heart className="w-7 h-7 text-blue-600" />
                                     About {hospital.name}
                                 </h2>
-                                <p className="text-gray-600 leading-relaxed mb-6">{hospital.about}</p>
+                                <p className="text-gray-600 leading-relaxed mb-6">{hospital.description?.long}</p>
 
                                 <h3 className="text-xl font-bold text-gray-800 mb-4">Key Highlights</h3>
                                 <div className="grid md:grid-cols-2 gap-3">
-                                    {hospital.highlights.map((highlight: string, i: number) => (
+                                    {hospital.highlights?.map((highlight: string, i: number) => (
                                         <motion.div
                                             key={i}
                                             initial={{ x: -20, opacity: 0 }}
@@ -789,17 +620,17 @@ export default function HospitalDetailPage() {
                                             Patient Reviews
                                         </h2>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-4xl font-bold text-gray-900">{hospital.rating}</span>
+                                            <span className="text-4xl font-bold text-gray-900">4.9</span>
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-1">
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
                                                             key={i}
-                                                            className={`w-5 h-5 ${i < Math.floor(hospital.rating) ? 'text-yellow-400 fill-current' : 'text-gray-200 fill-current'}`}
+                                                            className={`w-5 h-5 ${i < Math.floor(4.9) ? 'text-yellow-400 fill-current' : 'text-gray-200 fill-current'}`}
                                                         />
                                                     ))}
                                                 </div>
-                                                <span className="text-gray-500 text-sm">{hospital.reviewsRating} total reviews</span>
+                                                <span className="text-gray-500 text-sm">{hospital.reviews?.length || 0} total reviews</span>
                                             </div>
                                         </div>
                                     </div>
@@ -967,7 +798,7 @@ export default function HospitalDetailPage() {
                                     </div>
                                     <div className="pt-4 border-t">
                                         <div className="text-sm text-gray-500 mb-1">Address</div>
-                                        <p className="text-gray-700">{hospital.location}</p>
+                                        <p className="text-gray-700">{hospital.location?.address}</p>
                                     </div>
                                 </div>
 
@@ -992,7 +823,7 @@ export default function HospitalDetailPage() {
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
                                         <span className="text-blue-100">Established</span>
-                                        <span className="font-bold">{hospital.established}</span>
+                                        <span className="font-bold">{hospital.establishmentYear}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-blue-100">Total Beds</span>

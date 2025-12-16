@@ -14,6 +14,7 @@
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.556.0",
     "next": "16.0.8",
+    "next-auth": "^4.24.11",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-focus-lock": "^2.13.7",

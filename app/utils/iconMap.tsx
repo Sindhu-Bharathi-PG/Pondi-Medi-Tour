@@ -10,6 +10,8 @@ import {
     Clock,
     DollarSign,
     Droplets,
+    GitCommit,
+    Github,
     Headphones,
     Heart,
     Leaf,
@@ -53,7 +55,9 @@ const iconMap: Record<string, LucideIcon> = {
     Moon,
     Wind,
     Droplets,
-    Headphones
+    Headphones,
+    GitCommit,
+    Github
 };
 
 export function getIcon(iconName: string): LucideIcon | null {

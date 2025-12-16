@@ -1,26 +1,29 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { eq } = require('drizzle-orm');
-const db = require('../../config/database');
+const db = require('../../../config/database');
 const { users } = require('../models/User');
 
 const login = async (request, reply) => {
   const { email, password } = request.body;
+  console.log('📝 Login attempt:', { email, passwordProvided: !!password });
 
   try {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    
     if (!user) {
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
+    
     if (!isValidPassword) {
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
     const token = jwt.sign(
       { userId: user.id, userType: user.userType },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'your-super-secret-key-change-this-in-production',
       { expiresIn: '24h' }
     );
 
@@ -81,6 +84,37 @@ const verifyMFA = async (request, reply) => {
   reply.send({ message: 'MFA verification not implemented yet' });
 };
 
+const verifyCredentialsForRole = async (request, reply) => {
+  const { email, password } = request.body;
+
+  try {
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    
+    if (!user) {
+      return reply.code(401).send({ error: 'Invalid credentials' });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    
+    if (!isValidPassword) {
+      return reply.code(401).send({ error: 'Invalid credentials' });
+    }
+
+    // Update last login
+    await db.update(users).set({ lastLogin: new Date() }).where(eq(users.id, user.id));
+
+    // Return role information for redirect logic
+    return reply.send({
+      userType: user.userType,
+      requiresRedirect: user.userType === 'superadmin',
+      redirectUrl: user.userType === 'superadmin' ? '/dashboard/superadmin' : null,
+    });
+  } catch (error) {
+    request.log.error(error);
+    reply.code(500).send({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -88,4 +122,5 @@ module.exports = {
   refreshToken,
   setupMFA,
   verifyMFA,
+  verifyCredentialsForRole,
 };

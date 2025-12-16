@@ -1,3 +1,4 @@
-const { users } = require('../../database/schema');
+const { users } = require('../../../database/schema');
 
-module.exports = users;
+module.exports = { users };
+

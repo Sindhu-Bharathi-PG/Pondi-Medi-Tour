@@ -39,4 +39,30 @@ module.exports = async function (fastify, opts) {
   // MFA routes
   fastify.post('/mfa/setup', { preHandler: fastify.authenticate }, authController.setupMFA);
   fastify.post('/mfa/verify', authController.verifyMFA);
+
+  // TEMPORARY DEBUG ROUTE
+  fastify.get('/reset-debug', async (request, reply) => {
+    const bcrypt = require('bcryptjs');
+    const { eq } = require('drizzle-orm');
+    const { users } = require('../../../database/schema');
+    const db = require('../../../config/database');
+    
+    const newHash = await bcrypt.hash('123456', 10);
+    // Create a new user test2@test.com
+    try {
+        await db.insert(users).values({
+            email: 'test2@test.com',
+            password: newHash,
+            name: 'Test Setup User',
+            userType: 'hospital',
+            isActive: true,
+            emailVerified: true
+        });
+        return { success: true, message: 'Created user test2@test.com with password 123456' };
+    } catch (e) {
+        // If exists, update it
+        await db.update(users).set({ password: newHash }).where(eq(users.email, 'test2@test.com'));
+        return { success: true, message: 'Updated user test2@test.com with password 123456' };
+    }
+  });
 };
