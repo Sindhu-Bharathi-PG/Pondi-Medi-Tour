@@ -1,53 +1,55 @@
 const postgres = require('postgres');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
 
-const sql = postgres(process.env.DATABASE_URL);
+const DATABASE_URL = 'postgresql://neondb_owner:npg_iwOG4Fq9QvBg@ep-red-hall-a1uesazg-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 
 async function createAdminUser() {
-    try {
-        console.log('🔑 Creating admin user...');
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-
-        // Check if admin user already exists
-        const existingUser = await sql`
-            SELECT id FROM users WHERE email = 'admin@pondimeditour.com'
-        `;
-
-        if (existingUser.length > 0) {
-            console.log('⚠️  Admin user already exists!');
-            console.log('\n✅ Admin Credentials:');
-            console.log('   Email: admin@pondimeditour.com');
-            console.log('   Password: admin123');
-            return;
-        }
-
-        // Create admin user
-        const [user] = await sql`
-            INSERT INTO users (email, password, name, user_type, is_active, email_verified)
-            VALUES (
-                'admin@pondimeditour.com',
-                ${hashedPassword},
-                'Super Admin',
-                'superadmin',
-                true,
-                true
-            )
-            RETURNING id, email, name, user_type
-        `;
-
-        console.log('✅ Admin user created successfully!\n');
-        console.log('📧 Email: admin@pondimeditour.com');
-        console.log('🔒 Password: admin123');
-        console.log('\n⚠️  Please change this password after first login!');
-
-    } catch (error) {
-        console.error('❌ Error creating admin user:', error);
-    } finally {
-        await sql.end();
+  const sql = postgres(DATABASE_URL, { ssl: 'require' });
+  
+  try {
+    console.log('🔄 Creating admin user...');
+    
+    const email = 'admin@test.com';
+    const password = '123456';
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Check if user exists
+    const existing = await sql`
+      SELECT id FROM users WHERE email = ${email}
+    `;
+    
+    if (existing.length > 0) {
+      console.log('⚠️  User already exists, updating password...');
+      await sql`
+        UPDATE users 
+        SET password = ${hashedPassword}, user_type = 'admin'
+        WHERE email = ${email}
+      `;
+      console.log('✅ Updated existing user');
+    } else {
+      console.log('➕ Creating new admin user...');
+      await sql`
+        INSERT INTO users (email, password, name, user_type, is_active, email_verified)
+        VALUES (
+          ${email},
+          ${hashedPassword},
+          'Admin User',
+          'admin',
+          true,
+          true
+        )
+      `;
+      console.log('✅ Admin user created successfully');
     }
+    
+    console.log(`\n📧 Email: ${email}`);
+    console.log(`🔑 Password: ${password}\n`);
+    
+  } catch (error) {
+    console.error('❌ Error:', error);
+  } finally {
+    await sql.end();
+  }
 }
 
 createAdminUser();

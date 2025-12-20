@@ -1,44 +1,91 @@
 "use client";
 
-import { Activity, ArrowLeft, Clock, DollarSign, Plus, Sparkles, Trash2 } from "lucide-react";
+import { API_BASE, apiCall, useApi } from "@/app/hooks/useApi";
+import { ArrowLeft, DollarSign, Pill, Plus, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { EmptyState, ErrorState, LoadingSpinner } from "../components/LoadingStates";
+import TreatmentModal from "./components/TreatmentModal";
 
 export default function TreatmentsPage() {
-    const [viewMode, setViewMode] = useState('treatments'); // treatments | packages
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTreatment, setSelectedTreatment] = useState<any>(null);
 
-    const treatments = [
-        {
-            id: 1,
-            name: "Total Knee Replacement",
-            category: "Orthopedics",
-            price: "$4,500 - $6,000",
-            duration: "3-5 Days Stay",
-            popular: true,
-            description: "Complete surgical replacement of the knee joint with artificial material."
-        },
-        {
-            id: 2,
-            name: "Angioplasty",
-            category: "Cardiology",
-            price: "$3,200 - $4,500",
-            duration: "2-3 Days Stay",
-            popular: false,
-            description: "Procedure to restore blood flow through the artery."
-        },
-        {
-            id: 3,
-            name: "Dental Implants (Full Mouth)",
-            category: "Dental",
-            price: "$8,000 - $12,000",
-            duration: "2 Visits (7 Days)",
-            popular: true,
-            description: "Comprehensive dental restoration using titanium implants."
+    // Use optimized API hook
+    const { data: treatments, loading, error, refetch } = useApi<any[]>({
+        url: `${API_BASE}/api/hospitals/me/treatments`,
+        initialData: []
+    });
+
+    const handleSave = async (data: any) => {
+        try {
+            if (selectedTreatment) {
+                await apiCall(`/api/hospitals/me/treatments/${selectedTreatment.id}`, 'PUT', data);
+            } else {
+                await apiCall('/api/hospitals/me/treatments', 'POST', data);
+            }
+            await refetch();
+            setIsModalOpen(false);
+            setSelectedTreatment(null);
+        } catch (err: any) {
+            alert(err.message || 'Failed to save treatment');
         }
-    ];
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this treatment?')) return;
+        try {
+            await apiCall(`/api/hospitals/me/treatments/${id}`, 'DELETE');
+            await refetch();
+        } catch (err: any) {
+            alert(err.message || 'Failed to delete treatment');
+        }
+    };
+
+    const handleEdit = (treatment: any) => {
+        setSelectedTreatment(treatment);
+        setIsModalOpen(true);
+    };
+
+    const handleAddNew = () => {
+        setSelectedTreatment(null);
+        setIsModalOpen(true);
+    };
+
+    if (loading) {
+        return <LoadingSpinner message="Loading treatments..." />;
+    }
+
+    if (error) {
+        return <ErrorState message={error} onRetry={refetch} showLogin />;
+    }
+
+    if (!treatments?.length && !loading) {
+        return (
+            <div className="min-h-full bg-gray-50/50 p-8">
+                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-teal-600 mb-4">
+                    <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+                </Link>
+                <EmptyState
+                    title="No Treatments Yet"
+                    description="Add your first treatment to showcase your medical services."
+                    icon={<Pill className="w-8 h-8 text-teal-500" />}
+                    action={{ label: "Add First Treatment", onClick: handleAddNew }}
+                />
+                <TreatmentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} treatment={null} onSave={handleSave} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-full bg-gray-50/50">
+            <TreatmentModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                treatment={selectedTreatment}
+                onSave={handleSave}
+            />
+
             {/* Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-0 w-1/3 h-1/3 bg-teal-500/5 rounded-full blur-3xl" />
@@ -56,40 +103,14 @@ export default function TreatmentsPage() {
                             <ArrowLeft className="w-4 h-4" />
                             Back to Dashboard
                         </Link>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Treatments & Packages</h1>
-                        <p className="text-gray-500 mt-1">Showcase your medical services and wellness packages.</p>
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Medical Treatments</h1>
+                        <p className="text-gray-500 mt-1">Manage your medical procedures and pricing.</p>
                     </div>
 
-                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl font-medium shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-[1.02] transition-all">
+                    <button onClick={handleAddNew} className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl font-medium shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-[1.02] transition-all">
                         <Plus className="w-4 h-4" />
-                        Add New Service
+                        Add New Treatment
                     </button>
-                </div>
-
-                {/* View Switcher */}
-                <div className="flex justify-center mb-8">
-                    <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-100 inline-flex">
-                        <button
-                            onClick={() => setViewMode('treatments')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === 'treatments'
-                                    ? 'bg-teal-50 text-teal-700'
-                                    : 'text-gray-600 hover:bg-gray-50'
-                                }`}
-                        >
-                            <Activity className="w-4 h-4" />
-                            Treatments
-                        </button>
-                        <button
-                            onClick={() => setViewMode('packages')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === 'packages'
-                                    ? 'bg-blue-50 text-blue-700'
-                                    : 'text-gray-600 hover:bg-gray-50'
-                                }`}
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            Wellness Packages
-                        </button>
-                    </div>
                 </div>
 
                 {/* Content Grid */}
@@ -98,9 +119,7 @@ export default function TreatmentsPage() {
                         <div
                             key={treatment.id}
                             className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
-                            style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            {/* Decorative Top Border */}
                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                             <div className="p-6">
@@ -108,7 +127,7 @@ export default function TreatmentsPage() {
                                     <span className="px-3 py-1 rounded-lg bg-gray-50 text-gray-600 text-xs font-bold uppercase tracking-wide">
                                         {treatment.category}
                                     </span>
-                                    {treatment.popular && (
+                                    {treatment.isPopular && (
                                         <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
                                             <Sparkles className="w-3 h-3" />
                                             Popular
@@ -119,23 +138,39 @@ export default function TreatmentsPage() {
                                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">
                                     {treatment.name}
                                 </h3>
-                                <p className="text-sm text-gray-500 mb-6 line-clamp-2">
-                                    {treatment.description}
+
+                                {/* Key Stats Grid */}
+                                <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg">
+                                    <div>
+                                        <span className="block text-gray-400">Success Rate</span>
+                                        <span className="font-bold text-teal-700">{treatment.successRate}%</span>
+                                    </div>
+                                    <div>
+                                        <span className="block text-gray-400">Hospital Stay</span>
+                                        <span className="font-bold">{treatment.hospitalStay}</span>
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-gray-500 mb-6 line-clamp-2 min-h-[40px]">
+                                    {treatment.shortDescription}
                                 </p>
 
                                 <div className="space-y-3 mb-6">
                                     <div className="flex items-center gap-3 text-sm text-gray-700">
                                         <DollarSign className="w-4 h-4 text-gray-400" />
-                                        <span className="font-semibold">{treatment.price}</span>
+                                        <span className="font-semibold">${treatment.minPrice} - ${treatment.maxPrice}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-sm text-gray-700">
-                                        <Clock className="w-4 h-4 text-gray-400" />
-                                        <span>{treatment.duration}</span>
+                                    <div className="flex flex-wrap gap-1">
+                                        {(treatment.technology || []).slice(0, 2).map((tech, i) => (
+                                            <span key={i} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100">
+                                                {tech}
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2 pt-4 border-t border-gray-50">
-                                    <button className="flex-1 py-2 rounded-lg border border-gray-100 text-gray-600 text-sm font-medium hover:bg-gray-50 hover:border-gray-200 transition">
+                                    <button onClick={() => handleEdit(treatment)} className="flex-1 py-2 rounded-lg border border-gray-100 text-gray-600 text-sm font-medium hover:bg-gray-50 hover:border-gray-200 transition">
                                         Edit Details
                                     </button>
                                     <button className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
@@ -146,8 +181,8 @@ export default function TreatmentsPage() {
                         </div>
                     ))}
 
-                    {/* Add New Card */}
-                    <button className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-200 hover:border-teal-400 hover:bg-teal-50/10 transition-all group min-h-[280px]">
+                    {/* Add New Card Button */}
+                    <button onClick={handleAddNew} className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-200 hover:border-teal-400 hover:bg-teal-50/10 transition-all group min-h-[350px]">
                         <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-teal-100 transition-all text-teal-600">
                             <Plus className="w-8 h-8" />
                         </div>

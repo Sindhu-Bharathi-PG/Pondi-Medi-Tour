@@ -10,7 +10,7 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:migrate": "drizzle-kit migrate:pg",
     "db:push": "drizzle-kit push:pg",
-    "seed": "node scripts/seed-data.js"
+    "seed": "node seed-data.js"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
@@ -22,6 +22,7 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.0",

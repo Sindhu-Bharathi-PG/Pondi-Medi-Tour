@@ -1,0 +1,380 @@
+const { eq, desc, and } = require('drizzle-orm');
+const db = require('../../../config/database');
+const { users, doctors, treatments, packages, inquiries, hospitalDetails } = require('../../../database/schema');
+
+// Helper to get hospital ID from user
+const getHospitalIdFromUser = async (userId) => {
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  
+  if (user?.hospitalId) return user.hospitalId;
+
+  // Auto-link logic for dev environment/recovery
+  if (user && user.userType === 'hospital') {
+      const [hospital] = await db.select().from(hospitalDetails).limit(1);
+      if (hospital) {
+          console.log(`Auto-linking user ${userId} to hospital ${hospital.id}`);
+          await db.update(users).set({ hospitalId: hospital.id }).where(eq(users.id, userId));
+          return hospital.id;
+      }
+  }
+  
+  return null;
+};
+
+// ============================================
+// DOCTORS CRUD
+// ============================================
+
+const getMyDoctors = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const doctorsList = await db.select().from(doctors)
+      .where(eq(doctors.hospitalId, hospitalId))
+      .orderBy(desc(doctors.createdAt));
+
+    return doctorsList;
+  } catch (error) {
+    console.error('Get doctors error:', error);
+    return reply.code(500).send({ error: 'Failed to fetch doctors' });
+  }
+};
+
+const addDoctor = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const [newDoctor] = await db.insert(doctors).values({
+      ...request.body,
+      hospitalId
+    }).returning();
+
+    return reply.code(201).send(newDoctor);
+  } catch (error) {
+    console.error('Add doctor error:', error);
+    return reply.code(500).send({ error: 'Failed to add doctor' });
+  }
+};
+
+const updateDoctor = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const doctorId = parseInt(request.params.id);
+    console.log(`[DEBUG] Update Check: DocID=${doctorId}, HospID=${hospitalId}`);
+
+    // Verify doctor belongs to this hospital
+    const [existingDoctor] = await db.select().from(doctors)
+      .where(and(eq(doctors.id, doctorId), eq(doctors.hospitalId, hospitalId)));
+
+    if (!existingDoctor) {
+      const [anyDoc] = await db.select().from(doctors).where(eq(doctors.id, doctorId));
+      console.log(`[DEBUG] Update Failed. Existing match? false. Doctor Exists Globally? ${!!anyDoc} (Global HospID: ${anyDoc?.hospitalId})`);
+      return reply.code(404).send({ error: 'Doctor not found' });
+    }
+
+    const [updated] = await db.update(doctors)
+      .set({ ...request.body, updatedAt: new Date() })
+      .where(eq(doctors.id, doctorId))
+      .returning();
+
+    return updated;
+  } catch (error) {
+    console.error('Update doctor error:', error);
+    return reply.code(500).send({ error: 'Failed to update doctor' });
+  }
+};
+
+const deleteDoctor = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const doctorId = parseInt(request.params.id);
+
+    // Verify doctor belongs to this hospital
+    const [existingDoctor] = await db.select().from(doctors)
+      .where(and(eq(doctors.id, doctorId), eq(doctors.hospitalId, hospitalId)));
+
+    if (!existingDoctor) {
+      return reply.code(404).send({ error: 'Doctor not found' });
+    }
+
+    await db.delete(doctors).where(eq(doctors.id, doctorId));
+
+    return { message: 'Doctor deleted successfully' };
+  } catch (error) {
+    console.error('Delete doctor error:', error);
+    return reply.code(500).send({ error: 'Failed to delete doctor' });
+  }
+};
+
+// ============================================
+// TREATMENTS CRUD
+// ============================================
+
+const getMyTreatments = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const treatmentsList = await db.select().from(treatments)
+      .where(eq(treatments.hospitalId, hospitalId))
+      .orderBy(desc(treatments.createdAt));
+
+    return treatmentsList;
+  } catch (error) {
+    console.error('Get treatments error:', error);
+    return reply.code(500).send({ error: 'Failed to fetch treatments' });
+  }
+};
+
+const addTreatment = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const [newTreatment] = await db.insert(treatments).values({
+      ...request.body,
+      hospitalId
+    }).returning();
+
+    return reply.code(201).send(newTreatment);
+  } catch (error) {
+    console.error('Add treatment error:', error);
+    return reply.code(500).send({ error: 'Failed to add treatment' });
+  }
+};
+
+const updateTreatment = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const treatmentId = parseInt(request.params.id);
+
+    const [existingTreatment] = await db.select().from(treatments)
+      .where(and(eq(treatments.id, treatmentId), eq(treatments.hospitalId, hospitalId)));
+
+    if (!existingTreatment) {
+      return reply.code(404).send({ error: 'Treatment not found' });
+    }
+
+    const [updated] = await db.update(treatments)
+      .set({ ...request.body, updatedAt: new Date() })
+      .where(eq(treatments.id, treatmentId))
+      .returning();
+
+    return updated;
+  } catch (error) {
+    console.error('Update treatment error:', error);
+    return reply.code(500).send({ error: 'Failed to update treatment' });
+  }
+};
+
+const deleteTreatment = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const treatmentId = parseInt(request.params.id);
+
+    const [existingTreatment] = await db.select().from(treatments)
+      .where(and(eq(treatments.id, treatmentId), eq(treatments.hospitalId, hospitalId)));
+
+    if (!existingTreatment) {
+      return reply.code(404).send({ error: 'Treatment not found' });
+    }
+
+    await db.delete(treatments).where(eq(treatments.id, treatmentId));
+
+    return { message: 'Treatment deleted successfully' };
+  } catch (error) {
+    console.error('Delete treatment error:', error);
+    return reply.code(500).send({ error: 'Failed to delete treatment' });
+  }
+};
+
+// ============================================
+// INQUIRIES
+// ============================================
+
+const getMyInquiries = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const inquiriesList = await db.select().from(inquiries)
+      .where(eq(inquiries.hospitalId, hospitalId))
+      .orderBy(desc(inquiries.createdAt));
+
+    return inquiriesList;
+  } catch (error) {
+    console.error('Get inquiries error:', error);
+    return reply.code(500).send({ error: 'Failed to fetch inquiries' });
+  }
+};
+
+const updateInquiry = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const inquiryId = parseInt(request.params.id);
+
+    const [existingInquiry] = await db.select().from(inquiries)
+      .where(and(eq(inquiries.id, inquiryId), eq(inquiries.hospitalId, hospitalId)));
+
+    if (!existingInquiry) {
+      return reply.code(404).send({ error: 'Inquiry not found' });
+    }
+
+    const [updated] = await db.update(inquiries)
+      .set({ ...request.body, updatedAt: new Date() })
+      .where(eq(inquiries.id, inquiryId))
+      .returning();
+
+    return updated;
+  } catch (error) {
+    console.error('Update inquiry error:', error);
+    return reply.code(500).send({ error: 'Failed to update inquiry' });
+  }
+};
+
+// ============================================
+// PACKAGES CRUD
+// ============================================
+
+const getMyPackages = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const packagesList = await db.select().from(packages)
+      .where(eq(packages.hospitalId, hospitalId))
+      .orderBy(desc(packages.createdAt));
+
+    return packagesList;
+  } catch (error) {
+    console.error('Get packages error:', error);
+    return reply.code(500).send({ error: 'Failed to fetch packages' });
+  }
+};
+
+const addPackage = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const [newPackage] = await db.insert(packages).values({
+      ...request.body,
+      hospitalId
+    }).returning();
+
+    return reply.code(201).send(newPackage);
+  } catch (error) {
+    console.error('Add package error:', error);
+    return reply.code(500).send({ error: 'Failed to add package' });
+  }
+};
+
+const updatePackage = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const packageId = parseInt(request.params.id);
+
+    const [existingPackage] = await db.select().from(packages)
+      .where(and(eq(packages.id, packageId), eq(packages.hospitalId, hospitalId)));
+
+    if (!existingPackage) {
+      return reply.code(404).send({ error: 'Package not found' });
+    }
+
+    const [updated] = await db.update(packages)
+      .set({ ...request.body, updatedAt: new Date() })
+      .where(eq(packages.id, packageId))
+      .returning();
+
+    return updated;
+  } catch (error) {
+    console.error('Update package error:', error);
+    return reply.code(500).send({ error: 'Failed to update package' });
+  }
+};
+
+const deletePackage = async (request, reply) => {
+  try {
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    const packageId = parseInt(request.params.id);
+
+    const [existingPackage] = await db.select().from(packages)
+      .where(and(eq(packages.id, packageId), eq(packages.hospitalId, hospitalId)));
+
+    if (!existingPackage) {
+      return reply.code(404).send({ error: 'Package not found' });
+    }
+
+    await db.delete(packages).where(eq(packages.id, packageId));
+
+    return { message: 'Package deleted successfully' };
+  } catch (error) {
+    console.error('Delete package error:', error);
+    return reply.code(500).send({ error: 'Failed to delete package' });
+  }
+};
+
+module.exports = {
+  // Doctors
+  getMyDoctors,
+  addDoctor,
+  updateDoctor,
+  deleteDoctor,
+  // Treatments
+  getMyTreatments,
+  addTreatment,
+  updateTreatment,
+  deleteTreatment,
+  // Inquiries
+  getMyInquiries,
+  updateInquiry,
+  // Packages
+  getMyPackages,
+  addPackage,
+  updatePackage,
+  deletePackage
+};

@@ -5,22 +5,32 @@ const db = require('../../../config/database');
 const { users } = require('../models/User');
 
 const login = async (request, reply) => {
+  console.error('=== LOGIN CONTROLLER REACHED ===');
+  
   const { email, password } = request.body;
-  console.log('📝 Login attempt:', { email, passwordProvided: !!password });
+  console.error('Email:', email, 'Password provided:', !!password);
 
   try {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    console.error('User query result:', !!user);
     
     if (!user) {
+      console.error('User not found');
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
+    console.error('User found:', user.id, user.email);
+    
     const isValidPassword = await bcrypt.compare(password, user.password);
+    console.error('Password valid:', isValidPassword);
     
     if (!isValidPassword) {
+      console.error('Password mismatch');
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
+    console.error('Login successful!');
+    
     const token = jwt.sign(
       { userId: user.id, userType: user.userType },
       process.env.JWT_SECRET || 'your-super-secret-key-change-this-in-production',
@@ -29,6 +39,7 @@ const login = async (request, reply) => {
 
     reply.send({ token, user: { id: user.id, email: user.email, userType: user.userType } });
   } catch (error) {
+    console.error('Login error:', error);
     request.log.error(error);
     reply.code(500).send({ error: 'Internal server error' });
   }

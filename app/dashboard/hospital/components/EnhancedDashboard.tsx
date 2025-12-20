@@ -1,12 +1,11 @@
 "use client";
 
-import { Activity, ArrowRight, Bell, Building2, Calendar, FileText, Search, Star, TrendingUp, Users } from 'lucide-react';
+import { Activity, ArrowRight, Bell, Building2, FileText, Search, Star, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function EnhancedDashboard({ userName = "Partner" }: { userName?: string | null }) {
     const [stats, setStats] = useState({
-        appointments: 0,
         doctors: 0,
         inquiries: 0,
         profileComplete: 0
@@ -14,10 +13,9 @@ export default function EnhancedDashboard({ userName = "Partner" }: { userName?:
     const [animateStats, setAnimateStats] = useState(false);
 
     useEffect(() => {
-        // Trigger animation after mount
+        // Trigger animation after mount with mock data
         setTimeout(() => {
             setAnimateStats(true);
-            animateCount('appointments', 24);
             animateCount('doctors', 12);
             animateCount('inquiries', 8);
             animateCount('profileComplete', 85);
@@ -65,15 +63,7 @@ export default function EnhancedDashboard({ userName = "Partner" }: { userName?:
             bg: 'bg-violet-50',
             textColor: 'text-violet-700'
         },
-        {
-            title: 'Appointments',
-            description: 'View upcoming surgeries and consultations.',
-            icon: Calendar,
-            link: '/dashboard/hospital/appointments',
-            gradient: 'from-orange-500 to-rose-600',
-            bg: 'bg-orange-50',
-            textColor: 'text-orange-700'
-        }
+
     ];
 
     return (
@@ -105,17 +95,7 @@ export default function EnhancedDashboard({ userName = "Partner" }: { userName?:
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                    title="Total Appointments"
-                    value={stats.appointments}
-                    trend="+12% from last week"
-                    icon={Calendar}
-                    color="text-emerald-500"
-                    gradient="from-emerald-500/10 to-emerald-500/5"
-                    borderColor="border-emerald-100"
-                    animate={animateStats}
-                    delay={0}
-                />
+
                 <StatCard
                     title="Active Doctors"
                     value={stats.doctors}
@@ -202,13 +182,7 @@ export default function EnhancedDashboard({ userName = "Partner" }: { userName?:
                     <h3 className="text-xl font-bold text-gray-800">Recent Activity</h3>
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div className="p-2">
-                            <ActivityItem
-                                title="New Appointment"
-                                subtitle="Dr. Sarah • Cardio"
-                                time="10 min ago"
-                                icon={Calendar}
-                                color="bg-orange-100 text-orange-600"
-                            />
+
                             <ActivityItem
                                 title="New Inquiry"
                                 subtitle="Knee Replacement"

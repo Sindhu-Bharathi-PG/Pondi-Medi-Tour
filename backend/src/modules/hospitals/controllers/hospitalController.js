@@ -1,10 +1,10 @@
 const { eq } = require('drizzle-orm');
 const db = require('../../../config/database');
-const { hospitalProfiles, users } = require('../../../database/schema');
+const { hospitalDetails, users } = require('../../../database/schema');
 
 const createHospital = async (req, reply) => {
   try {
-    const [hospital] = await db.insert(hospitalProfiles).values(req.body).returning();
+    const [hospital] = await db.insert(hospitalDetails).values(req.body).returning();
     reply.code(201).send(hospital);
   } catch (err) {
     req.log.error(err);
@@ -14,7 +14,7 @@ const createHospital = async (req, reply) => {
 
 const getAllHospitals = async (req, reply) => {
   try {
-    const hospitals = await db.select().from(hospitalProfiles);
+    const hospitals = await db.select().from(hospitalDetails);
     reply.send(hospitals);
   } catch (err) {
     req.log.error(err);
@@ -25,7 +25,7 @@ const getAllHospitals = async (req, reply) => {
 const getHospital = async (req, reply) => {
   const { id } = req.params;
   try {
-    const [hospital] = await db.select().from(hospitalProfiles).where(eq(hospitalProfiles.id, id));
+    const [hospital] = await db.select().from(hospitalDetails).where(eq(hospitalDetails.id, id));
     if (!hospital) {
       return reply.code(404).send({ error: 'Hospital not found' });
     }
@@ -48,7 +48,7 @@ const getMyHospital = async (req, reply) => {
       return reply.code(404).send({ error: 'No hospital profile linked to this account' });
     }
     
-    const [hospital] = await db.select().from(hospitalProfiles).where(eq(hospitalProfiles.id, user.hospitalId));
+    const [hospital] = await db.select().from(hospitalDetails).where(eq(hospitalDetails.id, user.hospitalId));
     
     if (!hospital) {
       return reply.code(404).send({ error: 'Hospital profile not found' });
@@ -64,9 +64,9 @@ const getMyHospital = async (req, reply) => {
 const updateHospital = async (req, reply) => {
   const { id } = req.params;
   try {
-    const [updated] = await db.update(hospitalProfiles)
+    const [updated] = await db.update(hospitalDetails)
       .set({ ...req.body, updatedAt: new Date() })
-      .where(eq(hospitalProfiles.id, id))
+      .where(eq(hospitalDetails.id, id))
       .returning();
     
     if (!updated) {
@@ -91,9 +91,9 @@ const updateMyHospital = async (req, reply) => {
       return reply.code(404).send({ error: 'No hospital profile linked to this account' });
     }
     
-    const [updated] = await db.update(hospitalProfiles)
+    const [updated] = await db.update(hospitalDetails)
       .set({ ...req.body, updatedAt: new Date() })
-      .where(eq(hospitalProfiles.id, user.hospitalId))
+      .where(eq(hospitalDetails.id, user.hospitalId))
       .returning();
     
     if (!updated) {

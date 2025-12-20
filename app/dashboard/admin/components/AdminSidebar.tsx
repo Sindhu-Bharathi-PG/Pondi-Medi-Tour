@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Building2, LayoutDashboard, Settings, Shield, Users, X } from "lucide-react";
+import { BarChart3, Building2, CheckCircle2, LayoutDashboard, MessageSquare, Settings, Shield, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,6 +30,18 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             icon: Building2,
             href: "/dashboard/admin/hospitals",
             gradient: "from-emerald-500 to-teal-600"
+        },
+        {
+            title: "Inquiries",
+            icon: MessageSquare,
+            href: "/dashboard/admin/inquiries",
+            gradient: "from-pink-500 to-rose-600" // Added gradient for Inquiries
+        },
+        {
+            title: "Approvals",
+            icon: CheckCircle2,
+            href: "/dashboard/admin/approvals",
+            gradient: "from-green-500 to-lime-600" // Added gradient for Approvals
         },
         {
             title: "Analytics",

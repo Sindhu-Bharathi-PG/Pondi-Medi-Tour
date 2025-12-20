@@ -1,36 +1,66 @@
 "use client";
 
-import { Activity, ArrowUpRight, Building2, CheckCircle, Clock, TrendingUp, UserCheck, Users } from "lucide-react";
+import { ToastContainer, useToast } from "@/app/components/admin/Toast";
+import { Activity, ArrowUpRight, Building2, Clock, TrendingUp, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
+interface Stats {
+    totalUsers: number;
+    totalHospitals: number;
+    pendingApprovals: number;
+    activeSessions: number;
+}
+
 export default function AdminDashboardPage() {
-    const [stats, setStats] = useState({
+    const [stats, setStats] = useState<Stats>({
         totalUsers: 0,
         totalHospitals: 0,
         pendingApprovals: 0,
         activeSessions: 0
     });
+    const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     useEffect(() => {
-        // Animate stats on mount
-        const animateCount = (key: keyof typeof stats, target: number) => {
-            let current = 0;
-            const increment = target / 30;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                setStats(prev => ({ ...prev, [key]: Math.floor(current) }));
-            }, 30);
-        };
-
-        animateCount('totalUsers', 1247);
-        animateCount('totalHospitals', 89);
-        animateCount('pendingApprovals', 12);
-        animateCount('activeSessions', 456);
+        // Use mock data instead of API call
+        setTimeout(() => {
+            const mockStats = {
+                totalUsers: 1247,
+                totalHospitals: 45,
+                pendingApprovals: 8,
+                activeSessions: 156
+            };
+            setStats(mockStats);
+            animateStats(mockStats);
+            setLoading(false);
+        }, 500);
     }, []);
+
+    const animateStats = (targetStats: Stats) => {
+        let current = { ...stats };
+        const steps = 30;
+        const interval = 30;
+
+        const timer = setInterval(() => {
+            let isDone = true;
+            const newStats = { ...current };
+
+            Object.keys(targetStats).forEach((key) => {
+                const k = key as keyof Stats;
+                const increment = Math.ceil((targetStats[k] - current[k]) / 10);
+
+                if (current[k] < targetStats[k]) {
+                    newStats[k] = Math.min(current[k] + increment, targetStats[k]);
+                    isDone = false;
+                }
+            });
+
+            current = newStats;
+            setStats(newStats);
+
+            if (isDone) clearInterval(timer);
+        }, interval);
+    };
 
     const statsCards = [
         {
@@ -67,15 +97,18 @@ export default function AdminDashboardPage() {
         }
     ];
 
-    const recentActivity = [
-        { type: "user", action: "New user registration", user: "John Doe", time: "2 min ago", icon: UserCheck, color: "text-emerald-600" },
-        { type: "hospital", action: "Hospital submission pending", user: "Apollo Hospital", time: "15 min ago", icon: Building2, color: "text-amber-600" },
-        { type: "user", action: "User verified email", user: "Sarah Smith", time: "1 hour ago", icon: CheckCircle, color: "text-blue-600" },
-        { type: "hospital", action: "Hospital approved", user: "City Medical Center", time: "2 hours ago", icon: CheckCircle, color: "text-emerald-600" }
-    ];
+    if (loading) {
+        return (
+            <div className="max-w-7xl mx-auto p-8 flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-7xl mx-auto space-y-8">
+            <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
@@ -120,87 +153,49 @@ export default function AdminDashboardPage() {
                 ))}
             </div>
 
-            {/* Recent Activity & Quick Actions */}
-            <div className="grid lg:grid-cols-3 gap-6">
-                {/* Recent Activity */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-                        <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
-                        <p className="text-sm text-slate-600 mt-1">Latest actions across the platform</p>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                        {recentActivity.map((activity, index) => (
-                            <div
-                                key={index}
-                                className="p-4 hover:bg-slate-50 transition-colors group cursor-pointer"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className={`w-10 h-10 rounded-xl ${activity.color.replace('text-', 'bg-').replace('600', '100')} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
-                                        <activity.icon className={`w-5 h-5 ${activity.color}`} />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-slate-900">{activity.action}</p>
-                                        <p className="text-sm text-slate-600 mt-0.5">{activity.user}</p>
-                                    </div>
-                                    <span className="text-xs text-slate-400 whitespace-nowrap">{activity.time}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="p-4 border-t border-slate-100 bg-slate-50">
-                        <button className="text-sm font-medium text-violet-600 hover:text-violet-700 flex items-center gap-1">
-                            View All Activity
-                            <ArrowUpRight className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="space-y-4">
-                    <div className="bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl shadow-violet-500/25">
-                        <h3 className="font-bold text-lg mb-2">Quick Actions</h3>
-                        <p className="text-violet-100 text-sm mb-6">Manage your platform efficiently</p>
-                        <div className="space-y-3">
-                            <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl font-medium hover:bg-white/30 transition text-left flex items-center justify-between group">
-                                <span>Approve Hospitals</span>
-                                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
-                            <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl font-medium hover:bg-white/30 transition text-left flex items-center justify-between group">
-                                <span>Manage Users</span>
-                                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
-                            <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl font-medium hover:bg-white/30 transition text-left flex items-center justify-between group">
-                                <span>View Analytics</span>
-                                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
+            {/* Quick Actions */}
+            <div className="grid md:grid-cols-3 gap-6">
+                <a
+                    href="/dashboard/admin/users"
+                    className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <Users className="w-6 h-6 text-white" />
                         </div>
+                        <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                     </div>
+                    <h3 className="font-bold text-slate-900 mb-1">Manage Users</h3>
+                    <p className="text-sm text-slate-600">View and manage all platform users</p>
+                </a>
 
-                    {/* System Status */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="font-bold text-slate-900 mb-4">System Status</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-600">API Status</span>
-                                <span className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Operational
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-600">Database</span>
-                                <span className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Healthy
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-600">Server Load</span>
-                                <span className="text-sm font-medium text-slate-900">23%</span>
-                            </div>
+                <a
+                    href="/dashboard/admin/hospitals"
+                    className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+                            <Building2 className="w-6 h-6 text-white" />
                         </div>
+                        <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                     </div>
-                </div>
+                    <h3 className="font-bold text-slate-900 mb-1">Approve Hospitals</h3>
+                    <p className="text-sm text-slate-600">Review pending hospital submissions</p>
+                </a>
+
+                <a
+                    href="/dashboard/admin/analytics"
+                    className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
+                            <Activity className="w-6 h-6 text-white" />
+                        </div>
+                        <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 mb-1">View Analytics</h3>
+                    <p className="text-sm text-slate-600">Platform insights and metrics</p>
+                </a>
             </div>
         </div>
     );

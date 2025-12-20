@@ -1,7 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import EnhancedDashboard from "./components/EnhancedDashboard";
+import ClassicDashboard from "./components/ClassicDashboard";
 
 export default async function HospitalDashboard() {
     const session = await getServerSession(authOptions);
@@ -10,5 +10,5 @@ export default async function HospitalDashboard() {
         redirect("/login/hospital");
     }
 
-    return <EnhancedDashboard userName={session.user.name || session.user.email} />;
+    return <ClassicDashboard />;
 }

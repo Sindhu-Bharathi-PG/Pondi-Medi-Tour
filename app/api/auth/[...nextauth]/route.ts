@@ -11,6 +11,7 @@ declare module "next-auth" {
             name?: string | null;
             userType: string;
         };
+        accessToken?: string;
     }
 
     interface User {
@@ -18,6 +19,7 @@ declare module "next-auth" {
         email: string;
         name?: string | null;
         userType: string;
+        accessToken?: string;
     }
 }
 
@@ -25,6 +27,7 @@ declare module "next-auth/jwt" {
     interface JWT {
         id: string;
         userType: string;
+        accessToken?: string;
     }
 }
 
@@ -53,13 +56,15 @@ export const authOptions = {
                     });
 
                     const data = await res.json();
+                    console.log('Backend login response:', res.ok, data);
 
-                    if (res.ok && data.user) {
+                    if (res.ok && data.user && data.token) {
                         return {
                             id: data.user.id,
                             email: data.user.email,
                             name: data.user.name || data.user.email,
                             userType: data.user.userType,
+                            accessToken: data.token, // Store the backend JWT
                         };
                     }
 
@@ -74,10 +79,11 @@ export const authOptions = {
     ],
     callbacks: {
         async jwt({ token, user }: { token: any; user: any }) {
-            // Initial sign in
+            // Initial sign in - store all user data including token
             if (user) {
                 token.id = user.id;
                 token.userType = user.userType;
+                token.accessToken = user.accessToken;
             }
             return token;
         },
@@ -87,12 +93,14 @@ export const authOptions = {
                 session.user.id = token.id as string;
                 session.user.userType = token.userType as string;
             }
+            // Include the access token in the session
+            session.accessToken = token.accessToken;
             return session;
         },
     },
     pages: {
-        signIn: "/login/partner",
-        error: "/login/partner",
+        signIn: "/login/hospital",
+        error: "/login/hospital",
     },
     session: {
         strategy: "jwt" as const,
@@ -104,5 +112,4 @@ export const authOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Building2, Eye, EyeOff, ImageIcon, Lock, Mail, Upload, Users } from 'lucide-react';
+import { ArrowLeft, Building2, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const HospitalLoginPage = () => {
     const router = useRouter();
@@ -14,175 +14,139 @@ const HospitalLoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // Diagnostic State
+    const [backendStatus, setBackendStatus] = useState<string>('Checking connection...');
+
+    useEffect(() => {
+        // Simple health check to backend
+        fetch('http://localhost:3001/health')
+            .then(res => res.json())
+            .then(data => setBackendStatus(`✅ Connected: ${data.status}`))
+            .catch(err => setBackendStatus(`❌ Connection Failed: ${err.message}`));
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
         try {
+            console.log("Attempting login with:", email);
+
             const result = await signIn("credentials", {
                 email,
                 password,
                 redirect: false,
             });
 
+            console.log("SignIn Result:", result);
+
             if (result?.error) {
-                setError("Invalid email or password");
+                setError("Login failed. Please check your email and password.");
                 setIsLoading(false);
                 return;
             }
 
-            // Successful login - check user role for redirect
-            // Fetch session to get user type
-            const response = await fetch('/api/auth/session');
-            const session = await response.json();
-
-            if (session?.user) {
-                const userType = session.user.userType;
-
-                // Super admin can access any portal
-                if (userType === 'superadmin') {
-                    router.push('/dashboard/superadmin');
-                } else if (userType === 'hospital') {
-                    router.push('/dashboard/hospital');
-                } else {
-                    setError('Access denied. This portal is for hospital partners only.');
-                    setIsLoading(false);
-                }
+            if (result?.ok) {
+                // Successful login
+                router.push('/dashboard/hospital');
+            } else {
+                setError("Unexpected response from server.");
+                setIsLoading(false);
             }
+
         } catch (error) {
             console.error('Login error:', error);
-            setError("An error occurred during login");
+            setError("An unexpected system error occurred.");
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 flex items-center justify-center p-4">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-                <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
-            </div>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
 
-            <div className="relative w-full max-w-md">
-                {/* Back Button */}
-                <Link
-                    href="/"
-                    className="absolute -top-12 left-0 flex items-center gap-2 text-white/70 hover:text-white transition"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Back to Home</span>
-                </Link>
-
-                {/* Login Card */}
-                <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-center">
-                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Building2 className="w-8 h-8 text-white" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-white">Hospital Portal</h1>
-                        <p className="text-emerald-100 text-sm mt-1">Manage your hospital profile & doctors</p>
+                {/* Header */}
+                <div className="bg-emerald-600 p-8 text-center">
+                    <div className="mx-auto bg-white/20 w-12 h-12 rounded-full flex items-center justify-center mb-3">
+                        <Building2 className="text-white w-6 h-6" />
                     </div>
+                    <h1 className="text-2xl font-bold text-white">Hospital Login</h1>
+                    <p className="text-emerald-100 text-sm">Secure Portal Access</p>
+                </div>
 
-                    {/* Features */}
-                    <div className="bg-emerald-50 px-6 py-4 border-b">
-                        <p className="text-xs text-emerald-700 font-medium mb-2">What you can do:</p>
-                        <div className="flex flex-wrap gap-3">
-                            <span className="flex items-center gap-1 text-xs text-emerald-600 bg-white px-2 py-1 rounded-full">
-                                <Upload className="w-3 h-3" /> Upload Doctor Profiles
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-emerald-600 bg-white px-2 py-1 rounded-full">
-                                <ImageIcon className="w-3 h-3" /> Add Hospital Photos
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-emerald-600 bg-white px-2 py-1 rounded-full">
-                                <Users className="w-3 h-3" /> Manage Staff
-                            </span>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-8 space-y-5">
+
+                    {error && (
+                        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+                            {error}
+                        </div>
+                    )}
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                                placeholder="name@hospital.com"
+                                required
+                            />
                         </div>
                     </div>
 
-                    {/* Form */}
-                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                                {error}
-                            </div>
-                        )}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Email</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="hospital@example.com"
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-                                    required
-                                />
-                            </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                                placeholder="••••••••"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                         </div>
+                    </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                    className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                            </div>
-                        </div>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? (
+                            <span className="flex items-center gap-2">
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Authenticating...
+                            </span>
+                        ) : 'Sign In'}
+                    </button>
 
-                        <div className="flex items-center justify-between text-sm">
-                            <label className="flex items-center gap-2">
-                                <input type="checkbox" className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                                <span className="text-gray-600">Remember me</span>
-                            </label>
-                            <Link href="/forgot-password" className="text-emerald-600 hover:text-emerald-700">
-                                Forgot password?
-                            </Link>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-300 disabled:opacity-50"
-                        >
-                            {isLoading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    Signing in...
-                                </span>
-                            ) : (
-                                'Sign In to Dashboard'
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Footer */}
-                    <div className="bg-gray-50 px-6 py-4 text-center text-sm text-gray-500">
-                        New hospital partner?{' '}
-                        <Link href="/register/hospital" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                            Register your hospital
+                    <div className="flex items-center justify-between text-sm pt-2">
+                        <Link href="/" className="text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                            <ArrowLeft className="w-3 h-3" /> Back home
+                        </Link>
+                        <Link href="/forgot-password" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                            Forgot password?
                         </Link>
                     </div>
+                </form>
+
+                {/* Connection Diagnostic */}
+                <div className="bg-gray-50 p-3 text-xs text-center border-t border-gray-100 text-gray-400 font-mono">
+                    Backend Status: <span className={backendStatus.includes('Connected') ? "text-green-600" : "text-red-500"}>{backendStatus}</span>
                 </div>
             </div>
         </div>

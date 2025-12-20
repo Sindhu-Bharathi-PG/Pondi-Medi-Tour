@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   name TEXT,
   user_type TEXT NOT NULL, -- 'patient', 'doctor', 'hospital', 'admin', 'superadmin'
-  hospital_id INTEGER REFERENCES hospital_profiles(id),
+  hospital_id INTEGER, -- FK added later to avoid circular dependency
   is_active BOOLEAN DEFAULT true,
   email_verified BOOLEAN DEFAULT false,
   last_login TIMESTAMP,

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Calendar, User, Mail, Phone, FileText, MapPin, ChevronRight, Shield, Clock, CheckCircle, Upload, Stethoscope } from 'lucide-react';
-import { Header, Footer } from '../components/common';
+import { CheckCircle, ChevronRight, Clock, FileText, Mail, MapPin, Phone, Shield, Stethoscope, Upload, User } from 'lucide-react';
+import { useState } from 'react';
+import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
 
 const BookingPage = () => {
@@ -25,6 +25,44 @@ const BookingPage = () => {
             } else {
                   const firstInvalid = document.querySelector('[aria-invalid="true"]') as HTMLElement | null;
                   firstInvalid?.focus();
+            }
+      };
+
+      const handleSubmit = async () => {
+            try {
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/inquiries`, {
+                        method: 'POST',
+                        headers: {
+                              'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                              // Patient Information (structured)
+                              patientName: formData.name,
+                              email: formData.email,
+                              phone: formData.phone, // ✅ Now a separate field
+                              country: formData.country, // ✅ Now a separate field
+
+                              // Inquiry Details
+                              treatmentType: formData.treatment, // ✅ Now a separate field
+                              subject: `Inquiry regarding ${formData.treatment}`,
+                              message: formData.message, // ✅ Clean message only
+
+                              // Source tracking
+                              source: 'website',
+                              referrerUrl: typeof window !== 'undefined' ? window.location.href : null,
+                        }),
+                  });
+
+                  if (response.ok) {
+                        setStep(3);
+                  } else {
+                        // Handle error (optional: show toast or alert)
+                        console.error("Failed to submit inquiry");
+                        alert("Something went wrong. Please try again.");
+                  }
+            } catch (error) {
+                  console.error("Error submitting inquiry:", error);
+                  alert("Network error. Please try again.");
             }
       };
 
@@ -186,7 +224,7 @@ const BookingPage = () => {
                                                       </div>
                                                       <div className="flex gap-4">
                                                             <button onClick={() => setStep(1)} className="flex-1 py-4 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">Back</button>
-                                                            <button onClick={() => setStep(3)} className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                                                            <button onClick={handleSubmit} className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
                                                                   Continue <ChevronRight className="w-5 h-5" /></button>
                                                       </div>
                                                 </div>

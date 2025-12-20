@@ -3,87 +3,211 @@ require('dotenv').config();
 const fastify = require('fastify')({
   logger: true
 });
+const path = require('path');
 
-// Register plugins
+// ============================================
+// PLUGINS
+// ============================================
+
+// CORS
 fastify.register(require('@fastify/cors'), {
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 
-fastify.register(require('@fastify/helmet'), {
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-    },
-  },
-});
-
-fastify.register(require('@fastify/rate-limit'), {
-  max: 100,
-  timeWindow: '1 minute',
-});
-
+// JWT (for token generation/verification)
 fastify.register(require('@fastify/jwt'), {
-  secret: process.env.JWT_SECRET || 'your-secret-key',
+  secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-2024',
 });
 
+// Multipart (for file uploads)
 fastify.register(require('@fastify/multipart'), {
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-  },
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
+// Static files
+const uploadsPath = path.join(__dirname, '../public/uploads');
+const fs = require('fs');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
 fastify.register(require('@fastify/static'), {
-  root: require('path').join(__dirname, '../public/uploads'),
+  root: uploadsPath,
   prefix: '/uploads/',
 });
 
-// Register routes
-fastify.register(require('./modules/auth/routes/authRoutes'), { prefix: '/api/auth' });
-fastify.register(require('./modules/consent/routes/consentRoutes'), { prefix: '/api/consent' });
-fastify.register(require('./modules/profile/routes/profileRoutes'), { prefix: '/api/profile' });
-fastify.register(require('./modules/search/routes/searchRoutes'), { prefix: '/api/search' });
-fastify.register(require('./modules/cost-calculator/routes/costRoutes'), { prefix: '/api/cost' });
-fastify.register(require('./modules/telemedicine/routes/telemedicineRoutes'), { prefix: '/api/telemedicine' });
-fastify.register(require('./modules/booking/routes/bookingRoutes'), { prefix: '/api/booking' });
-fastify.register(require('./modules/visa/routes/visaRoutes'), { prefix: '/api/visa' });
-fastify.register(require('./modules/wellness/routes/wellnessRoutes'), { prefix: '/api/wellness' });
-fastify.register(require('./modules/payment/routes/paymentRoutes'), { prefix: '/api/payment' });
-fastify.register(require('./modules/notifications/routes/notificationRoutes'), { prefix: '/api/notifications' });
-fastify.register(require('./modules/admin/routes/adminRoutes'), { prefix: '/api/admin' });
+// ============================================
+// AUTHENTICATION DECORATOR
+// ============================================
+
+// This decorator is used by protected routes
+fastify.decorate('authenticate', async function(request, reply) {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.code(401).send({ 
+      error: 'Unauthorized', 
+      message: 'Invalid or expired token',
+      statusCode: 401 
+    });
+  }
+});
+
+// ============================================
+// PUBLIC ROUTES (NO AUTH REQUIRED)
+// ============================================
+
+// Health check
+fastify.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// Root
+fastify.get('/', async () => ({
+  message: 'Pondicherry Medical Tourism Portal API',
+  version: '1.0.0'
+}));
+
+// ============================================
+// AUTH ROUTES (INLINE - NO MODULE)
+// ============================================
+
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { eq } = require('drizzle-orm');
+const db = require('./config/database');
+const { users } = require('./database/schema');
+
+// LOGIN - No authentication required
+fastify.post('/api/auth/login', {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 1 }
+      }
+    }
+  }
+}, async (request, reply) => {
+  const { email, password } = request.body;
+  console.log('LOGIN attempt:', email);
+
+  try {
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    
+    if (!user) {
+      console.log('User not found:', email);
+      return reply.code(401).send({ error: 'Invalid credentials' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    console.log('Password valid:', isValid);
+    
+    if (!isValid) {
+      return reply.code(401).send({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, userType: user.userType },
+      process.env.JWT_SECRET || 'your-super-secret-jwt-key-2024',
+      { expiresIn: '24h' }
+    );
+
+    console.log('LOGIN SUCCESS:', user.email);
+    return { 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        userType: user.userType,
+        name: user.name 
+      } 
+    };
+  } catch (error) {
+    console.error('Login error:', error);
+    return reply.code(500).send({ error: 'Internal server error' });
+  }
+});
+
+// REGISTER - No authentication required
+fastify.post('/api/auth/register', {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['email', 'password', 'userType'],
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 6 },
+        userType: { type: 'string' }
+      }
+    }
+  }
+}, async (request, reply) => {
+  const { email, password, userType, name } = request.body;
+
+  try {
+    const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existing.length > 0) {
+      return reply.code(409).send({ error: 'User already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const [newUser] = await db.insert(users).values({
+      email,
+      password: hashedPassword,
+      userType,
+      name: name || email
+    }).returning();
+
+    const token = jwt.sign(
+      { userId: newUser.id, userType: newUser.userType },
+      process.env.JWT_SECRET || 'your-super-secret-jwt-key-2024',
+      { expiresIn: '24h' }
+    );
+
+    return reply.code(201).send({ 
+      token, 
+      user: { id: newUser.id, email: newUser.email, userType: newUser.userType } 
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    return reply.code(500).send({ error: 'Internal server error' });
+  }
+});
+
+// ============================================
+// PROTECTED API ROUTES (MODULES)
+// ============================================
+
+// Hospital public routes (no auth for browsing)
 fastify.register(require('./modules/hospitals/routes/hospitalRoutes'), { prefix: '/api/hospitals' });
-fastify.register(require('./modules/doctors/routes/doctorRoutes'), { prefix: '/api/hospitals/me/doctors' });
-fastify.register(require('./modules/offerings/routes/offeringRoutes'), { prefix: '/api/hospitals/me/offerings' });
-fastify.register(require('./modules/inquiries/routes/inquiryRoutes'), { prefix: '/api/hospitals/me/inquiries' });
-fastify.register(require('./modules/appointments/routes/appointmentRoutes'), { prefix: '/api/hospitals/me/appointments' });
 
-// Health check route
-fastify.get('/health', async (request, reply) => {
-  return { status: 'ok', timestamp: new Date().toISOString() };
-});
+// Inquiries (public create, protected list)
+fastify.register(require('./modules/inquiries/routes/inquiryRoutes'), { prefix: '/api/inquiries' });
 
-// Root route
-fastify.get('/', async (request, reply) => {
-  return {
-    message: 'Pondicherry Medical Tourism Portal API',
-    version: '1.0.0',
-    docs: '/api/docs'
-  };
-});
+// Admin routes (auth required inside module)
+fastify.register(require('./modules/admin/routes/adminRoutes'), { prefix: '/api/admin' });
 
-// Error handler
+// CMS routes (superadmin auth required inside module)
+fastify.register(require('./modules/cms/routes/cmsRoutes'), { prefix: '/api/cms' });
+
+// Upload routes (auth required)
+fastify.register(require('./modules/upload/routes/uploadRoutes'), { prefix: '/api' });
+
+// ============================================
+// ERROR HANDLERS
+// ============================================
+
 fastify.setErrorHandler((error, request, reply) => {
-  fastify.log.error(error);
+  console.error('Error:', error.message);
   reply.status(error.statusCode || 500).send({
     error: error.message || 'Internal Server Error',
     statusCode: error.statusCode || 500,
   });
 });
 
-// Not found handler
 fastify.setNotFoundHandler((request, reply) => {
   reply.status(404).send({
     error: 'Not Found',
@@ -92,31 +216,19 @@ fastify.setNotFoundHandler((request, reply) => {
   });
 });
 
-// Start server
+// ============================================
+// START SERVER
+// ============================================
+
 const start = async () => {
   try {
     const port = process.env.PORT || 3001;
-    const host = process.env.HOST || '0.0.0.0';
-
-    await fastify.listen({ port, host });
-    fastify.log.info(`Server listening on ${fastify.server.address().port}`);
+    await fastify.listen({ port, host: '0.0.0.0' });
+    console.log(`✅ Server running on port ${port}`);
   } catch (err) {
-    fastify.log.error(err);
+    console.error('Server start error:', err);
     process.exit(1);
   }
 };
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  fastify.log.info('Received SIGINT, shutting down gracefully');
-  await fastify.close();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  fastify.log.info('Received SIGTERM, shutting down gracefully');
-  await fastify.close();
-  process.exit(0);
-});
 
 start();

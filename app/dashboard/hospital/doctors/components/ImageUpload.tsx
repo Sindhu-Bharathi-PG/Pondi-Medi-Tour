@@ -1,7 +1,7 @@
 "use client";
 
 import { Image as ImageIcon, Upload, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ImageUploadProps {
     value: string;
@@ -14,6 +14,10 @@ export default function ImageUpload({ value, onChange, label = "Profile Photo" }
     const [preview, setPreview] = useState(value);
     const [dragActive, setDragActive] = useState(false);
 
+    useEffect(() => {
+        setPreview(value);
+    }, [value]);
+
     const handleFileUpload = async (file: File) => {
         if (!file.type.startsWith('image/')) {
             alert('Please upload an image file');
@@ -23,23 +27,37 @@ export default function ImageUpload({ value, onChange, label = "Profile Photo" }
         setUploading(true);
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'doctor_profiles'); // You'll need to create this in Cloudinary
 
         try {
+            // Get auth token from NextAuth session
+            const sessionRes = await fetch('/api/auth/session');
+            const session = await sessionRes.json();
+            const token = session?.accessToken;
+
+            if (!token) {
+                alert('Please login to upload images');
+                setUploading(false);
+                return;
+            }
+
             const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/upload`,
                 {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: formData
                 }
             );
 
             if (response.ok) {
                 const data = await response.json();
-                setPreview(data.secure_url);
-                onChange(data.secure_url);
+                setPreview(data.url);
+                onChange(data.url);
             } else {
-                alert('Failed to upload image');
+                const error = await response.json();
+                alert(error.message || 'Failed to upload image');
             }
         } catch (error) {
             console.error('Upload error:', error);
@@ -97,8 +115,8 @@ export default function ImageUpload({ value, onChange, label = "Profile Photo" }
                     onDragLeave={() => setDragActive(false)}
                     onDrop={handleDrop}
                     className={`flex-1 border-2 border-dashed rounded-xl p-6 transition-all ${dragActive
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 bg-gray-50 hover:border-gray-400'
                         }`}
                 >
                     <div className="flex flex-col items-center justify-center text-center">

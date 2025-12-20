@@ -8,6 +8,25 @@ const getHospitalId = async (userId) => {
     return user ? user.hospitalId : null;
 };
 
+// Admin: Get all inquiries
+const getAllInquiries = async (req, reply) => {
+    try {
+        const { status } = req.query;
+        let query = db.select().from(inquiries).orderBy(desc(inquiries.createdAt));
+        
+        if (status) {
+            query = query.where(eq(inquiries.status, status));
+        }
+
+        const results = await query;
+        reply.send(results);
+    } catch (err) {
+        req.log.error(err);
+        reply.code(500).send({ error: 'Internal Server Error' });
+    }
+};
+
+// Hospital: Get own inquiries
 const getInquiries = async (req, reply) => {
     try {
         const hospitalId = await getHospitalId(req.user.userId);
@@ -16,15 +35,12 @@ const getInquiries = async (req, reply) => {
         }
 
         const { status } = req.query;
-        
         let query = db.select().from(inquiries)
             .where(eq(inquiries.hospitalId, hospitalId))
             .orderBy(desc(inquiries.createdAt));
         
         if (status) {
-            query = db.select().from(inquiries)
-                .where(and(eq(inquiries.hospitalId, hospitalId), eq(inquiries.status, status)))
-                .orderBy(desc(inquiries.createdAt));
+            query.where(and(eq(inquiries.hospitalId, hospitalId), eq(inquiries.status, status)));
         }
 
         const results = await query;
@@ -38,13 +54,18 @@ const getInquiries = async (req, reply) => {
 const getInquiry = async (req, reply) => {
     const { id } = req.params;
     try {
-        const hospitalId = await getHospitalId(req.user.userId);
-        if (!hospitalId) {
-            return reply.code(403).send({ error: 'Not authorized' });
+        // Allow admin or owning hospital
+        // For simplicity, checking if user has hospitalId. If not, assume admin (middleware should handle role)
+        // Ideally, use req.user.role
+        
+        let condition = eq(inquiries.id, id);
+        if (req.user.role === 'hospital') {
+             const hospitalId = await getHospitalId(req.user.userId);
+             if (!hospitalId) return reply.code(403).send({ error: 'Not authorized' });
+             condition = and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId));
         }
 
-        const [inquiry] = await db.select().from(inquiries)
-            .where(and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId)));
+        const [inquiry] = await db.select().from(inquiries).where(condition);
 
         if (!inquiry) {
             return reply.code(404).send({ error: 'Inquiry not found' });
@@ -59,16 +80,17 @@ const getInquiry = async (req, reply) => {
 const updateInquiry = async (req, reply) => {
     const { id } = req.params;
     try {
-        const hospitalId = await getHospitalId(req.user.userId);
-        if (!hospitalId) {
-            return reply.code(403).send({ error: 'Not authorized' });
+        let condition = eq(inquiries.id, id);
+        
+        if (req.user.role === 'hospital') {
+             const hospitalId = await getHospitalId(req.user.userId);
+             if (!hospitalId) return reply.code(403).send({ error: 'Not authorized' });
+             condition = and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId));
         }
 
-        // Only allow updating status and maybe priority/message?
-        // Typically hospital updates status to 'responded'
         const [updated] = await db.update(inquiries)
             .set({ ...req.body, updatedAt: new Date() })
-            .where(and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId)))
+            .where(condition)
             .returning();
 
         if (!updated) {
@@ -81,16 +103,15 @@ const updateInquiry = async (req, reply) => {
     }
 };
 
-// Manually create inquiry (e.g. phone call log)
+// Public: Create inquiry
 const createInquiry = async (req, reply) => {
     try {
-        const hospitalId = await getHospitalId(req.user.userId);
-        if (!hospitalId) {
-            return reply.code(403).send({ error: 'Not authorized' });
-        }
-
+        // Determine hospitalId if provided (e.g. from specific hospital page)
+        // If from general booking page, hospitalId might be null
+        const { hospitalId, ...data } = req.body;
+        
         const [newInquiry] = await db.insert(inquiries)
-            .values({ ...req.body, hospitalId })
+            .values({ ...data, hospitalId: hospitalId || null, status: 'pending' })
             .returning();
 
         reply.code(201).send(newInquiry);
@@ -101,6 +122,7 @@ const createInquiry = async (req, reply) => {
 };
 
 module.exports = {
+    getAllInquiries,
     getInquiries,
     getInquiry,
     updateInquiry,
