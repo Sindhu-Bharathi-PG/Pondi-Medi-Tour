@@ -67,8 +67,8 @@ export default function PackagesPage() {
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                            <Package className="w-6 h-6 text-purple-600" />
+                        <div className="p-2 bg-emerald-100 rounded-lg">
+                            <Package className="w-6 h-6 text-emerald-600" />
                         </div>
                         Packages
                     </h1>
@@ -77,7 +77,7 @@ export default function PackagesPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => { setEditingPackage(null); setIsModalOpen(true); }}
-                        className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium flex items-center gap-2 transition shadow-lg shadow-purple-200"
+                        className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-emerald-500/40 text-white rounded-xl font-medium flex items-center gap-2 transition shadow-lg shadow-emerald-200"
                     >
                         <Plus className="w-5 h-5" />
                         Add New Package
@@ -102,10 +102,10 @@ export default function PackagesPage() {
                 {/* Create Card */}
                 <button
                     onClick={() => { setEditingPackage(null); setIsModalOpen(true); }}
-                    className="group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-200 hover:border-purple-400 hover:bg-purple-50/50 transition-all min-h-[400px]"
+                    className="group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition-all min-h-[400px]"
                 >
-                    <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-purple-100 transition-all">
-                        <Plus className="w-8 h-8 text-purple-500" />
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">
+                        <Plus className="w-8 h-8 text-emerald-500" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900">Add Package</h3>
                 </button>

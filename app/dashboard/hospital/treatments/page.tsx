@@ -1,7 +1,7 @@
 "use client";
 
 import { API_BASE, apiCall, useApi } from "@/app/hooks/useApi";
-import { ArrowLeft, DollarSign, Pill, Plus, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, DollarSign, Pill, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingSpinner } from "../components/LoadingStates";
@@ -10,6 +10,7 @@ import TreatmentModal from "./components/TreatmentModal";
 export default function TreatmentsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTreatment, setSelectedTreatment] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Use optimized API hook
     const { data: treatments, loading, error, refetch } = useApi<any[]>({
@@ -113,9 +114,36 @@ export default function TreatmentsPage() {
                     </button>
                 </div>
 
+                {/* Search Bar */}
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-5 mb-8 relative z-50">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search treatments by name, category, or description..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border border-gray-200/50 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all outline-none text-gray-900 placeholder:text-gray-400"
+                        />
+                    </div>
+                    {searchQuery && (
+                        <p className="text-sm text-gray-500 mt-2">
+                            Showing {(treatments || []).filter((t: any) =>
+                                t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                t.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                t.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
+                            ).length} of {treatments?.length || 0} treatments
+                        </p>
+                    )}
+                </div>
+
                 {/* Content Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {treatments.map((treatment, index) => (
+                    {(treatments || []).filter((t: any) =>
+                        t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        t.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        t.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map((treatment: any, index: number) => (
                         <div
                             key={treatment.id}
                             className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
@@ -158,7 +186,7 @@ export default function TreatmentsPage() {
                                 <div className="space-y-3 mb-6">
                                     <div className="flex items-center gap-3 text-sm text-gray-700">
                                         <DollarSign className="w-4 h-4 text-gray-400" />
-                                        <span className="font-semibold">${treatment.minPrice} - ${treatment.maxPrice}</span>
+                                        <span className="font-semibold">₹{treatment.minPrice?.toLocaleString('en-IN')} - ₹{treatment.maxPrice?.toLocaleString('en-IN')}</span>
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {(treatment.technology || []).slice(0, 2).map((tech, i) => (
@@ -173,7 +201,7 @@ export default function TreatmentsPage() {
                                     <button onClick={() => handleEdit(treatment)} className="flex-1 py-2 rounded-lg border border-gray-100 text-gray-600 text-sm font-medium hover:bg-gray-50 hover:border-gray-200 transition">
                                         Edit Details
                                     </button>
-                                    <button className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                    <button onClick={() => handleDelete(treatment.id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
                                         <Trash2 className="w-5 h-5" />
                                     </button>
                                 </div>

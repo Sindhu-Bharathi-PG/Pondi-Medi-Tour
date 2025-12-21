@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LoadingSpinner } from "../components/LoadingStates";
 import ImageUpload from "../doctors/components/ImageUpload";
 
 export default function HospitalProfilePage() {
@@ -221,14 +222,7 @@ export default function HospitalProfilePage() {
     ];
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-sm text-gray-600">Loading your profile...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Loading your profile..." size="lg" />;
     }
 
     return (

@@ -165,10 +165,21 @@ export default function UsersManagementPage() {
             {/* Users Table */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 {loading ? (
-                    <div className="p-8 text-center text-slate-500">Loading users...</div>
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <div className="relative">
+                            <div className="absolute inset-0 w-14 h-14 border-4 border-violet-300/30 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
+                            <div className="w-14 h-14 border-4 border-violet-500/30 border-t-violet-600 rounded-full animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg p-2">
+                                    <User className="w-4 h-4 text-white" />
+                                </div>
+                            </div>
+                        </div>
+                        <p className="mt-4 text-slate-600 font-medium animate-pulse">Loading users...</p>
+                    </div>
                 ) : users.length === 0 ? (
-                    <div className="p-12 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="py-16 text-center">
+                        <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                             <User className="w-8 h-8 text-slate-400" />
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 mb-1">No users found</h3>
@@ -205,9 +216,9 @@ export default function UsersManagementPage() {
                                                 value={user.role}
                                                 onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                                 className={`px-2 py-1 rounded-lg text-xs font-medium border-0 cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                        user.role === 'hospital' ? 'bg-blue-100 text-blue-700' :
-                                                            user.role === 'doctor' ? 'bg-emerald-100 text-emerald-700' :
-                                                                'bg-slate-100 text-slate-700'
+                                                    user.role === 'hospital' ? 'bg-blue-100 text-blue-700' :
+                                                        user.role === 'doctor' ? 'bg-emerald-100 text-emerald-700' :
+                                                            'bg-slate-100 text-slate-700'
                                                     }`}
                                             >
                                                 <option value="patient">Patient</option>
@@ -220,8 +231,8 @@ export default function UsersManagementPage() {
                                             <button
                                                 onClick={() => handleStatusToggle(user.id)}
                                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${user.status === 'active'
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                        : 'bg-slate-50 text-slate-600 border-slate-200'
+                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                    : 'bg-slate-50 text-slate-600 border-slate-200'
                                                     }`}
                                             >
                                                 {user.status === 'active' ? (

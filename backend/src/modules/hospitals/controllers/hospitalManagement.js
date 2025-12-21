@@ -169,6 +169,7 @@ const updateTreatment = async (request, reply) => {
     }
 
     const treatmentId = parseInt(request.params.id);
+    console.log('[Treatment Update] ID:', treatmentId, 'Body:', request.body);
 
     const [existingTreatment] = await db.select().from(treatments)
       .where(and(eq(treatments.id, treatmentId), eq(treatments.hospitalId, hospitalId)));
@@ -177,15 +178,38 @@ const updateTreatment = async (request, reply) => {
       return reply.code(404).send({ error: 'Treatment not found' });
     }
 
+    // Build update data carefully with only valid fields
+    const updateData = {
+      updatedAt: new Date()
+    };
+
+    // Only include valid fields from request body
+    const allowedFields = [
+      'name', 'slug', 'category', 'subCategory',
+      'shortDescription', 'fullDescription', 'procedureSteps',
+      'technology', 'successRate', 'hospitalStay', 'recoveryTime',
+      'preRequisites', 'minPrice', 'maxPrice', 'insuranceCovered',
+      'thumbnailUrl', 'isPopular'
+    ];
+
+    for (const field of allowedFields) {
+      if (request.body[field] !== undefined) {
+        updateData[field] = request.body[field];
+      }
+    }
+
+    console.log('[Treatment Update] Update data:', updateData);
+
     const [updated] = await db.update(treatments)
-      .set({ ...request.body, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(treatments.id, treatmentId))
       .returning();
 
+    console.log('[Treatment Update] Success:', updated);
     return updated;
   } catch (error) {
     console.error('Update treatment error:', error);
-    return reply.code(500).send({ error: 'Failed to update treatment' });
+    return reply.code(500).send({ error: 'Failed to update treatment', details: error.message });
   }
 };
 
@@ -244,6 +268,7 @@ const updateInquiry = async (request, reply) => {
     }
 
     const inquiryId = parseInt(request.params.id);
+    console.log('[Inquiry Update] ID:', inquiryId, 'Body:', request.body);
 
     const [existingInquiry] = await db.select().from(inquiries)
       .where(and(eq(inquiries.id, inquiryId), eq(inquiries.hospitalId, hospitalId)));
@@ -252,15 +277,37 @@ const updateInquiry = async (request, reply) => {
       return reply.code(404).send({ error: 'Inquiry not found' });
     }
 
+    // Build update data carefully
+    const updateData = {
+      updatedAt: new Date()
+    };
+
+    // Only include valid fields from request body
+    if (request.body.status) {
+      updateData.status = request.body.status;
+    }
+    if (request.body.priority) {
+      updateData.priority = request.body.priority;
+    }
+    if (request.body.respondedAt) {
+      updateData.respondedAt = new Date(request.body.respondedAt);
+    }
+    if (request.body.responseNotes) {
+      updateData.responseNotes = request.body.responseNotes;
+    }
+
+    console.log('[Inquiry Update] Update data:', updateData);
+
     const [updated] = await db.update(inquiries)
-      .set({ ...request.body, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(inquiries.id, inquiryId))
       .returning();
 
+    console.log('[Inquiry Update] Success:', updated);
     return updated;
   } catch (error) {
     console.error('Update inquiry error:', error);
-    return reply.code(500).send({ error: 'Failed to update inquiry' });
+    return reply.code(500).send({ error: 'Failed to update inquiry', details: error.message });
   }
 };
 

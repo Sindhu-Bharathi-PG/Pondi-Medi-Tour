@@ -40,6 +40,21 @@ module.exports = async function (fastify, opts) {
   fastify.post('/mfa/setup', { preHandler: fastify.authenticate }, authController.setupMFA);
   fastify.post('/mfa/verify', authController.verifyMFA);
 
+  // Change password route
+  fastify.post('/change-password', {
+    preHandler: fastify.authenticate,
+    schema: {
+      body: {
+        type: 'object',
+        required: ['currentPassword', 'newPassword'],
+        properties: {
+          currentPassword: { type: 'string' },
+          newPassword: { type: 'string', minLength: 6 }
+        }
+      }
+    }
+  }, authController.changePassword);
+
   // TEMPORARY DEBUG ROUTE
   fastify.get('/reset-debug', async (request, reply) => {
     const bcrypt = require('bcryptjs');

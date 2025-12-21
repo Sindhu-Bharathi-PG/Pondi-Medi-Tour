@@ -125,6 +125,40 @@ const verifyCredentialsForRole = async (request, reply) => {
     reply.code(500).send({ error: 'Internal server error' });
   }
 };
+const changePassword = async (request, reply) => {
+  const { currentPassword, newPassword } = request.body;
+  const userId = request.user.userId;
+
+  try {
+    // Get current user
+    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    
+    if (!user) {
+      return reply.code(404).send({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isValidPassword) {
+      return reply.code(401).send({ error: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, parseInt(process.env.BCRYPT_ROUNDS) || 12);
+
+    // Update password
+    await db.update(users).set({ 
+      password: hashedPassword,
+      updatedAt: new Date()
+    }).where(eq(users.id, userId));
+
+    return reply.send({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return reply.code(500).send({ error: 'Failed to change password' });
+  }
+};
 
 module.exports = {
   login,
@@ -134,4 +168,5 @@ module.exports = {
   setupMFA,
   verifyMFA,
   verifyCredentialsForRole,
+  changePassword,
 };

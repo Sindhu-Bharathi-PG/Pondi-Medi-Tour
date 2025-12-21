@@ -177,6 +177,55 @@ fastify.post('/api/auth/register', {
   }
 });
 
+// CHANGE PASSWORD - Authentication required
+fastify.post('/api/auth/change-password', {
+  preHandler: [fastify.authenticate],
+  schema: {
+    body: {
+      type: 'object',
+      required: ['currentPassword', 'newPassword'],
+      properties: {
+        currentPassword: { type: 'string' },
+        newPassword: { type: 'string', minLength: 6 }
+      }
+    }
+  }
+}, async (request, reply) => {
+  const { currentPassword, newPassword } = request.body;
+  const userId = request.user.userId;
+
+  try {
+    // Get current user
+    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    
+    if (!user) {
+      return reply.code(404).send({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isValid) {
+      return reply.code(401).send({ error: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await db.update(users).set({ 
+      password: hashedPassword,
+      updatedAt: new Date()
+    }).where(eq(users.id, userId));
+
+    console.log('Password changed for user:', userId);
+    return { message: 'Password updated successfully' };
+  } catch (error) {
+    console.error('Change password error:', error);
+    return reply.code(500).send({ error: 'Failed to change password' });
+  }
+});
+
 // ============================================
 // PROTECTED API ROUTES (MODULES)
 // ============================================
@@ -189,6 +238,12 @@ fastify.register(require('./modules/inquiries/routes/inquiryRoutes'), { prefix: 
 
 // Admin routes (auth required inside module)
 fastify.register(require('./modules/admin/routes/adminRoutes'), { prefix: '/api/admin' });
+
+// Admin analytics routes (NEW)
+fastify.register(require('./modules/admin/routes/analyticsRoutes'), { prefix: '/api/admin' });
+
+// Admin settings routes (NEW)
+fastify.register(require('./modules/admin/routes/settingsRoutes'), { prefix: '/api/admin' });
 
 // CMS routes (superadmin auth required inside module)
 fastify.register(require('./modules/cms/routes/cmsRoutes'), { prefix: '/api/cms' });

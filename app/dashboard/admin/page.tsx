@@ -99,8 +99,33 @@ export default function AdminDashboardPage() {
 
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto p-8 flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+            <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                    <div className="relative inline-block mb-6">
+                        {/* Outer pulsing rings */}
+                        <div className="absolute inset-0 w-20 h-20 border-4 border-violet-300/20 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
+                        <div className="absolute inset-2 w-16 h-16 border-4 border-purple-300/30 rounded-full animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }} />
+
+                        {/* Main spinning ring */}
+                        <div className="w-20 h-20 border-4 border-transparent border-t-violet-600 border-r-purple-600 rounded-full animate-spin" />
+
+                        {/* Center icon */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 rounded-xl p-3 shadow-xl shadow-violet-500/30">
+                                <Activity className="w-6 h-6 text-white" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-slate-800 mb-1">Loading Dashboard</h3>
+                    <p className="text-slate-500 text-sm">Preparing admin panel...</p>
+
+                    {/* Loading bar */}
+                    <div className="mt-6 w-48 h-1 bg-slate-200 rounded-full mx-auto overflow-hidden">
+                        <div className="h-full w-full bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 rounded-full animate-pulse"
+                            style={{ animation: 'loading-bar 1.5s ease-in-out infinite' }} />
+                    </div>
+                </div>
             </div>
         );
     }

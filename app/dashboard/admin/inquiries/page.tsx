@@ -142,9 +142,28 @@ export default function AdminInquiriesPage() {
 
             {/* Inquiries List */}
             {loading ? (
-                <div className="text-center py-12">Loading...</div>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="relative">
+                        <div className="absolute inset-0 w-14 h-14 border-4 border-pink-300/30 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
+                        <div className="w-14 h-14 border-4 border-pink-500/30 border-t-pink-600 rounded-full animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg p-2">
+                                <MessageSquare className="w-4 h-4 text-white" />
+                            </div>
+                        </div>
+                    </div>
+                    <p className="mt-4 text-slate-600 font-medium animate-pulse">Loading inquiries...</p>
+                </div>
             ) : filteredInquiries.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No inquiries found.</div>
+                <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+                    <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <MessageSquare className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">No inquiries found</h3>
+                    <p className="text-slate-500">
+                        {searchQuery ? "Try adjusting your search" : "Patient inquiries will appear here"}
+                    </p>
+                </div>
             ) : (
                 <div className="space-y-4">
                     {filteredInquiries.map((inquiry, index) => (

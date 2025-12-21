@@ -114,13 +114,13 @@ export default function InquiriesPage() {
     if (safeInquiries.length === 0) {
         return (
             <div className="min-h-full bg-gray-50/50 p-8">
-                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-purple-600 mb-4">
+                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-emerald-600 mb-4">
                     <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                 </Link>
                 <EmptyState
                     title="No Inquiries Yet"
                     description="When patients submit inquiries, they will appear here."
-                    icon={<Inbox className="w-8 h-8 text-purple-500" />}
+                    icon={<Inbox className="w-8 h-8 text-emerald-500" />}
                 />
             </div>
         );
@@ -130,8 +130,8 @@ export default function InquiriesPage() {
         <div className="min-h-full bg-gray-50/50">
             {/* Ambient Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-purple-500/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full blur-3xl" />
+                <div className="absolute -top-1/4 -left-1/4 w-1/3 h-1/3 bg-gradient-to-br from-emerald-400/10 to-teal-400/5 rounded-full blur-3xl" />
+                <div className="absolute -bottom-1/4 -right-1/4 w-1/3 h-1/3 bg-gradient-to-tl from-teal-400/10 to-cyan-400/5 rounded-full blur-3xl" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -139,7 +139,7 @@ export default function InquiriesPage() {
                 <div className="mb-8">
                     <Link
                         href="/dashboard/hospital"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-purple-600 mb-2 transition-colors"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-emerald-600 mb-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Dashboard
@@ -207,6 +207,12 @@ export default function InquiriesPage() {
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'closed' ? 'bg-gray-50 text-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 Closed
+                            </button>
+                            <button
+                                onClick={() => setFilter('spam')}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'spam' ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            >
+                                Spam
                             </button>
                         </div>
 
@@ -314,31 +320,77 @@ export default function InquiriesPage() {
                                                 <>
                                                     <button
                                                         onClick={() => handleUpdateStatus(inquiry.id, 'responded')}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition shadow-sm"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 rounded-lg text-sm font-medium transition shadow-sm"
                                                     >
-                                                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                                        <CheckCircle2 className="w-4 h-4" />
                                                         Mark as Responded
                                                     </button>
                                                     <a
-                                                        href={`mailto:${inquiry.email}`}
+                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
                                                         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition hover:-translate-y-0.5"
                                                     >
-                                                        <MessageCircle className="w-4 h-4" />
-                                                        Reply
+                                                        <Mail className="w-4 h-4" />
+                                                        Reply via Email
                                                     </a>
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(inquiry.id, 'spam')}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-sm font-medium transition"
+                                                    >
+                                                        <Flag className="w-4 h-4" />
+                                                        Spam
+                                                    </button>
                                                 </>
                                             )}
 
                                             {inquiry.status === 'responded' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(inquiry.id, 'closed')}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
+                                                    >
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                        Close Inquiry
+                                                    </button>
+                                                    <a
+                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 rounded-lg text-sm font-medium transition"
+                                                    >
+                                                        <MessageCircle className="w-4 h-4" />
+                                                        Follow Up
+                                                    </a>
+                                                </>
+                                            )}
+
+                                            {inquiry.status === 'closed' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(inquiry.id, 'pending')}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-medium transition"
+                                                    >
+                                                        <Clock className="w-4 h-4" />
+                                                        Reopen Inquiry
+                                                    </button>
+                                                    <a
+                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
+                                                    >
+                                                        <Mail className="w-4 h-4" />
+                                                        Send Email
+                                                    </a>
+                                                </>
+                                            )}
+
+                                            {inquiry.status === 'spam' && (
                                                 <button
-                                                    onClick={() => handleUpdateStatus(inquiry.id, 'closed')}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
+                                                    onClick={() => handleUpdateStatus(inquiry.id, 'pending')}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-medium transition"
                                                 >
-                                                    Close Inquiry
+                                                    <Clock className="w-4 h-4" />
+                                                    Not Spam - Restore
                                                 </button>
                                             )}
 
-                                            {/* Priority Dropdown */}
+                                            {/* Priority Dropdown - Always visible */}
                                             <select
                                                 value={inquiry.priority || 'normal'}
                                                 onChange={(e) => handleUpdatePriority(inquiry.id, e.target.value)}

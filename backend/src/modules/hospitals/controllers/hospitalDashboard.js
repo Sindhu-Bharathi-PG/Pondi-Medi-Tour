@@ -130,7 +130,9 @@ const getMyDashboardStats = async (request, reply) => {
         name: hospital?.name,
         status: hospital?.status,
         type: hospital?.type,
-        logoUrl: hospital?.logoUrl
+        logoUrl: hospital?.logoUrl,
+        coverUrl: hospital?.coverUrl,
+        gallery: hospital?.gallery || []
       },
       stats: {
         doctorsCount: doctorsResult[0]?.count || 0,
