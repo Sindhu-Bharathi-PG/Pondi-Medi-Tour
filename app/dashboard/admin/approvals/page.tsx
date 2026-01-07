@@ -1,5 +1,6 @@
 "use client";
 
+import { ToastContainer, useToast } from "@/app/components/admin/Toast";
 import { Building2, CheckCircle, Clock, Eye, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -16,19 +17,83 @@ export default function ApprovalsPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
+    const toast = useToast();
 
     useEffect(() => {
-        // Mock data
-        setTimeout(() => {
-            setPendingItems([
-                { id: '1', type: 'hospital', name: 'New Apollo Branch', submittedBy: 'Apollo Healthcare', submittedDate: '2024-01-15', status: 'pending' },
-                { id: '2', type: 'hospital', name: 'City Medical Center', submittedBy: 'City Health Group', submittedDate: '2024-01-14', status: 'pending' },
-                { id: '3', type: 'doctor', name: 'Dr. Rajesh Kumar', submittedBy: 'JIPMER', submittedDate: '2024-01-13', status: 'pending' },
-                { id: '4', type: 'treatment', name: 'Advanced Cardiac Surgery', submittedBy: 'Apollo Hospital', submittedDate: '2024-01-12', status: 'pending' },
-            ]);
+        fetchPendingItems();
+    }, [filter]);
+
+    const fetchPendingItems = async () => {
+        setLoading(true);
+        try {
+            // Currently backend only supports hospital approvals. 
+            // In future we can add endpoints for doctors/treatments.
+            if (filter === 'all' || filter === 'hospital') {
+                const response = await fetch('/api/admin/hospitals?status=pending');
+                if (response.ok) {
+                    const data = await response.json();
+                    const hospitals: PendingItem[] = (data.hospitals || []).map((h: any) => ({
+                        id: h.id,
+                        type: 'hospital',
+                        name: h.name,
+                        submittedBy: h.email || 'Hospital Admin',
+                        submittedDate: h.submittedDate,
+                        status: 'pending'
+                    }));
+                    setPendingItems(hospitals);
+                }
+            } else {
+                setPendingItems([]); // Clear list for unsupported types for now
+            }
+        } catch (error) {
+            console.error('Error fetching pending items:', error);
+            toast.error('Failed to load pending items');
+        } finally {
             setLoading(false);
-        }, 800);
-    }, []);
+        }
+    };
+
+    const handleApprove = async (id: string, type: string) => {
+        if (type !== 'hospital') return;
+        try {
+            const response = await fetch(`/api/admin/hospitals/${id}/approve`, { method: 'PATCH' });
+            if (response.ok) {
+                // Remove from list
+                setPendingItems(prev => prev.filter(item => item.id !== id));
+                toast.success('Hospital approved successfully');
+            } else {
+                toast.error('Failed to approve hospital');
+            }
+        } catch (error) {
+            console.error('Error approving item:', error);
+            toast.error('Error approving hospital');
+        }
+    };
+
+    const handleReject = async (id: string, type: string) => {
+        if (type !== 'hospital') return;
+        // For simple rejection without reason modal (based on current UI, 
+        // ideally we should reuse the modal from hospitals page but let's keep it simple first)
+        const reason = prompt("Enter rejection reason:");
+        if (!reason) return;
+
+        try {
+            const response = await fetch(`/api/admin/hospitals/${id}/reject`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason })
+            });
+            if (response.ok) {
+                setPendingItems(prev => prev.filter(item => item.id !== id));
+                toast.success('Hospital rejected successfully');
+            } else {
+                toast.error('Failed to reject hospital');
+            }
+        } catch (error) {
+            console.error('Error rejecting item:', error);
+            toast.error('Error rejecting hospital');
+        }
+    };
 
     const getTypeIcon = (type: string) => {
         return type === 'hospital' ? Building2 : type === 'doctor' ? CheckCircle : Clock;
@@ -63,6 +128,8 @@ export default function ApprovalsPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">
+            <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
@@ -80,8 +147,8 @@ export default function ApprovalsPage() {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${filter === f
-                                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg'
-                                    : 'text-slate-600 hover:bg-slate-50'
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg'
+                                : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                         >
                             {f}
@@ -129,11 +196,15 @@ export default function ApprovalsPage() {
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-2 mt-4">
-                                            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all text-sm">
+                                            <button
+                                                onClick={() => handleApprove(item.id, item.type)}
+                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all text-sm">
                                                 <CheckCircle className="w-4 h-4" />
                                                 Approve
                                             </button>
-                                            <button className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl font-medium hover:bg-rose-100 transition text-sm border border-rose-200">
+                                            <button
+                                                onClick={() => handleReject(item.id, item.type)}
+                                                className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl font-medium hover:bg-rose-100 transition text-sm border border-rose-200">
                                                 <XCircle className="w-4 h-4" />
                                                 Reject
                                             </button>

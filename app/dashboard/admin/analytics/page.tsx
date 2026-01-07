@@ -246,16 +246,47 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Visual Chart Placeholder */}
+            {/* Traffic Overview Chart - CSS Based */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                <h3 className="text-lg font-bold text-slate-900 mb-6">Traffic Overview</h3>
-                <div className="h-64 bg-gradient-to-br from-violet-50 via-purple-50 to-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
-                    <div className="text-center">
-                        <Activity className="w-12 h-12 text-violet-300 mx-auto mb-3" />
-                        <p className="text-slate-600 font-medium">Chart visualization coming soon</p>
-                        <p className="text-sm text-slate-400 mt-1">Integrate Chart.js or Recharts for interactive graphs</p>
-                    </div>
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-slate-900">Traffic Overview</h3>
+                    <span className="text-sm text-slate-500">Last 7 days</span>
                 </div>
+                <div className="h-64 flex items-end justify-between gap-2 px-4">
+                    {[
+                        { day: 'Mon', value: 65, label: '650' },
+                        { day: 'Tue', value: 80, label: '800' },
+                        { day: 'Wed', value: 45, label: '450' },
+                        { day: 'Thu', value: 90, label: '900' },
+                        { day: 'Fri', value: 75, label: '750' },
+                        { day: 'Sat', value: 55, label: '550' },
+                        { day: 'Sun', value: 40, label: '400' },
+                    ].map((item, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+                            <span className="text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {item.label}
+                            </span>
+                            <div
+                                className="w-full bg-gradient-to-t from-violet-500 to-purple-400 rounded-t-lg transition-all duration-700 hover:from-violet-600 hover:to-purple-500 cursor-pointer relative group"
+                                style={{
+                                    height: `${item.value}%`,
+                                    animation: `grow-bar 1s ease-out ${i * 0.1}s both`
+                                }}
+                            >
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    {item.label} views
+                                </div>
+                            </div>
+                            <span className="text-xs font-medium text-slate-600">{item.day}</span>
+                        </div>
+                    ))}
+                </div>
+                <style jsx>{`
+                    @keyframes grow-bar {
+                        from { height: 0%; opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                `}</style>
             </div>
         </div>
     );

@@ -329,40 +329,83 @@ async function getAllHospitals(request, reply) {
     let params = [];
 
     if (status && status !== 'all') {
-      whereConditions.push(`status = $${params.length + 1}`);
+      whereConditions.push(`h.status = $${params.length + 1}`);
       params.push(status);
     }
 
     if (search) {
-      whereConditions.push(`name ILIKE $${params.length + 1}`);
+      whereConditions.push(`(h.name ILIKE $${params.length + 1} OR h.email ILIKE $${params.length + 1})`);
       params.push(`%${search}%`);
     }
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
+    // Get hospitals with doctor count
     const hospitals = await sql.unsafe(`
-      SELECT id, name, type, city, state, beds, status, created_at
-      FROM hospital_details
+      SELECT 
+        h.id, 
+        h.name, 
+        h.type, 
+        h.location,
+        h.email,
+        h.phone,
+        h.logo_url,
+        h.status, 
+        h.created_at,
+        h.infrastructure,
+        COALESCE(d.doctor_count, 0) as doctors_count
+      FROM hospital_details h
+      LEFT JOIN (
+        SELECT hospital_id, COUNT(*) as doctor_count 
+        FROM doctors 
+        GROUP BY hospital_id
+      ) d ON h.id = d.hospital_id
       ${whereClause}
-      ORDER BY created_at DESC
+      ORDER BY h.created_at DESC
       LIMIT $${params.length + 1} OFFSET $${params.length + 2}
     `, [...params, limit, offset]);
 
     const [{ count }] = await sql.unsafe(`
-      SELECT COUNT(*) as count FROM hospital_details ${whereClause}
+      SELECT COUNT(*) as count FROM hospital_details h ${whereClause}
     `, params);
 
     return reply.send({
-      hospitals: hospitals.map(h => ({
-        id: h.id,
-        name: h.name,
-        type: h.type,
-        location: `${h.city}, ${h.state}`,
-        city: h.city,
-        beds: h.beds,
-        status: h.status,
-        submittedDate: h.created_at
-      })),
+      hospitals: hospitals.map(h => {
+        // Parse infrastructure for beds
+        let beds = 0;
+        if (h.infrastructure) {
+          const infra = typeof h.infrastructure === 'string' 
+            ? JSON.parse(h.infrastructure) 
+            : h.infrastructure;
+          beds = infra.totalBeds || 0;
+        }
+        
+        // Parse location
+        let city = '';
+        let state = '';
+        if (h.location) {
+          const loc = typeof h.location === 'string' 
+            ? JSON.parse(h.location) 
+            : h.location;
+          city = loc.city || '';
+          state = loc.state || '';
+        }
+
+        return {
+          id: h.id,
+          name: h.name,
+          type: h.type || 'General Hospital',
+          location: city && state ? `${city}, ${state}` : city || 'Location not specified',
+          city: city,
+          beds: beds,
+          status: h.status || 'pending',
+          submittedDate: h.created_at,
+          email: h.email,
+          phone: h.phone,
+          doctors: parseInt(h.doctors_count) || 0,
+          logoUrl: h.logo_url
+        };
+      }),
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

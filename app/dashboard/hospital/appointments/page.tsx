@@ -43,9 +43,9 @@ export default function AppointmentsPage() {
     return (
         <div className="min-h-full bg-gray-50/50">
             {/* Ambient Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-1/4 -left-1/4 w-1/3 h-1/3 bg-gradient-to-br from-emerald-400/10 to-teal-400/5 rounded-full blur-3xl" />
+                <div className="absolute -bottom-1/4 -right-1/4 w-1/3 h-1/3 bg-gradient-to-tl from-teal-400/10 to-cyan-400/5 rounded-full blur-3xl" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -54,17 +54,25 @@ export default function AppointmentsPage() {
                     <div>
                         <Link
                             href="/dashboard/hospital"
-                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 mb-2 transition-colors"
+                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-emerald-600 mb-3 transition-colors group"
                         >
-                            <ArrowLeft className="w-4 h-4" />
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                             Back to Dashboard
                         </Link>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Appointments</h1>
-                        <p className="text-gray-500 mt-1">Manage scheduled visits and patient consultations.</p>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Appointments</h1>
+                            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
+                                {appointments.length}
+                            </div>
+                        </div>
+                        <p className="text-gray-600 flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            Manage scheduled visits and patient consultations
+                        </p>
                     </div>
 
-                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all">
-                        <Plus className="w-4 h-4" />
+                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all">
+                        <Plus className="w-5 h-5" />
                         New Appointment
                     </button>
                 </div>
@@ -77,8 +85,8 @@ export default function AppointmentsPage() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-medium capitalize transition-all ${activeTab === tab
-                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    ? 'bg-blue-50 text-blue-700 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
                                 {tab}
@@ -91,7 +99,7 @@ export default function AppointmentsPage() {
                         <input
                             type="text"
                             placeholder="Find appointment..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
                         />
                     </div>
                 </div>
@@ -103,7 +111,7 @@ export default function AppointmentsPage() {
                         {appointments.slice(0, 2).map((apt, index) => (
                             <div
                                 key={apt.id}
-                                className="group bg-white rounded-2xl p-4 md:p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 items-center"
+                                className="group bg-white/90 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200/50 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row gap-6 items-center"
                             >
                                 {/* Time Column */}
                                 <div className="min-w-[140px] flex flex-col items-center md:items-start border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-6">

@@ -1,11 +1,16 @@
 "use client";
 
 import ConfirmDialog from "@/app/components/admin/ConfirmDialog";
+import Modal from "@/app/components/admin/Modal";
 import { ToastContainer, useToast } from "@/app/components/admin/Toast";
 import {
+    Eye,
+    EyeOff,
+    Mail,
     Search,
     Trash2,
-    User
+    User,
+    UserPlus
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -28,6 +33,15 @@ export default function UsersManagementPage() {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [newUser, setNewUser] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'admin'
+    });
 
     const toast = useToast();
 
@@ -110,6 +124,33 @@ export default function UsersManagementPage() {
         }
     };
 
+    const handleCreateUser = async () => {
+        if (!newUser.name || !newUser.email || !newUser.password) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+        try {
+            setCreating(true);
+            const response = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newUser)
+            });
+
+            if (!response.ok) throw new Error('Failed to create user');
+
+            const data = await response.json();
+            toast.success('User created successfully');
+            setIsCreateOpen(false);
+            setNewUser({ name: '', email: '', password: '', role: 'admin' });
+            fetchUsers();
+        } catch (error) {
+            toast.error('Failed to create user');
+        } finally {
+            setCreating(false);
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto space-y-6">
             <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
@@ -120,8 +161,11 @@ export default function UsersManagementPage() {
                     <h1 className="text-2xl font-bold text-slate-900">Users Management</h1>
                     <p className="text-slate-600">Manage all registered users and their permissions</p>
                 </div>
-                <button className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                <button
+                    onClick={() => setIsCreateOpen(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all flex items-center gap-2"
+                >
+                    <UserPlus className="w-4 h-4" />
                     Add New User
                 </button>
             </div>
@@ -283,6 +327,103 @@ export default function UsersManagementPage() {
                 variant="danger"
                 confirmText="Delete User"
             />
+
+            {/* Create User Modal */}
+            <Modal
+                isOpen={isCreateOpen}
+                onClose={() => setIsCreateOpen(false)}
+                title="Create New User"
+                size="sm"
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                            Full Name <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                                type="text"
+                                value={newUser.name}
+                                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                                placeholder="Enter full name"
+                                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                            Email Address <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                                type="email"
+                                value={newUser.email}
+                                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                placeholder="email@example.com"
+                                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                            Password <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={newUser.password}
+                                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                placeholder="Enter secure password"
+                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                            Role
+                        </label>
+                        <select
+                            value={newUser.role}
+                            onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none"
+                        >
+                            <option value="admin">Admin</option>
+                            <option value="hospital">Hospital Admin</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="patient">Patient</option>
+                        </select>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                        <button
+                            onClick={() => setIsCreateOpen(false)}
+                            className="px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleCreateUser}
+                            disabled={creating || !newUser.name || !newUser.email || !newUser.password}
+                            className="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <UserPlus className="w-4 h-4" />
+                            {creating ? 'Creating...' : 'Create User'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

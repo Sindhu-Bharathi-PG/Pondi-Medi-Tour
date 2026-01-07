@@ -22,24 +22,39 @@ export default function AdminDashboardPage() {
     const toast = useToast();
 
     useEffect(() => {
-        // Use mock data instead of API call
-        setTimeout(() => {
-            const mockStats = {
-                totalUsers: 1247,
-                totalHospitals: 45,
-                pendingApprovals: 8,
-                activeSessions: 156
-            };
-            setStats(mockStats);
-            animateStats(mockStats);
-            setLoading(false);
-        }, 500);
+        fetchStats();
     }, []);
+
+    const fetchStats = async () => {
+        try {
+            const response = await fetch('/api/admin/stats');
+            if (response.ok) {
+                const data = await response.json();
+                const fetchedStats = {
+                    totalUsers: data.totalUsers || 0,
+                    totalHospitals: data.totalHospitals || 0,
+                    pendingApprovals: data.pendingApprovals || 0,
+                    activeSessions: data.activeSessions || 0
+                };
+                // Initial set to avoid 0s before animation if desired, or let animation handle it
+                // setStats(fetchedStats); 
+                animateStats(fetchedStats);
+                setLoading(false);
+            } else {
+                console.error('Failed to fetch stats');
+                // Fallback to 0 or previous logic if needed, but for now just stop loading
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+            setLoading(false);
+        }
+    };
 
     const animateStats = (targetStats: Stats) => {
         let current = { ...stats };
-        const steps = 30;
-        const interval = 30;
+        // Faster animation for better UX
+        const interval = 20;
 
         const timer = setInterval(() => {
             let isDone = true;
@@ -47,10 +62,11 @@ export default function AdminDashboardPage() {
 
             Object.keys(targetStats).forEach((key) => {
                 const k = key as keyof Stats;
-                const increment = Math.ceil((targetStats[k] - current[k]) / 10);
+                const dist = targetStats[k] - current[k];
+                const increment = Math.ceil(dist / 10);
 
                 if (current[k] < targetStats[k]) {
-                    newStats[k] = Math.min(current[k] + increment, targetStats[k]);
+                    newStats[k] = Math.min(current[k] + (increment > 0 ? increment : 1), targetStats[k]);
                     isDone = false;
                 }
             });

@@ -64,13 +64,13 @@ export default function TreatmentsPage() {
     if (!treatments?.length && !loading) {
         return (
             <div className="min-h-full bg-gray-50/50 p-8">
-                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-teal-600 mb-4">
+                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-emerald-600 mb-4 transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                 </Link>
                 <EmptyState
                     title="No Treatments Yet"
                     description="Add your first treatment to showcase your medical services."
-                    icon={<Pill className="w-8 h-8 text-teal-500" />}
+                    icon={<Pill className="w-8 h-8 text-emerald-500" />}
                     action={{ label: "Add First Treatment", onClick: handleAddNew }}
                 />
                 <TreatmentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} treatment={null} onSave={handleSave} />
@@ -87,10 +87,10 @@ export default function TreatmentsPage() {
                 onSave={handleSave}
             />
 
-            {/* Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 left-0 w-1/3 h-1/3 bg-teal-500/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full blur-3xl" />
+            {/* Ambient Background */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-1/4 -left-1/4 w-1/3 h-1/3 bg-gradient-to-br from-emerald-400/10 to-teal-400/5 rounded-full blur-3xl" />
+                <div className="absolute -bottom-1/4 -right-1/4 w-1/3 h-1/3 bg-gradient-to-tl from-teal-400/10 to-cyan-400/5 rounded-full blur-3xl" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -99,17 +99,25 @@ export default function TreatmentsPage() {
                     <div>
                         <Link
                             href="/dashboard/hospital"
-                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-teal-600 mb-2 transition-colors"
+                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-emerald-600 mb-3 transition-colors group"
                         >
-                            <ArrowLeft className="w-4 h-4" />
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                             Back to Dashboard
                         </Link>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Medical Treatments</h1>
-                        <p className="text-gray-500 mt-1">Manage your medical procedures and pricing.</p>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Medical Treatments</h1>
+                            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
+                                {(treatments || []).length}
+                            </div>
+                        </div>
+                        <p className="text-gray-600 flex items-center gap-2">
+                            <Pill className="w-4 h-4" />
+                            Manage your medical procedures and pricing
+                        </p>
                     </div>
 
-                    <button onClick={handleAddNew} className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl font-medium shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-[1.02] transition-all">
-                        <Plus className="w-4 h-4" />
+                    <button onClick={handleAddNew} className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all">
+                        <Plus className="w-5 h-5" />
                         Add New Treatment
                     </button>
                 </div>
@@ -123,7 +131,7 @@ export default function TreatmentsPage() {
                             placeholder="Search treatments by name, category, or description..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border border-gray-200/50 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all outline-none text-gray-900 placeholder:text-gray-400"
+                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border border-gray-200/50 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all outline-none text-gray-900 placeholder:text-gray-400"
                         />
                     </div>
                     {searchQuery && (
@@ -148,7 +156,7 @@ export default function TreatmentsPage() {
                             key={treatment.id}
                             className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
                         >
-                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                             <div className="p-6">
                                 <div className="flex justify-between items-start mb-4">
@@ -163,7 +171,7 @@ export default function TreatmentsPage() {
                                     )}
                                 </div>
 
-                                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
                                     {treatment.name}
                                 </h3>
 
@@ -171,7 +179,7 @@ export default function TreatmentsPage() {
                                 <div className="grid grid-cols-2 gap-2 mb-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg">
                                     <div>
                                         <span className="block text-gray-400">Success Rate</span>
-                                        <span className="font-bold text-teal-700">{treatment.successRate}%</span>
+                                        <span className="font-bold text-emerald-700">{treatment.successRate}%</span>
                                     </div>
                                     <div>
                                         <span className="block text-gray-400">Hospital Stay</span>
@@ -189,7 +197,7 @@ export default function TreatmentsPage() {
                                         <span className="font-semibold">₹{treatment.minPrice?.toLocaleString('en-IN')} - ₹{treatment.maxPrice?.toLocaleString('en-IN')}</span>
                                     </div>
                                     <div className="flex flex-wrap gap-1">
-                                        {(treatment.technology || []).slice(0, 2).map((tech, i) => (
+                                        {(treatment.technology || []).slice(0, 2).map((tech: string, i: number) => (
                                             <span key={i} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100">
                                                 {tech}
                                             </span>
@@ -210,12 +218,12 @@ export default function TreatmentsPage() {
                     ))}
 
                     {/* Add New Card Button */}
-                    <button onClick={handleAddNew} className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-200 hover:border-teal-400 hover:bg-teal-50/10 transition-all group min-h-[350px]">
-                        <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-teal-100 transition-all text-teal-600">
-                            <Plus className="w-8 h-8" />
+                    <button onClick={handleAddNew} className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-gray-300 hover:border-emerald-500 hover:bg-gradient-to-br hover:from-emerald-50 hover:to-teal-50 transition-all duration-300 group min-h-[350px] bg-white/50">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:from-emerald-500 group-hover:to-teal-600 transition-all duration-300 shadow-lg">
+                            <Plus className="w-10 h-10 text-emerald-500 group-hover:text-white transition-colors" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">Add Treatment</h3>
-                        <p className="text-sm text-gray-500">List a new medical procedure</p>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Add New Treatment</h3>
+                        <p className="text-sm text-gray-500 text-center max-w-[220px]">List a new medical procedure to expand your services</p>
                     </button>
                 </div>
             </div>
