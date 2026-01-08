@@ -363,6 +363,7 @@ const Header: React.FC<HeaderProps> = ({
                                                       }
                                                 }}
                                                 aria-label="Search"
+                                                id="tour-search-toggle"
                                                 className={cn(
                                                       "p-2 rounded-full transition-all duration-300 relative z-10 group",
                                                       hasScrolled
@@ -422,15 +423,18 @@ const Header: React.FC<HeaderProps> = ({
                                                                                     // setLanguage(lang.code);
                                                                                     setLanguageDropdownOpen(false);
                                                                               }}
-                                                                        // className={cn(
-                                                                        //       "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors",
-                                                                        //       // currentLanguage === lang.code
-                                                                        //             ? "bg-blue-500 text-white"
-                                                                        //             : "hover:bg-gray-100 text-gray-700"
-                                                                        // )}
+                                                                              className={cn(
+                                                                                    "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center gap-3",
+                                                                                    selectedLanguage.code === lang.code
+                                                                                          ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
+                                                                                          : "hover:bg-gray-50 text-gray-700 active:scale-95"
+                                                                              )}
                                                                         >
-                                                                              <span className="mr-2">{lang.flag}</span>
-                                                                              {lang.name}
+                                                                              <span className="text-base">{lang.flag}</span>
+                                                                              <span className="font-medium">{lang.name}</span>
+                                                                              {selectedLanguage.code === lang.code && (
+                                                                                    <div className={cn("ml-auto w-1.5 h-1.5 rounded-full", isMedical ? "bg-emerald-500" : "bg-amber-500")} />
+                                                                              )}
                                                                         </button>
                                                                   ))}
                                                             </div>
@@ -499,11 +503,12 @@ const Header: React.FC<HeaderProps> = ({
                                     </div>
 
                                     {/* Medical/Wellness Toggle */}
-                                    <div 
+                                    <div
+                                          id="tour-mode-switch"
                                           className={cn(
                                                 "relative p-0.5 rounded-full flex cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95",
                                                 hasScrolled ? "bg-gray-100 shadow-inner" : "bg-white/15 border border-white/20"
-                                          )} 
+                                          )}
                                           onClick={toggleMode}
                                     >
                                           <div className={cn(
@@ -514,13 +519,13 @@ const Header: React.FC<HeaderProps> = ({
                                                 hasScrolled ? "shadow-md" : "shadow-lg bg-white"
                                           )} />
                                           <div className={cn(
-                                                "relative z-10 p-1.5 rounded-full transition-all duration-300", 
+                                                "relative z-10 p-1.5 rounded-full transition-all duration-300",
                                                 isMedical ? "text-white scale-110" : (hasScrolled ? "text-gray-400" : "text-white/50")
                                           )}>
                                                 <Stethoscope className="w-3.5 h-3.5" />
                                           </div>
                                           <div className={cn(
-                                                "relative z-10 p-1.5 rounded-full transition-all duration-300", 
+                                                "relative z-10 p-1.5 rounded-full transition-all duration-300",
                                                 !isMedical ? "text-white scale-110" : (hasScrolled ? "text-gray-400" : "text-white/50")
                                           )}>
                                                 <Leaf className="w-3.5 h-3.5" />

@@ -1,18 +1,49 @@
 "use client";
 
-import React from 'react';
+import { API_BASE } from '@/app/hooks/useApi';
+import { Award, CheckCircle, Globe, Heart, MapPin, Phone, Shield, Star, Users } from 'lucide-react';
 import Image from 'next/image';
-import { Award, Users, Heart, Globe, Shield, Clock, Star, CheckCircle, MapPin, Phone, Mail } from 'lucide-react';
-import { Header, Footer } from '../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
 
 const AboutPage = () => {
       const scrolled = useScrolled(50);
+      const [dynamicStats, setDynamicStats] = useState({
+            totalHospitals: 10, // Default fallback
+            totalUsers: 5000,
+            loading: true
+      });
+
+      // Fetch real stats from database
+      useEffect(() => {
+            const fetchStats = async () => {
+                  try {
+                        const res = await fetch(`${API_BASE}/api/hospitals`);
+                        if (res.ok) {
+                              const hospitals = await res.json();
+                              const count = Array.isArray(hospitals) ? hospitals.length : (hospitals.hospitals?.length || 0);
+                              setDynamicStats({
+                                    totalHospitals: count > 0 ? count : 10, // Use 10 as minimum fallback
+                                    totalUsers: 5000,
+                                    loading: false
+                              });
+                        } else {
+                              // API failed, use defaults
+                              setDynamicStats(prev => ({ ...prev, loading: false }));
+                        }
+                  } catch (error) {
+                        console.error('Failed to fetch stats:', error);
+                        setDynamicStats(prev => ({ ...prev, loading: false }));
+                  }
+            };
+            fetchStats();
+      }, []);
 
       const stats = [
             { value: '5M+', label: 'Medical Tourists Annually', icon: Users },
             { value: '70%', label: 'Cost Savings vs West', icon: Award },
-            { value: '500+', label: 'JCI Accredited Hospitals', icon: Heart },
+            { value: dynamicStats.loading ? '...' : `${dynamicStats.totalHospitals}+`, label: 'Partner Hospitals', icon: Heart },
             { value: '150+', label: 'Countries Trust India', icon: Globe },
       ];
 
@@ -33,7 +64,7 @@ const AboutPage = () => {
                   description: 'Combine modern medicine with ancient wellness traditions—Ayurveda, Yoga, and meditation for complete recovery.'
             },
             {
-                  icon: Clock,
+                  icon: Award,
                   title: 'Zero Wait Times',
                   description: 'Skip months-long queues. Get immediate consultations, rapid diagnostics, and same-week surgeries.'
             },
@@ -138,8 +169,8 @@ const AboutPage = () => {
                                                 />
                                           </div>
                                           <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-emerald-600 to-teal-600 text-white p-6 rounded-2xl shadow-xl">
-                                                <div className="text-3xl font-bold">500+</div>
-                                                <div className="text-emerald-100">JCI Hospitals</div>
+                                                <div className="text-3xl font-bold">{dynamicStats.loading ? '...' : `${dynamicStats.totalHospitals}+`}</div>
+                                                <div className="text-emerald-100">Partner Hospitals</div>
                                           </div>
                                     </div>
 
@@ -196,8 +227,6 @@ const AboutPage = () => {
                               </div>
                         </div>
                   </section>
-
-                  {/* Team Section - Removed as it was too company-specific */}
 
                   {/* Benefits Comparison Section */}
                   <section className="py-20 bg-white">

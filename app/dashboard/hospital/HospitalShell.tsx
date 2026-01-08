@@ -3,6 +3,8 @@
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import HospitalSidebar from "./components/HospitalSidebar";
+import NotificationBell from "./components/NotificationBell";
+import UserMenu from "./components/UserMenu";
 
 export default function HospitalShell({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,17 +19,25 @@ export default function HospitalShell({ children }: { children: React.ReactNode 
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-w-0 pointer-events-auto">
-                {/* Mobile Header */}
-                <header className="lg:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
-                    <button
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 -ml-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                        aria-label="Open menu"
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
-                    <span className="font-bold text-gray-900">Hospital Portal</span>
-                    <div className="w-8" /> {/* Spacer for centering */}
+                {/* Top Navbar */}
+                <header className="bg-white border-b border-gray-100 px-4 lg:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+                    {/* Left: Mobile menu + Title */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="lg:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                            aria-label="Open menu"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <span className="font-bold text-gray-900 text-lg hidden sm:block">Hospital Portal</span>
+                    </div>
+
+                    {/* Right: Notifications + User Menu */}
+                    <div className="flex items-center gap-2">
+                        <NotificationBell />
+                        <UserMenu />
+                    </div>
                 </header>
 
                 {/* Page Content */}

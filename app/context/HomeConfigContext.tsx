@@ -67,23 +67,49 @@ export function HomeConfigProvider({ children, initialMode = 'medical' }: HomeCo
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
 
-    // Load from localStorage on mount (client-side only)
+    // Load from API and localStorage on mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            try {
-                const storedMedical = localStorage.getItem(STORAGE_KEY_MEDICAL);
-                const storedWellness = localStorage.getItem(STORAGE_KEY_WELLNESS);
+            const initConfig = async () => {
+                try {
+                    // 1. Fetch published configs from backend
+                    try {
+                        const [medRes, wellRes] = await Promise.all([
+                            fetch('/api/public/pages/medical'),
+                            fetch('/api/public/pages/wellness')
+                        ]);
 
-                if (storedMedical) {
-                    setMedicalConfig(JSON.parse(storedMedical));
+                        if (medRes.ok) {
+                            const data = await medRes.json();
+                            if (data.config) setMedicalConfig(data.config);
+                        }
+
+                        if (wellRes.ok) {
+                            const data = await wellRes.json();
+                            if (data.config) setWellnessConfig(data.config);
+                        }
+                    } catch (apiError) {
+                        console.error('Failed to fetch from API, falling back to defaults/local:', apiError);
+                    }
+
+                    // 2. Override with localStorage if exists (preserves unsaved drafts)
+                    const storedMedical = localStorage.getItem(STORAGE_KEY_MEDICAL);
+                    const storedWellness = localStorage.getItem(STORAGE_KEY_WELLNESS);
+
+                    if (storedMedical) {
+                        setMedicalConfig(JSON.parse(storedMedical));
+                    }
+                    if (storedWellness) {
+                        setWellnessConfig(JSON.parse(storedWellness));
+                    }
+                } catch (error) {
+                    console.error('Error loading config:', error);
+                } finally {
+                    setIsHydrated(true);
                 }
-                if (storedWellness) {
-                    setWellnessConfig(JSON.parse(storedWellness));
-                }
-            } catch (error) {
-                console.error('Error loading config from localStorage:', error);
-            }
-            setIsHydrated(true);
+            };
+
+            initConfig();
         }
     }, []);
 

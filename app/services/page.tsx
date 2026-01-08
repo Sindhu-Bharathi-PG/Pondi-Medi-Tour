@@ -24,147 +24,21 @@ const PATIENT_COUNTRIES = [
 
 const ServicesPage = () => {
       const { convertAmount, formatCurrency, selectedCurrency } = useCurrency();
+      const [services, setServices] = useState<any[]>([]);
+      const [isLoading, setIsLoading] = useState(true);
       const [convertedPrices, setConvertedPrices] = useState<Record<string, { pondy: number; us: number; uk: number; uae: number }>>({});
 
-      // All prices stored in INR (Indian Rupees) - to be converted via context
-      const services = [
-            {
-                  id: 'orthopedics',
-                  icon: Bone,
-                  title: 'Orthopedics & Joint Replacement',
-                  description: 'World-class joint replacement with 95%+ satisfaction at 5-year follow-up. FRCS-trained surgeons with international fellowship experience.',
-                  image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800',
-                  procedures: ['Total Knee Replacement', 'Hip Replacement', 'Spine Surgery', 'ACL Reconstruction', 'Shoulder Arthroscopy'],
-                  savings: '70%',
-                  pondyPriceINR: 708000, // ~$8,500 USD
-                  usPriceINR: 2916000, // ~$35,000 USD
-                  ukPriceINR: 2332800, // ~$28,000 USD
-                  uaePriceINR: 1832000, // ~$22,000 USD
-                  recovery: '6-12 weeks',
-                  successRate: '95%+',
-                  color: 'from-[var(--medical-teal)] to-[var(--medical-dark-teal)]',
-                  featured: true
-            },
-            {
-                  id: 'ivf',
-                  icon: Baby,
-                  title: 'IVF & Fertility Treatment',
-                  description: 'Advanced reproductive medicine with 45%+ live birth rate (age <35). 35+ IVF specialists with international protocols.',
-                  image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800',
-                  procedures: ['IVF Treatment', 'IUI', 'ICSI', 'Egg Freezing', 'Donor Programs'],
-                  savings: '80%',
-                  pondyPriceINR: 291600, // ~$3,500 USD
-                  usPriceINR: 1499400, // ~$18,000 USD
-                  ukPriceINR: 999600, // ~$12,000 USD
-                  uaePriceINR: 833000, // ~$10,000 USD
-                  recovery: '14 days',
-                  successRate: '45%+',
-                  color: 'from-rose-600 to-pink-500',
-                  featured: true
-            },
-            {
-                  id: 'ophthalmology',
-                  icon: Eye,
-                  title: 'Eye Surgery & LASIK',
-                  description: 'Leading eye care with 99%+ vision improvement rate. 15,000+ cataract surgeries annually at Aravind Eye Hospital.',
-                  image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800',
-                  procedures: ['Cataract Surgery', 'LASIK', 'Retina Treatment', 'Glaucoma Surgery', 'Cornea Transplant'],
-                  savings: '85%',
-                  pondyPriceINR: 99960, // ~$1,200 USD
-                  usPriceINR: 666400, // ~$8,000 USD
-                  ukPriceINR: 458150, // ~$5,500 USD
-                  uaePriceINR: 374850, // ~$4,500 USD
-                  recovery: '3-7 days',
-                  successRate: '99%+',
-                  color: 'from-[var(--medical-teal)] to-emerald-500',
-                  featured: true
-            },
-            {
-                  id: 'cardiology',
-                  icon: Heart,
-                  title: 'Cardiac Surgery',
-                  description: 'Interventional cardiology at JIPMER with 98.5% success rate and <1% mortality. 50+ board-certified cardiologists.',
-                  image: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800',
-                  procedures: ['Bypass Surgery', 'Angioplasty', 'Valve Replacement', 'Pacemaker Implant', 'Heart Transplant'],
-                  savings: '76%',
-                  pondyPriceINR: 999600, // ~$12,000 USD
-                  usPriceINR: 4165000, // ~$50,000 USD
-                  ukPriceINR: 3165000, // ~$38,000 USD
-                  uaePriceINR: 2499000, // ~$30,000 USD
-                  recovery: '8-12 weeks',
-                  successRate: '98.5%',
-                  color: 'from-red-600 to-rose-500',
-                  featured: false
-            },
-            {
-                  id: 'gastroenterology',
-                  icon: Activity,
-                  title: 'Gastroenterology & Bariatric',
-                  description: 'Asia\'s premier GI center at GEM Hospital with JCI accreditation. World-class laparoscopic expertise.',
-                  image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=800',
-                  procedures: ['Bariatric Surgery', 'Laparoscopic Surgery', 'Liver Treatment', 'Colorectal Surgery', 'Endoscopy'],
-                  savings: '70%',
-                  pondyPriceINR: 499800, // ~$6,000 USD
-                  usPriceINR: 1666000, // ~$20,000 USD
-                  ukPriceINR: 1332800, // ~$16,000 USD
-                  uaePriceINR: 1166200, // ~$14,000 USD
-                  recovery: '7-14 days',
-                  successRate: '97%+',
-                  color: 'from-amber-600 to-orange-500',
-                  featured: false
-            },
-            {
-                  id: 'neurology',
-                  icon: Brain,
-                  title: 'Neurology & Neurosurgery',
-                  description: 'Advanced brain and spine surgery with robotic assistance and minimally invasive techniques.',
-                  image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800',
-                  procedures: ['Brain Tumor Surgery', 'Spine Surgery', 'Epilepsy Surgery', 'Stroke Treatment', 'Deep Brain Stimulation'],
-                  savings: '75%',
-                  pondyPriceINR: 1249500, // ~$15,000 USD
-                  usPriceINR: 4998000, // ~$60,000 USD
-                  ukPriceINR: 3998400, // ~$48,000 USD
-                  uaePriceINR: 3332000, // ~$40,000 USD
-                  recovery: '2-4 weeks',
-                  successRate: '96%+',
-                  color: 'from-purple-600 to-indigo-500',
-                  featured: false
-            },
-            {
-                  id: 'dental',
-                  icon: Scissors,
-                  title: 'Dental Care & Implants',
-                  description: 'Full mouth rehabilitation with 98%+ 10-year implant survival. 25+ dental specialists with cosmetic expertise.',
-                  image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800',
-                  procedures: ['Dental Implants', 'Full Mouth Rehab', 'Veneers', 'Root Canal', 'Smile Makeover'],
-                  savings: '85%',
-                  pondyPriceINR: 49980, // ~$600 USD
-                  usPriceINR: 333200, // ~$4,000 USD
-                  ukPriceINR: 266560, // ~$3,200 USD
-                  uaePriceINR: 208250, // ~$2,500 USD
-                  recovery: '3-10 days',
-                  successRate: '98%+',
-                  color: 'from-cyan-600 to-[var(--medical-teal)]',
-                  featured: false
-            },
-            {
-                  id: 'oncology',
-                  icon: Stethoscope,
-                  title: 'Cancer Treatment',
-                  description: 'Comprehensive oncology care with 30+ oncologists using latest chemotherapy and radiation protocols.',
-                  image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800',
-                  procedures: ['Chemotherapy', 'Radiation Therapy', 'Surgical Oncology', 'Immunotherapy', 'Palliative Care'],
-                  savings: '65%',
-                  pondyPriceINR: 666400, // ~$8,000 USD
-                  usPriceINR: 2082500, // ~$25,000 USD
-                  ukPriceINR: 1666000, // ~$20,000 USD
-                  uaePriceINR: 1499400, // ~$18,000 USD
-                  recovery: 'Varies',
-                  successRate: 'Stage-dependent',
-                  color: 'from-green-600 to-[var(--medical-teal)]',
-                  featured: false
-            },
-      ];
+      // Map categories to icons
+      const categoryIcons: any = {
+            'Orthopedics': Bone,
+            'IVF': Baby,
+            'Ophthalmology': Eye,
+            'Cardiology': Heart,
+            'Gastroenterology': Activity,
+            'Neurology': Brain,
+            'Dental': Scissors,
+            'Oncology': Stethoscope
+      };
 
       const journeySteps = [
             { icon: Phone, title: 'Free Consultation', desc: 'Connect via call, WhatsApp, or video', time: 'Day 1' },
@@ -175,9 +49,52 @@ const ServicesPage = () => {
             { icon: Heart, title: 'Recovery', desc: 'Comfortable recovery with support', time: 'Post-treatment' },
       ];
 
-      // Convert prices when currency changes
+      // Fetch services from API
+      useEffect(() => {
+            const fetchServices = async () => {
+                  try {
+                        const response = await fetch('http://localhost:3001/api/treatments');
+                        const data = await response.json();
+
+                        if (data && Array.isArray(data) && data.length > 0) {
+                              // Map DB data to Frontend format
+                              const mappedServices = data.map(t => ({
+                                    id: t.slug || t.id.toString(),
+                                    icon: categoryIcons[t.category] || Stethoscope,
+                                    title: t.name,
+                                    description: t.shortDescription,
+                                    image: t.thumbnailUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
+                                    procedures: t.technology || [],
+                                    savings: t.isPopular ? '70%+' : '60%+',
+                                    pondyPriceINR: t.minPrice || 50000,
+                                    // Fallback prices for comparison if not in DB
+                                    usPriceINR: (t.minPrice || 50000) * 4,
+                                    ukPriceINR: (t.minPrice || 50000) * 3,
+                                    uaePriceINR: (t.minPrice || 50000) * 2.5,
+                                    recovery: t.recoveryTime || 'Varies',
+                                    successRate: t.successRate ? `${t.successRate}%+` : '95%+',
+                                    color: t.category === 'Oncology' ? 'from-green-600 to-[var(--medical-teal)]' : 'from-[var(--medical-teal)] to-[var(--medical-dark-teal)]',
+                                    featured: t.isPopular
+                              }));
+                              setServices(mappedServices);
+                        } else {
+                              // If no data in DB, we could use static fallback or show empty state
+                              // For this demo, let's keep the static fallbacks if DB is empty
+                              console.log('No treatments found in DB, using static data');
+                        }
+                  } catch (error) {
+                        console.error('Error fetching services:', error);
+                  } finally {
+                        setIsLoading(false);
+                  }
+            };
+            fetchServices();
+      }, []);
+
+      // Convert prices when currency changes or services load
       useEffect(() => {
             const convertPrices = async () => {
+                  if (services.length === 0) return;
                   const converted: Record<string, { pondy: number; us: number; uk: number; uae: number }> = {};
                   for (const service of services) {
                         const pondy = await convertAmount(service.pondyPriceINR, 'INR');
@@ -189,7 +106,7 @@ const ServicesPage = () => {
                   setConvertedPrices(converted);
             };
             convertPrices();
-      }, [selectedCurrency]);
+      }, [selectedCurrency, services]);
 
       const getPrice = (serviceId: string, type: 'pondy' | 'us' | 'uk' | 'uae') => {
             return convertedPrices[serviceId]?.[type] || 0;
@@ -365,7 +282,12 @@ const ServicesPage = () => {
 
                               {/* Featured Grid */}
                               <div className="grid lg:grid-cols-3 gap-8 mb-16">
-                                    {services.filter(s => s.featured).map((service, index) => (
+                                    {isLoading ? (
+                                          <div className="col-span-3 text-center py-20">
+                                                <div className="animate-spin w-10 h-10 border-4 border-[var(--medical-teal)] border-t-transparent rounded-full mx-auto mb-4"></div>
+                                                <p className="text-[var(--medical-navy)] font-medium">Loading treatments...</p>
+                                          </div>
+                                    ) : services.filter(s => s.featured).map((service, index) => (
                                           <motion.div
                                                 key={service.id}
                                                 initial={{ opacity: 0, y: 30 }}
@@ -460,7 +382,11 @@ const ServicesPage = () => {
                               {/* All Services Grid */}
                               <h3 className="text-2xl font-bold text-[var(--medical-navy)] mb-8 text-center">All Medical Specialties</h3>
                               <div className="grid md:grid-cols-2 gap-6">
-                                    {services.filter(s => !s.featured).map((service, index) => (
+                                    {isLoading ? (
+                                          <div className="col-span-2 text-center py-10">
+                                                <p className="text-gray-400">Loading categorized treatments...</p>
+                                          </div>
+                                    ) : services.filter(s => !s.featured).map((service, index) => (
                                           <motion.div
                                                 key={service.id}
                                                 initial={{ opacity: 0, y: 20 }}

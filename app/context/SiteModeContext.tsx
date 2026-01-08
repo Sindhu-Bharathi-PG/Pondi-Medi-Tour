@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname, useRouter } from 'next/navigation';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import WaveTransition from '../components/common/WaveTransition';
 
 export type SiteMode = 'medical' | 'wellness';
 
@@ -17,11 +18,11 @@ const SiteModeContext = createContext<SiteModeContextType | undefined>(undefined
 
 export const SiteModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const [mode, setModeState] = useState<SiteMode>('medical');
+      const [isTransitioning, setIsTransitioning] = useState(false);
+      const [targetMode, setTargetMode] = useState<SiteMode>('medical');
       const router = useRouter();
-      const pathname = usePathname();
 
       useEffect(() => {
-            // Load saved preference
             const saved = localStorage.getItem('siteMode') as SiteMode;
             if (saved && (saved === 'medical' || saved === 'wellness')) {
                   setModeState(saved);
@@ -31,21 +32,19 @@ export const SiteModeProvider: React.FC<{ children: ReactNode }> = ({ children }
       const setMode = (newMode: SiteMode) => {
             setModeState(newMode);
             localStorage.setItem('siteMode', newMode);
-            // Trigger smooth page transition
-            document.documentElement.classList.add('mode-transitioning');
-            setTimeout(() => {
-                  document.documentElement.classList.remove('mode-transitioning');
-            }, 500);
       };
+
+      const handleTransitionComplete = useCallback(() => {
+            setIsTransitioning(false);
+            setModeState(targetMode);
+            localStorage.setItem('siteMode', targetMode);
+            router.push('/');
+      }, [targetMode, router]);
 
       const toggleMode = () => {
             const newMode = mode === 'medical' ? 'wellness' : 'medical';
-            setMode(newMode);
-
-            // Navigate to home page to trigger wave animation
-            if (pathname !== '/') {
-                  router.push('/');
-            }
+            setTargetMode(newMode);
+            setIsTransitioning(true);
       };
 
       return (
@@ -59,6 +58,11 @@ export const SiteModeProvider: React.FC<{ children: ReactNode }> = ({ children }
                   }}
             >
                   {children}
+                  <WaveTransition
+                        isActive={isTransitioning}
+                        targetMode={targetMode}
+                        onComplete={handleTransitionComplete}
+                  />
             </SiteModeContext.Provider>
       );
 };

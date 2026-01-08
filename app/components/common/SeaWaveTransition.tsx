@@ -1,7 +1,7 @@
 "use client";
 
-import { Heart, Leaf, Sparkles, Waves } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Heart, Leaf } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface SeaWaveTransitionProps {
       isActive: boolean;
@@ -14,254 +14,283 @@ const SeaWaveTransition: React.FC<SeaWaveTransitionProps> = ({
       targetMode,
       onComplete
 }) => {
-      const [phase, setPhase] = useState<'hidden' | 'waves-entering' | 'waves-peak' | 'waves-exiting'>('hidden');
-
-      // Generate random foam particles once
-      const foamParticles = useMemo(() =>
-            [...Array(30)].map((_, i) => {
-                  const randomLeft = Math.random() * 100;
-                  const randomDelay = Math.random() * 0.5;
-                  const randomSize = 4 + Math.random() * 8;
-                  const randomDuration = 1 + Math.random() * 1.5;
-                  return {
-                        id: i,
-                        left: randomLeft,
-                        delay: randomDelay,
-                        size: randomSize,
-                        duration: randomDuration,
-                  };
-            }), []
-      );
+      const [phase, setPhase] = useState<'hidden' | 'rising' | 'peak' | 'receding'>('hidden');
+      const onCompleteRef = useRef(onComplete);
 
       useEffect(() => {
-            if (isActive && phase === 'hidden') {
-                  // Wave animation sequence
-                  setPhase('waves-entering');
-
-                  // Waves reach peak
-                  setTimeout(() => setPhase('waves-peak'), 600);
-
-                  // Waves recede
-                  setTimeout(() => setPhase('waves-exiting'), 1400);
-
-                  // Complete transition
-                  setTimeout(() => {
-                        setPhase('hidden');
-                        onComplete();
-                  }, 2200);
-            }
-      }, [isActive, phase, onComplete]);
+            onCompleteRef.current = onComplete;
+      }, [onComplete]);
 
       useEffect(() => {
-            if (!isActive && phase !== 'hidden') {
+            if (!isActive) {
                   setPhase('hidden');
+                  return;
             }
-      }, [isActive, phase]);
+
+            setPhase('rising');
+            const peakTimer = setTimeout(() => setPhase('peak'), 400);
+            const recedeTimer = setTimeout(() => setPhase('receding'), 800);
+            const completeTimer = setTimeout(() => {
+                  setPhase('hidden');
+                  onCompleteRef.current();
+            }, 1200);
+
+            return () => {
+                  clearTimeout(peakTimer);
+                  clearTimeout(recedeTimer);
+                  clearTimeout(completeTimer);
+            };
+      }, [isActive]);
 
       if (phase === 'hidden') return null;
 
       const isWellness = targetMode === 'wellness';
 
-      // Theme colors
+      // Rich color themes with gradients
       const colors = isWellness
             ? {
-                  sky: 'from-orange-400 via-amber-500 to-yellow-400',
-                  wave1: '#f59e0b', // amber-500
-                  wave2: '#d97706', // amber-600
-                  wave3: '#b45309', // amber-700
-                  wave4: '#92400e', // amber-800
-                  foam: 'rgba(255, 237, 213, 0.8)', // orange-100
-                  accent: 'text-amber-200',
-                  iconBg: 'from-amber-400 to-orange-500',
+                  wave1: '#f59e0b', wave2: '#d97706', wave3: '#b45309', wave4: '#92400e',
+                  outline1: '#fcd34d', outline2: '#fbbf24', outline3: '#f59e0b', outline4: '#d97706',
+                  glow: '#fef3c7', foam: '#fffbeb', accent: 'from-amber-400 to-orange-500'
             }
             : {
-                  sky: 'from-emerald-400 via-green-500 to-teal-500',
-                  wave1: '#10b981', // emerald-500
-                  wave2: '#059669', // emerald-600
-                  wave3: '#047857', // emerald-700
-                  wave4: '#065f46', // emerald-800
-                  foam: 'rgba(209, 250, 229, 0.8)', // emerald-100
-                  accent: 'text-emerald-200',
-                  iconBg: 'from-emerald-400 to-green-500',
+                  wave1: '#14b8a6', wave2: '#0d9488', wave3: '#0f766e', wave4: '#115e59',
+                  outline1: '#5eead4', outline2: '#2dd4bf', outline3: '#14b8a6', outline4: '#0d9488',
+                  glow: '#ccfbf1', foam: '#f0fdfa', accent: 'from-teal-400 to-emerald-500'
             };
 
-      // Animation states
-      const isEntering = phase === 'waves-entering';
-      const isPeak = phase === 'waves-peak';
-      const isExiting = phase === 'waves-exiting';
+      const isRising = phase === 'rising';
+      const isPeak = phase === 'peak';
+      const isReceding = phase === 'receding';
+
+      // Wave paths with realistic curves
+      const wave1Path = "M0,100 C120,60 240,140 360,100 C480,60 600,140 720,100 C840,60 960,140 1080,100 C1200,60 1320,140 1440,100 L1440,400 L0,400 Z";
+      const wave2Path = "M0,120 C100,80 200,160 300,120 C400,80 500,160 600,120 C700,80 800,160 900,120 C1000,80 1100,160 1200,120 C1300,80 1400,160 1440,140 L1440,400 L0,400 Z";
+      const wave3Path = "M0,140 C80,100 160,180 240,140 C320,100 400,180 480,140 C560,100 640,180 720,140 C800,100 880,180 960,140 C1040,100 1120,180 1200,140 C1280,100 1360,180 1440,150 L1440,400 L0,400 Z";
+      const wave4Path = "M0,160 C60,130 120,190 180,160 C240,130 300,190 360,160 C420,130 480,190 540,160 C600,130 660,190 720,160 C780,130 840,190 900,160 C960,130 1020,190 1080,160 C1140,130 1200,190 1260,160 C1320,130 1380,190 1440,170 L1440,400 L0,400 Z";
+
+      // Outline paths (just the top edge)
+      const outline1Path = "M0,100 C120,60 240,140 360,100 C480,60 600,140 720,100 C840,60 960,140 1080,100 C1200,60 1320,140 1440,100";
+      const outline2Path = "M0,120 C100,80 200,160 300,120 C400,80 500,160 600,120 C700,80 800,160 900,120 C1000,80 1100,160 1200,120 C1300,80 1400,160 1440,140";
+      const outline3Path = "M0,140 C80,100 160,180 240,140 C320,100 400,180 480,140 C560,100 640,180 720,140 C800,100 880,180 960,140 C1040,100 1120,180 1200,140 C1280,100 1360,180 1440,150";
+      const outline4Path = "M0,160 C60,130 120,190 180,160 C240,130 300,190 360,160 C420,130 480,190 540,160 C600,130 660,190 720,160 C780,130 840,190 900,160 C960,130 1020,190 1080,160 C1140,130 1200,190 1260,160 C1320,130 1380,190 1440,170";
+
+      const getTransform = (delay: number) => {
+            const base = isRising ? 100 : isPeak ? 0 : -100;
+            return `translateY(${base}%)`;
+      };
 
       return (
             <div className="fixed inset-0 z-[9999] overflow-hidden">
-                  {/* Sky/Background gradient */}
+                  {/* Background overlay */}
                   <div
-                        className={`absolute inset-0 bg-gradient-to-b ${colors.sky} transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'
-                              }`}
+                        className="absolute inset-0 transition-opacity duration-500"
+                        style={{
+                              background: `linear-gradient(to bottom, ${colors.wave4}ee 0%, ${colors.wave3}dd 100%)`,
+                              opacity: isPeak || isReceding ? 1 : 0.8,
+                        }}
                   />
 
-                  {/* Animated sun/glow behind waves */}
-                  <div
-                        className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl transition-all duration-700 ${isWellness ? 'bg-yellow-300/60' : 'bg-emerald-300/40'
-                              } ${isPeak || isExiting ? 'scale-150 opacity-30' : 'scale-100 opacity-60'}`}
-                  />
-
-                  {/* Wave Layer 4 (Back - darkest) */}
+                  {/* Wave Layer 4 - Back (slowest) */}
                   <svg
-                        className={`absolute bottom-0 w-full transition-transform duration-700 ease-out ${isEntering ? 'translate-y-full' :
-                              isExiting ? 'translate-y-full' : 'translate-y-0'
-                              }`}
-                        style={{ transitionDelay: isEntering ? '0ms' : '300ms', height: '120vh' }}
-                        viewBox="0 0 1440 320"
+                        className="absolute bottom-0 w-full"
+                        style={{
+                              height: '70vh',
+                              transform: getTransform(0),
+                              transition: 'transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)',
+                        }}
+                        viewBox="0 0 1440 400"
                         preserveAspectRatio="none"
                   >
+                        <path fill={colors.wave4} d={wave4Path} />
                         <path
-                              fill={colors.wave4}
-                              d="M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,181.3C672,171,768,181,864,186.7C960,192,1056,192,1152,181.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-                              className="wave-animate-slow"
+                              d={outline4Path}
+                              fill="none"
+                              stroke={colors.outline4}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              opacity="0.8"
+                        />
+                        {/* Foam highlight */}
+                        <path
+                              d={outline4Path}
+                              fill="none"
+                              stroke={colors.foam}
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              opacity="0.4"
+                              strokeDasharray="20,30"
                         />
                   </svg>
 
                   {/* Wave Layer 3 */}
                   <svg
-                        className={`absolute bottom-0 w-full transition-transform duration-600 ease-out ${isEntering ? 'translate-y-full' :
-                              isExiting ? 'translate-y-full' : 'translate-y-0'
-                              }`}
-                        style={{ transitionDelay: isEntering ? '100ms' : '200ms', height: '120vh' }}
-                        viewBox="0 0 1440 320"
+                        className="absolute bottom-0 w-full"
+                        style={{
+                              height: '60vh',
+                              transform: getTransform(50),
+                              transition: 'transform 0.45s cubic-bezier(0.33, 1, 0.68, 1)',
+                              transitionDelay: '0.05s',
+                        }}
+                        viewBox="0 0 1440 400"
                         preserveAspectRatio="none"
                   >
+                        <path fill={colors.wave3} d={wave3Path} />
                         <path
-                              fill={colors.wave3}
-                              d="M0,224L60,213.3C120,203,240,181,360,181.3C480,181,600,203,720,218.7C840,235,960,245,1080,234.7C1200,224,1320,192,1380,176L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
-                              className="wave-animate-medium"
+                              d={outline3Path}
+                              fill="none"
+                              stroke={colors.outline3}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              opacity="0.9"
+                        />
+                        <path
+                              d={outline3Path}
+                              fill="none"
+                              stroke={colors.foam}
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              opacity="0.5"
+                              strokeDasharray="15,25"
                         />
                   </svg>
 
                   {/* Wave Layer 2 */}
                   <svg
-                        className={`absolute bottom-0 w-full transition-transform duration-500 ease-out ${isEntering ? 'translate-y-full' :
-                              isExiting ? 'translate-y-full' : 'translate-y-0'
-                              }`}
-                        style={{ transitionDelay: isEntering ? '200ms' : '100ms', height: '120vh' }}
-                        viewBox="0 0 1440 320"
+                        className="absolute bottom-0 w-full"
+                        style={{
+                              height: '50vh',
+                              transform: getTransform(100),
+                              transition: 'transform 0.4s cubic-bezier(0.33, 1, 0.68, 1)',
+                              transitionDelay: '0.1s',
+                        }}
+                        viewBox="0 0 1440 400"
                         preserveAspectRatio="none"
                   >
+                        <path fill={colors.wave2} d={wave2Path} />
                         <path
-                              fill={colors.wave2}
-                              d="M0,256L48,261.3C96,267,192,277,288,266.7C384,256,480,224,576,224C672,224,768,256,864,261.3C960,267,1056,245,1152,234.7C1248,224,1344,224,1392,224L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-                              className="wave-animate-fast"
+                              d={outline2Path}
+                              fill="none"
+                              stroke={colors.outline2}
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                        />
+                        <path
+                              d={outline2Path}
+                              fill="none"
+                              stroke={colors.foam}
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              opacity="0.6"
+                              strokeDasharray="10,20"
                         />
                   </svg>
 
-                  {/* Wave Layer 1 (Front - lightest with foam) */}
+                  {/* Wave Layer 1 - Front (fastest) */}
                   <svg
-                        className={`absolute bottom-0 w-full transition-transform duration-500 ease-out ${isEntering ? 'translate-y-full' :
-                              isExiting ? 'translate-y-full' : 'translate-y-0'
-                              }`}
-                        style={{ transitionDelay: isEntering ? '300ms' : '0ms', height: '120vh' }}
-                        viewBox="0 0 1440 320"
+                        className="absolute bottom-0 w-full"
+                        style={{
+                              height: '40vh',
+                              transform: getTransform(150),
+                              transition: 'transform 0.35s cubic-bezier(0.33, 1, 0.68, 1)',
+                              transitionDelay: '0.15s',
+                        }}
+                        viewBox="0 0 1440 400"
                         preserveAspectRatio="none"
                   >
+                        {/* Glow effect behind the wave */}
+                        <defs>
+                              <filter id="glow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                    <feMerge>
+                                          <feMergeNode in="coloredBlur" />
+                                          <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                              </filter>
+                        </defs>
+                        <path fill={colors.wave1} d={wave1Path} />
+                        {/* Main outline with glow */}
                         <path
-                              fill={colors.wave1}
-                              d="M0,288L40,277.3C80,267,160,245,240,250.7C320,256,400,288,480,288C560,288,640,256,720,245.3C800,235,880,245,960,261.3C1040,277,1120,299,1200,293.3C1280,288,1360,256,1400,240L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"
+                              d={outline1Path}
+                              fill="none"
+                              stroke={colors.outline1}
+                              strokeWidth="5"
+                              strokeLinecap="round"
+                              filter="url(#glow)"
                         />
-                        {/* Foam effect on top of wave */}
+                        {/* White foam on top */}
                         <path
-                              fill={colors.foam}
-                              d="M0,288L40,277.3C80,267,160,245,240,250.7C320,256,400,288,480,288C560,288,640,256,720,245.3C800,235,880,245,960,261.3C1040,277,1120,299,1200,293.3C1280,288,1360,256,1400,240L1440,224L1440,234L1400,250C1360,266,1280,298,1200,303.3C1120,309,1040,287,960,271.3C880,255,800,245,720,255.3C640,266,560,298,480,298C400,298,320,266,240,260.7C160,255,80,277,40,287.3L0,298Z"
-                              className="animate-pulse"
-                              style={{ opacity: 0.6 }}
+                              d={outline1Path}
+                              fill="none"
+                              stroke={colors.foam}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              opacity="0.7"
+                        />
+                        {/* Foam dots */}
+                        <path
+                              d={outline1Path}
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              opacity="0.5"
+                              strokeDasharray="5,15"
                         />
                   </svg>
 
-                  {/* Foam particles/bubbles */}
-                  <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isPeak ? 'opacity-100' : 'opacity-0'
-                        }`}>
-                        {foamParticles.map((particle) => {
-                              const randomBottom = 30 + Math.random() * 20;
-                              return (
-                                    <div
-                                          key={particle.id}
-                                          className="absolute rounded-full animate-bounce"
-                                          style={{
-                                                left: `${particle.left}%`,
-                                                bottom: `${randomBottom}%`,
-                                                width: `${particle.size}px`,
-                                                height: `${particle.size}px`,
-                                                background: colors.foam,
-                                                animationDelay: `${particle.delay}s`,
-                                          animationDuration: `${particle.duration}s`,
-                                          opacity: 0.7,
-                                    }}
-                              />
-                        );
-                        })}
-                  </div>
-
-                  {/* Sparkle effects */}
-                  <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isPeak ? 'opacity-100' : 'opacity-0'
-                        }`}>
-                        {[...Array(8)].map((_, i) => {
-                              const randomLeft = 10 + Math.random() * 80;
-                              const randomTop = 20 + Math.random() * 40;
-                              return (
-                                    <Sparkles
-                                          key={i}
-                                          className={`absolute ${colors.accent} animate-ping`}
-                                          style={{
-                                                left: `${randomLeft}%`,
-                                                top: `${randomTop}%`,
-                                                animationDelay: `${i * 0.15}s`,
-                                          opacity: 0.6,
-                                    }}
-                                    size={16 + Math.random() * 16}
-                              />
-                        );
-                        })}
-                  </div>
-
-                  {/* Center Content */}
+                  {/* Floating foam bubbles */}
                   <div
-                        className={`absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-500 ${isPeak ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                              }`}
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ opacity: isPeak ? 1 : 0, transition: 'opacity 0.3s' }}
                   >
-                        {/* Animated Icon */}
-                        <div className={`relative mb-6 p-6 rounded-full bg-gradient-to-br ${colors.iconBg} shadow-2xl`}>
-                              <div className="absolute inset-0 rounded-full animate-ping opacity-30 bg-white" />
+                        {[...Array(12)].map((_, i) => (
+                              <div
+                                    key={i}
+                                    className="absolute rounded-full animate-bounce"
+                                    style={{
+                                          width: 4 + Math.random() * 8 + 'px',
+                                          height: 4 + Math.random() * 8 + 'px',
+                                          backgroundColor: colors.foam,
+                                          border: `1px solid ${colors.outline1}`,
+                                          left: 5 + i * 8 + '%',
+                                          top: 30 + Math.random() * 30 + '%',
+                                          opacity: 0.6 + Math.random() * 0.4,
+                                          animationDelay: `${i * 0.1}s`,
+                                          animationDuration: '1s',
+                                    }}
+                              />
+                        ))}
+                  </div>
+
+                  {/* Center content */}
+                  <div
+                        className="absolute inset-0 flex flex-col items-center justify-center z-20"
+                        style={{
+                              opacity: isPeak ? 1 : 0,
+                              transform: isPeak ? 'scale(1)' : 'scale(0.9)',
+                              transition: 'all 0.3s ease-out',
+                        }}
+                  >
+                        <div
+                              className={`mb-4 p-5 rounded-full bg-gradient-to-br ${colors.accent} shadow-2xl`}
+                              style={{
+                                    boxShadow: `0 0 40px ${colors.glow}, 0 0 80px ${colors.wave1}44`,
+                              }}
+                        >
                               {isWellness ? (
-                                    <Leaf className="w-12 h-12 text-white relative z-10" />
+                                    <Leaf className="w-10 h-10 text-white drop-shadow-lg" />
                               ) : (
-                                    <Heart className="w-12 h-12 text-white relative z-10 animate-pulse" />
+                                    <Heart className="w-10 h-10 text-white drop-shadow-lg" />
                               )}
                         </div>
-
-                        {/* Title */}
-                        <h1 className="text-4xl md:text-6xl font-bold text-white text-center drop-shadow-lg mb-3">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                               {isWellness ? 'Wellness Mode' : 'Medical Mode'}
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className={`text-lg md:text-xl ${colors.accent} text-center max-w-md`}>
-                              {isWellness
-                                    ? '🌊 Ride the waves of serenity'
-                                    : '🏥 Dive into world-class healthcare'
-                              }
+                        </h2>
+                        <p className="text-white/80 mt-2 text-lg">
+                              {isWellness ? '🌿 Embrace holistic healing' : '🏥 World-class healthcare'}
                         </p>
-
-                        {/* Wave icon animation */}
-                        <div className="mt-6 flex items-center gap-2">
-                              <Waves className={`w-6 h-6 ${colors.accent} animate-bounce`} style={{ animationDelay: '0s' }} />
-                              <Waves className={`w-8 h-8 ${colors.accent} animate-bounce`} style={{ animationDelay: '0.1s' }} />
-                              <Waves className={`w-6 h-6 ${colors.accent} animate-bounce`} style={{ animationDelay: '0.2s' }} />
-                        </div>
                   </div>
-
-                  {/* Bottom gradient fade for smooth transition */}
-                  <div
-                        className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t ${isWellness ? 'from-amber-800' : 'from-teal-800'
-                              } to-transparent transition-opacity duration-300 ${isExiting ? 'opacity-100' : 'opacity-0'
-                              }`}
-                  />
             </div>
       );
 };

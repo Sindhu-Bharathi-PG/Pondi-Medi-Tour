@@ -1,21 +1,21 @@
-const analyticsController = require('../controllers/analyticsController');
+const { adminAuth } = require('../../../middleware/adminAuth');
+const {
+  logEvent,
+  getAnalyticsSummary,
+  getAnalyticsLogs
+} = require('../controllers/analyticsLogController');
 
-module.exports = async function (fastify, opts) {
-  // Analytics stats
-  fastify.get('/analytics/stats', {
-    preHandler: fastify.authenticate,
-    handler: analyticsController.getStats
-  });
+async function analyticsRoutes(fastify, options) {
+  // Public endpoint for logging events (no auth required)
+  fastify.post('/event', logEvent);
 
-  // Top hospitals
-  fastify.get('/analytics/top-hospitals', {
-    preHandler: fastify.authenticate,
-    handler: analyticsController.getTopHospitals
-  });
+  // Protected routes for viewing analytics (admin only)
+  fastify.register(async function (protectedRoutes) {
+    protectedRoutes.addHook('onRequest', adminAuth);
 
-  // Activity feed
-  fastify.get('/analytics/activity', {
-    preHandler: fastify.authenticate,
-    handler: analyticsController.getActivityFeed
+    protectedRoutes.get('/summary', getAnalyticsSummary);
+    protectedRoutes.get('/logs', getAnalyticsLogs);
   });
-};
+}
+
+module.exports = analyticsRoutes;

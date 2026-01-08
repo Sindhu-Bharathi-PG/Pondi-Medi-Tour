@@ -1,12 +1,13 @@
 "use client";
 
+import { API_BASE } from '@/app/hooks/useApi';
 import { motion } from 'framer-motion';
 import { Award, Building2, ChevronRight, Globe, MapPin, Phone, Search, Shield, Star, Stethoscope, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Footer, Header } from '../components/common';
-import { hospitals } from '../data/hospitals';
+import { Hospital, hospitals as staticHospitals } from '../data/hospitals';
 
 const filters = [
       { id: 'all', label: 'All Hospitals', icon: Building2 },
@@ -16,9 +17,80 @@ const filters = [
       { id: 'Educational', label: 'Teaching Hospitals', icon: Globe },
 ];
 
+// Helper to transform DB hospital to match static Hospital interface
+const transformDbHospital = (dbHospital: any): Hospital => ({
+      id: dbHospital.id,
+      name: dbHospital.name,
+      fullName: dbHospital.name,
+      slug: dbHospital.slug || `hospital-${dbHospital.id}`,
+      image: dbHospital.gallery?.[0] || dbHospital.coverUrl || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
+      heroImage: dbHospital.coverUrl || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600',
+      gallery: dbHospital.gallery || [],
+      rating: 4.5,
+      reviewsRating: 100,
+      specialties: dbHospital.specializedCenters || ['General Medicine'],
+      serviceSlugs: [],
+      accreditation: dbHospital.accreditations || [],
+      location: dbHospital.location?.city ? `${dbHospital.location.city}, ${dbHospital.location.state || 'India'}` : 'Pondicherry',
+      established: dbHospital.establishmentYear || 2000,
+      beds: dbHospital.infrastructure?.beds || 100,
+      type: dbHospital.type || 'Private',
+      featured: dbHospital.status === 'active',
+      tagline: dbHospital.shortDescription || 'Quality Healthcare',
+      description: dbHospital.shortDescription || dbHospital.fullDescription || '',
+      about: dbHospital.fullDescription || '',
+      highlights: [],
+      equipment: [],
+      facilities: dbHospital.infrastructure?.facilities || [],
+      internationalPatients: dbHospital.internationalServices?.patientsServed || '100+',
+      successRate: '95%',
+      contact: {
+            phone: dbHospital.phone || '',
+            emergency: dbHospital.emergencyPhone || '',
+            email: dbHospital.email || '',
+            website: dbHospital.website || '',
+      }
+});
+
 const HospitalPage = () => {
       const [activeFilter, setActiveFilter] = useState('all');
       const [searchQuery, setSearchQuery] = useState('');
+      const [hospitals, setHospitals] = useState<Hospital[]>(staticHospitals);
+      const [loading, setLoading] = useState(true);
+
+      // Fetch hospitals from API
+      useEffect(() => {
+            const fetchHospitals = async (retryCount = 0) => {
+                  try {
+                        const res = await fetch(`${API_BASE}/api/hospitals`);
+                        if (res.ok) {
+                              const dbHospitals = await res.json();
+                              const hospitalList = Array.isArray(dbHospitals) ? dbHospitals : (dbHospitals.hospitals || []);
+
+                              // Filter active/approved hospitals and transform
+                              const activeDbHospitals = hospitalList
+                                    .filter((h: any) => h.status === 'active' || h.status === 'approved')
+                                    .map(transformDbHospital);
+
+                              // Merge: DB hospitals first, then static ones that aren't duplicates
+                              const dbIds = new Set(activeDbHospitals.map((h: Hospital) => h.id));
+                              const uniqueStatic = staticHospitals.filter(h => !dbIds.has(h.id));
+                              setHospitals([...activeDbHospitals, ...uniqueStatic]);
+                        } else if (retryCount < 2) {
+                              setTimeout(() => fetchHospitals(retryCount + 1), 1000);
+                              return;
+                        }
+                  } catch (error) {
+                        console.error('Failed to fetch hospitals:', error);
+                        if (retryCount < 2) {
+                              setTimeout(() => fetchHospitals(retryCount + 1), 1000);
+                              return;
+                        }
+                  }
+                  setLoading(false);
+            };
+            fetchHospitals();
+      }, []);
 
       const filteredHospitals = hospitals.filter(h => {
             const matchesFilter = activeFilter === 'all' || h.type === activeFilter;
@@ -29,9 +101,6 @@ const HospitalPage = () => {
       });
 
       const featuredHospitals = filteredHospitals.filter(h => h.featured);
-      // If we filter, we show all matching as "All Hospitals" below, keeping featured ones at top if needed or just separate.
-      // The design has a "Featured" section and an "All" section. 
-      // Let's show only featured in the top section (if they match filter) and ALL matching in the bottom section.
 
 
       return (

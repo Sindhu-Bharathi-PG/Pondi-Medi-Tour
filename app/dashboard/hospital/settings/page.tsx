@@ -31,6 +31,7 @@ export default function SettingsPage() {
         dailySummary: false,
         marketingEmails: false
     });
+    const [notificationsSaved, setNotificationsSaved] = useState(false);
 
     // Fetch hospital profile
     const { data: profile, loading, error, refetch } = useApi<any>({
@@ -49,6 +50,27 @@ export default function SettingsPage() {
             });
         }
     }, [profile]);
+
+    // Load notification preferences from localStorage (or could be backend)
+    useEffect(() => {
+        const saved = localStorage.getItem('hospital_notification_prefs');
+        if (saved) {
+            try {
+                setNotifications(JSON.parse(saved));
+            } catch { }
+        }
+    }, []);
+
+    // Save notification preferences
+    const handleSaveNotifications = () => {
+        localStorage.setItem('hospital_notification_prefs', JSON.stringify(notifications));
+        setNotificationsSaved(true);
+        setSaveSuccess(true);
+        setTimeout(() => {
+            setNotificationsSaved(false);
+            setSaveSuccess(false);
+        }, 3000);
+    };
 
     const handleSaveAccount = async () => {
         setSaving(true);
@@ -337,6 +359,17 @@ export default function SettingsPage() {
                                                     </div>
                                                 ))}
                                             </div>
+                                        </div>
+
+                                        {/* Save Button */}
+                                        <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                            <button
+                                                onClick={handleSaveNotifications}
+                                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all"
+                                            >
+                                                <Save className="w-4 h-4" />
+                                                Save Preferences
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

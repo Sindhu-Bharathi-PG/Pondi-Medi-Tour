@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
+import SuperAdminShell from './components/SuperAdminShell';
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
@@ -27,5 +28,5 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         );
     }
 
-    return <div className="min-h-screen bg-slate-50 p-4 lg:p-8">{children}</div>;
+    return <SuperAdminShell>{children}</SuperAdminShell>;
 }

@@ -252,6 +252,31 @@ fastify.register(require('./modules/cms/routes/cmsRoutes'), { prefix: '/api/cms'
 fastify.register(require('./modules/upload/routes/uploadRoutes'), { prefix: '/api' });
 
 // ============================================
+// NEW FEATURE ROUTES
+// ============================================
+
+// Notifications (auth required inside module)
+fastify.register(require('./modules/notifications/routes/notificationRoutes'), { prefix: '/api/notifications' });
+
+// Activity Logs (admin auth inside module)
+fastify.register(require('./modules/admin/routes/activityLogRoutes'), { prefix: '/api/admin/activity-logs' });
+
+// Approval Queue (admin auth inside module)
+fastify.register(require('./modules/admin/routes/approvalRoutes'), { prefix: '/api/admin/approvals' });
+
+// Media Library (admin auth inside module)
+fastify.register(require('./modules/admin/routes/mediaRoutes'), { prefix: '/api/admin/media' });
+
+// Appointments (auth inside module)
+fastify.register(require('./modules/appointments/routes/appointmentRoutes'), { prefix: '/api/appointments' });
+
+// Doctors (public browsing)
+fastify.register(require('./modules/doctors/routes/doctorRoutes'), { prefix: '/api/doctors' });
+
+// Treatments (public browsing)
+fastify.register(require('./modules/treatments/routes/treatmentRoutes'), { prefix: '/api/treatments' });
+
+// ============================================
 // ERROR HANDLERS
 // ============================================
 
