@@ -1,12 +1,16 @@
 "use client";
 
-import React from 'react';
+import {
+      CheckCircle,
+      ChevronRight,
+      Clock,
+      Heart, Leaf, MapPin,
+      Sparkles,
+      Star, Sun,
+      Users
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-      ChevronRight, Heart, Leaf, MapPin, Star, Sun,
-      Clock, CheckCircle, Users, Sparkles, Waves, Calendar
-} from 'lucide-react';
 import { Footer, Header } from '../components/common';
 import { ConvertedPrice } from '../components/common/ConvertedPrice';
 
@@ -340,12 +344,6 @@ const WellnessPage = () => {
                                           className="bg-white text-amber-600 px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
                                     >
                                           Plan My Wellness Retreat
-                                    </Link>
-                                    <Link
-                                          href="/telemedicine"
-                                          className="bg-white/10 backdrop-blur-md text-white px-8 py-3 rounded-full font-semibold hover:bg-white/20 transition-all duration-300 border border-white/20"
-                                    >
-                                          Free Consultation
                                     </Link>
                               </div>
                         </div>

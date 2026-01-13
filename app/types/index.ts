@@ -78,3 +78,70 @@ export interface SearchState {
       focused: boolean;
       results: string[];
 }
+
+// Hospital types
+export interface Hospital {
+      id: number;
+      name: string;
+      fullName: string;
+      slug: string;
+      image: string;
+      heroImage: string;
+      gallery: string[];
+      rating: number;
+      reviewCount: number;
+      specialties: string[];
+      serviceSlugs: string[];
+      accreditation: string[];
+      location: string;
+      established: number;
+      beds: number;
+      type: string;
+      featured?: boolean;
+      tagline: string;
+      description: string;
+      about: string;
+      highlights: string[];
+      equipment: string[];
+      facilities: string[];
+      internationalPatients?: string;
+      successRate?: string;
+      contact: {
+            phone: string;
+            emergency: string;
+            email: string;
+            website: string;
+      };
+}
+
+// Package types
+export interface Package {
+      id: string;
+      hospitalId?: number;
+      hospitalName?: string;
+      name: string;
+      tagline: string;
+      basePrice: number;
+      duration: string;
+      image: string;
+      color: string;
+      features: string[];
+      includes: {
+            flights: boolean;
+            visa: boolean;
+            insurance: boolean;
+      };
+      popular: boolean;
+}
+
+// Treatment types
+export interface Treatment {
+      id: number;
+      name: string;
+      category: string;
+      shortDescription: string;
+      successRate: string;
+      hospitalName: string;
+      basePrice?: number;
+      duration?: string;
+}

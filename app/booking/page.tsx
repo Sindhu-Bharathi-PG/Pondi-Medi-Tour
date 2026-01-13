@@ -1,12 +1,20 @@
 "use client";
 
 import { CheckCircle, ChevronRight, Clock, FileText, Mail, MapPin, Phone, Shield, Stethoscope, Upload, User } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
 
-const BookingPage = () => {
+function BookingForm() {
       const scrolled = useScrolled(50);
+      const searchParams = useSearchParams();
+
+      // Get hospital context from URL
+      const hospitalId = searchParams.get('hospitalId');
+      const hospitalName = searchParams.get('hospitalName');
+      const inquiryType = searchParams.get('type') || 'general';
+
       const [step, setStep] = useState(1);
       const [formData, setFormData] = useState({ name: '', email: '', phone: '', country: '', treatment: '', message: '' });
       const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -36,16 +44,22 @@ const BookingPage = () => {
                               'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                              // Patient Information (structured)
+                              // Patient Information
                               patientName: formData.name,
                               email: formData.email,
-                              phone: formData.phone, // ✅ Now a separate field
-                              country: formData.country, // ✅ Now a separate field
+                              phone: formData.phone,
+                              country: formData.country,
 
                               // Inquiry Details
-                              treatmentType: formData.treatment, // ✅ Now a separate field
-                              subject: `Inquiry regarding ${formData.treatment}`,
-                              message: formData.message, // ✅ Clean message only
+                              treatmentType: formData.treatment,
+                              subject: hospitalName
+                                    ? `Inquiry for ${hospitalName} - ${formData.treatment}`
+                                    : `Inquiry regarding ${formData.treatment}`,
+                              message: formData.message,
+
+                              // Hospital-specific routing
+                              hospitalId: hospitalId ? parseInt(hospitalId) : null,
+                              inquiryType: inquiryType,
 
                               // Source tracking
                               source: 'website',
@@ -56,9 +70,9 @@ const BookingPage = () => {
                   if (response.ok) {
                         setStep(3);
                   } else {
-                        // Handle error (optional: show toast or alert)
-                        console.error("Failed to submit inquiry");
-                        alert("Something went wrong. Please try again.");
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error("Failed to submit inquiry:", response.status, errorData);
+                        alert(`Submission failed (${response.status}): ${errorData.error || 'Please try again.'}`);
                   }
             } catch (error) {
                   console.error("Error submitting inquiry:", error);
@@ -80,6 +94,13 @@ const BookingPage = () => {
                               </nav>
 
                               <div className="max-w-4xl">
+                                    {hospitalName && (
+                                          <div className="bg-blue-500/20 backdrop-blur-sm border border-blue-300/30 rounded-lg px-4 py-3 mb-6">
+                                                <p className="text-white/90 text-sm">
+                                                      📍 Booking inquiry for: <strong className="text-white font-semibold">{decodeURIComponent(hospitalName)}</strong>
+                                                </p>
+                                          </div>
+                                    )}
                                     <div className="gov-seal mb-6">
                                           <span>Free Consultation • No Obligations</span>
                                     </div>
@@ -267,6 +288,13 @@ const BookingPage = () => {
                   <Footer />
             </div>
       );
-};
+}
 
-export default BookingPage;
+// Wrap in Suspense to handle useSearchParams
+export default function BookingPage() {
+      return (
+            <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+                  <BookingForm />
+            </Suspense>
+      );
+}

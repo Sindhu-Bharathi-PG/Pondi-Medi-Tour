@@ -1,258 +1,85 @@
 "use client";
 
+import { API_BASE } from '@/app/hooks/useApi';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Award, Building2, Calendar, ChevronRight, Clock, Globe, GraduationCap, Heart, Languages, MapPin, Star, Stethoscope, TrendingUp, User, Users } from 'lucide-react';
+import { ArrowLeft, Award, Building2, ChevronRight, Clock, Globe, GraduationCap, Languages, Star, Stethoscope, TrendingUp, User, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Header, Footer } from '../../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../../components/common';
 
-// Doctor data - This should match the listing page
-const doctorData: Record<string, any> = {
-      '1': {
-            id: 1,
-            name: 'Dr. V. Veerappan',
-            image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800',
-            specialty: 'Orthopedics',
-            serviceSlug: 'orthopedics',
-            subSpecialty: 'Spine & Joint Replacement',
-            credentials: 'MBBS, MS (Orthopaedics), FRCS (Glasgow)',
-            experience: '31+ years',
-            hospital: 'POSH Hospital',
-            hospitalId: '1',
-            rating: 4.9,
-            reviews: 450,
-            surgeries: 5000,
-            languages: ['English', 'Tamil', 'Hindi'],
-            education: [
-                  { degree: 'MBBS', institution: 'Madras Medical College', year: '1990' },
-                  { degree: 'MS Orthopaedics', institution: 'CMC Vellore', year: '1994' },
-                  { degree: 'FRCS', institution: 'Royal College, Glasgow, UK', year: '1998' },
-            ],
-            bio: 'Dr. V. Veerappan is a pioneer in minimally invasive spine surgery with over three decades of experience. He has performed over 5,000 successful surgeries and is known for his expertise in complex joint replacements and revision surgeries. Trained at prestigious institutions in India and the UK, he brings international best practices to patient care.',
-            expertise: [
-                  'Total Knee Replacement',
-                  'Hip Replacement Surgery',
-                  'Spine Surgery',
-                  'Revision Joint Surgery',
-                  'Sports Medicine',
-                  'Arthroscopic Surgery',
-            ],
-            awards: [
-                  'Best Orthopedic Surgeon Award - 2019',
-                  'Excellence in Spine Surgery - 2017',
-                  'Distinguished Alumni Award - CMC Vellore',
-            ],
-            publications: 45,
-            internationalTraining: ['UK', 'USA', 'Germany'],
-            consultationTimings: 'Mon-Sat: 9:00 AM - 1:00 PM, 4:00 PM - 7:00 PM',
-            featured: true,
-            available: true,
-      },
-      '2': {
-            id: 2,
-            name: 'Dr. V. M. Thomas',
-            image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800',
-            specialty: 'IVF & Fertility',
-            serviceSlug: 'ivf',
-            subSpecialty: 'Reproductive Medicine',
-            credentials: 'PhD, FSAB (Reproductive Biotechnology)',
-            experience: '25+ years',
-            hospital: 'Indira IVF Centre',
-            hospitalId: '2',
-            rating: 4.9,
-            reviews: 680,
-            surgeries: 10000,
-            languages: ['English', 'Malayalam', 'Tamil'],
-            education: [
-                  { degree: 'PhD', institution: 'IISc Bangalore', year: '1995' },
-                  { degree: 'FSAB', institution: 'European Society of Human Reproduction', year: '2000' },
-            ],
-            bio: 'Dr. V. M. Thomas is a renowned embryologist with thousands of successful IVF cycles worldwide. His groundbreaking research in reproductive biotechnology has helped countless couples achieve their dream of parenthood. He is a sought-after speaker at international fertility conferences.',
-            expertise: [
-                  'In Vitro Fertilization (IVF)',
-                  'Intracytoplasmic Sperm Injection (ICSI)',
-                  'Embryo Cryopreservation',
-                  'Preimplantation Genetic Testing',
-                  'Fertility Preservation',
-                  'Donor Programs',
-            ],
-            awards: [
-                  'Pioneer in IVF Technology Award - 2020',
-                  'Best Embryologist - National Fertility Summit',
-                  'Lifetime Achievement - Reproductive Medicine',
-            ],
-            publications: 78,
-            internationalTraining: ['Belgium', 'Spain', 'Australia'],
-            consultationTimings: 'Mon-Fri: 10:00 AM - 2:00 PM, 5:00 PM - 8:00 PM',
-            featured: true,
-            available: true,
-      },
-      '3': {
-            id: 3,
-            name: 'Dr. Ramya R',
-            image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800',
-            specialty: 'IVF & Fertility',
-            serviceSlug: 'ivf',
-            subSpecialty: 'Infertility Consultant',
-            credentials: 'MBBS, DGO, FRM',
-            experience: '11+ years',
-            hospital: 'Indira IVF Centre',
-            hospitalId: '2',
-            rating: 4.8,
-            reviews: 320,
-            surgeries: 2500,
-            languages: ['English', 'Tamil', 'Hindi'],
-            education: [
-                  { degree: 'MBBS', institution: 'Stanley Medical College', year: '2010' },
-                  { degree: 'DGO', institution: 'Govt General Hospital', year: '2013' },
-                  { degree: 'FRM', institution: 'National University Singapore', year: '2016' },
-            ],
-            bio: 'Dr. Ramya R is a passionate fertility specialist dedicated to making parenthood dreams come true. With specialized training from Singapore, she brings a compassionate approach combined with cutting-edge fertility treatments. Her patient-centric care has earned her excellent reviews.',
-            expertise: [
-                  'IVF & IUI Treatments',
-                  'Ovulation Induction',
-                  'Laparoscopic Fertility Surgery',
-                  'PCOS Management',
-                  'Recurrent Pregnancy Loss',
-                  'Male Infertility Treatment',
-            ],
-            awards: [
-                  'Young Fertility Specialist Award - 2021',
-                  'Patient Choice Award - 2022',
-            ],
-            publications: 12,
-            internationalTraining: ['Singapore', 'Japan'],
-            consultationTimings: 'Mon-Sat: 9:00 AM - 5:00 PM',
-            featured: true,
-            available: true,
-      },
-      '4': {
-            id: 4,
-            name: 'Dr. Suresh Kumar',
-            image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800',
-            specialty: 'Cardiology',
-            serviceSlug: 'cardiology',
-            subSpecialty: 'Interventional Cardiology',
-            credentials: 'DM Cardiology, FACC (USA)',
-            experience: '18+ years',
-            hospital: 'JIPMER',
-            hospitalId: '1',
-            rating: 4.9,
-            reviews: 520,
-            surgeries: 4000,
-            languages: ['English', 'Tamil', 'Telugu'],
-            education: [
-                  { degree: 'MBBS', institution: 'JIPMER Pondicherry', year: '2002' },
-                  { degree: 'DM Cardiology', institution: 'AIIMS New Delhi', year: '2008' },
-                  { degree: 'Fellowship', institution: 'Cleveland Clinic, USA', year: '2011' },
-            ],
-            bio: 'Dr. Suresh Kumar is a Cleveland Clinic trained interventional cardiologist specializing in complex angioplasty and structural heart disease. His expertise in treating complex cardiac conditions has saved thousands of lives across South India.',
-            expertise: [
-                  'Complex Angioplasty',
-                  'TAVI/TAVR Procedures',
-                  'Structural Heart Interventions',
-                  'Pacemaker Implantation',
-                  'Heart Failure Management',
-                  'Preventive Cardiology',
-            ],
-            awards: [
-                  'Excellence in Interventional Cardiology - 2022',
-                  'Best Cardiologist - Tamil Nadu State Award',
-            ],
-            publications: 56,
-            internationalTraining: ['USA', 'Germany', 'France'],
-            consultationTimings: 'Mon-Fri: 8:00 AM - 4:00 PM',
-            featured: false,
-            available: true,
-      },
-      '5': {
-            id: 5,
-            name: 'Dr. Priya Sharma',
-            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800',
-            specialty: 'Gastroenterology',
-            serviceSlug: 'gastroenterology',
-            subSpecialty: 'Bariatric Surgery',
-            credentials: 'MS, MCh, FAIS',
-            experience: '15+ years',
-            hospital: 'GEM Hospital',
-            hospitalId: '2',
-            rating: 4.8,
-            reviews: 380,
-            surgeries: 3200,
-            languages: ['English', 'Hindi', 'Tamil'],
-            education: [
-                  { degree: 'MBBS', institution: 'Maulana Azad Medical College', year: '2005' },
-                  { degree: 'MS', institution: 'PGI Chandigarh', year: '2009' },
-                  { degree: 'MCh', institution: 'GEM Hospital', year: '2012' },
-            ],
-            bio: 'Dr. Priya Sharma is a leading bariatric surgeon with expertise in laparoscopic and robotic procedures. She has transformed the lives of thousands through weight loss surgery and metabolic disease treatment.',
-            expertise: [
-                  'Bariatric Surgery',
-                  'Laparoscopic Surgery',
-                  'Robotic Surgery',
-                  'Metabolic Surgery for Diabetes',
-                  'Revision Bariatric Surgery',
-                  'Hernia Repair',
-            ],
-            awards: [
-                  'Best Bariatric Surgeon - North India 2021',
-                  'Innovation in Surgical Techniques Award',
-            ],
-            publications: 34,
-            internationalTraining: ['USA', 'South Korea'],
-            consultationTimings: 'Mon-Sat: 10:00 AM - 6:00 PM',
-            featured: false,
-            available: true,
-      },
-      '6': {
-            id: 6,
-            name: 'Dr. Aravind Mohan',
-            image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=800',
-            specialty: 'Ophthalmology',
-            serviceSlug: 'ophthalmology',
-            subSpecialty: 'Cataract & Retina',
-            credentials: 'MS, DNB, FICO',
-            experience: '20+ years',
-            hospital: 'Aravind Eye Hospital',
-            hospitalId: '1',
-            rating: 4.9,
-            reviews: 890,
-            surgeries: 15000,
-            languages: ['English', 'Tamil', 'Malayalam'],
-            education: [
-                  { degree: 'MBBS', institution: 'Madras Medical College', year: '2000' },
-                  { degree: 'MS Ophthalmology', institution: 'Aravind Eye Hospital', year: '2004' },
-                  { degree: 'Fellowship', institution: 'Moorfields Eye Hospital, UK', year: '2007' },
-            ],
-            bio: 'Dr. Aravind Mohan is a world-renowned retina specialist with expertise from Moorfields Eye Hospital, UK. With over 15,000 surgeries, he is one of the most experienced eye surgeons in South India.',
-            expertise: [
-                  'Cataract Surgery',
-                  'Retinal Detachment Repair',
-                  'Diabetic Retinopathy Treatment',
-                  'Macular Degeneration',
-                  'Vitrectomy',
-                  'LASIK & Refractive Surgery',
-            ],
-            awards: [
-                  'Excellence in Retinal Surgery - 2020',
-                  'Lifetime Achievement in Ophthalmology',
-                  'Best Eye Surgeon - Healthcare Excellence Awards',
-            ],
-            publications: 89,
-            internationalTraining: ['UK', 'USA', 'Singapore'],
-            consultationTimings: 'Mon-Sat: 8:00 AM - 2:00 PM',
-            featured: false,
-            available: true,
-      },
-};
+interface DoctorDetail {
+      id: number;
+      name: string;
+      imageUrl: string;
+      specialty: string;
+      serviceSlug: string;
+      subSpecialty: string;
+      credentials: string;
+      experience: string;
+      hospitalName: string;
+      hospitalId: number;
+      rating: number;
+      reviewsCount: number;
+      surgeriesCount: number;
+      languages: string[];
+      education: Array<{ degree: string; institution: string; year: string }>;
+      bio: string;
+      expertise: string[];
+      awards: string[];
+      publicationsCount: number;
+      internationalTraining: string[];
+      consultationTimings: string;
+      isFeatured: boolean;
+      isAvailable: boolean;
+}
 
 export default function DoctorDetailPage() {
       const params = useParams();
       const doctorId = params?.id as string;
-      const doctor = doctorData[doctorId];
+      const [doctor, setDoctor] = useState<DoctorDetail | null>(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(false);
 
-      if (!doctor) {
+      useEffect(() => {
+            const fetchDoctor = async () => {
+                  try {
+                        const res = await fetch(`${API_BASE}/api/doctors/${doctorId}`);
+                        if (res.ok) {
+                              const data = await res.json();
+                              // Add fallback for imageUrl
+                              if (!data.imageUrl) {
+                                    data.imageUrl = 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800';
+                              }
+                              setDoctor(data);
+                        } else {
+                              setError(true);
+                        }
+                  } catch (err) {
+                        console.error('Error fetching doctor:', err);
+                        setError(true);
+                  } finally {
+                        setLoading(false);
+                  }
+            };
+            fetchDoctor();
+      }, [doctorId]);
+
+      if (loading) {
+            return (
+                  <div className="min-h-screen bg-gray-50">
+                        <Header />
+                        <div className="container mx-auto px-4 py-32 text-center">
+                              <div className="animate-spin w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                              <p className="text-gray-600">Loading doctor profile...</p>
+                        </div>
+                        <Footer />
+                  </div>
+            );
+      }
+
+      if (error || !doctor) {
             return (
                   <div className="min-h-screen bg-gray-50">
                         <Header />
@@ -302,13 +129,13 @@ export default function DoctorDetailPage() {
                                           className="relative w-64 h-80 rounded-2xl overflow-hidden shadow-2xl shrink-0 border-4 border-white/20"
                                     >
                                           <Image
-                                                src={doctor.image}
+                                                src={doctor.imageUrl}
                                                 alt={doctor.name}
                                                 fill
                                                 className="object-cover"
                                                 priority
                                           />
-                                          {doctor.available && (
+                                          {doctor.isAvailable && (
                                                 <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                                                       Available
                                                 </div>
@@ -323,7 +150,7 @@ export default function DoctorDetailPage() {
                                                 transition={{ delay: 0.4 }}
                                                 className="flex flex-wrap gap-2 mb-4"
                                           >
-                                                {doctor.featured && (
+                                                {doctor.isFeatured && (
                                                       <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
                                                             <Award className="w-4 h-4" />
                                                             Top Rated
@@ -373,7 +200,7 @@ export default function DoctorDetailPage() {
                                                 <div className="flex items-center gap-2">
                                                       <Star className="w-5 h-5 text-yellow-400 fill-current" />
                                                       <span className="font-bold">{doctor.rating}</span>
-                                                      <span className="text-white/70">({doctor.reviews} reviews)</span>
+                                                      <span className="text-white/70">({doctor.reviewsCount} reviews)</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                       <Clock className="w-5 h-5" />
@@ -381,7 +208,7 @@ export default function DoctorDetailPage() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                       <TrendingUp className="w-5 h-5" />
-                                                      <span>{doctor.surgeries.toLocaleString()}+ Procedures</span>
+                                                      <span>{doctor.surgeriesCount.toLocaleString()}+ Procedures</span>
                                                 </div>
                                           </motion.div>
 
@@ -397,7 +224,7 @@ export default function DoctorDetailPage() {
                                                       <Building2 className="w-5 h-5 text-white" />
                                                       <div>
                                                             <div className="text-white/60 text-xs">Practicing at</div>
-                                                            <div className="text-white font-semibold">{doctor.hospital}</div>
+                                                            <div className="text-white font-semibold">{doctor.hospitalName}</div>
                                                       </div>
                                                       <ChevronRight className="w-5 h-5 text-white/60" />
                                                 </Link>
@@ -413,8 +240,8 @@ export default function DoctorDetailPage() {
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     {[
                                           { value: doctor.experience, label: 'Experience', icon: Clock },
-                                          { value: `${doctor.surgeries.toLocaleString()}+`, label: 'Procedures', icon: TrendingUp },
-                                          { value: doctor.publications, label: 'Publications', icon: GraduationCap },
+                                          { value: `${doctor.surgeriesCount.toLocaleString()}+`, label: 'Procedures', icon: TrendingUp },
+                                          { value: doctor.publicationsCount, label: 'Publications', icon: GraduationCap },
                                           { value: doctor.rating, label: 'Rating', icon: Star },
                                     ].map((stat, i) => (
                                           <motion.div
@@ -503,7 +330,7 @@ export default function DoctorDetailPage() {
                                                                   className="flex gap-4 items-start"
                                                             >
                                                                   <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shrink-0">
-                                                                        {edu.year.slice(-2)}
+                                                                        {String(edu.year || '').slice(-2) || '—'}
                                                                   </div>
                                                                   <div>
                                                                         <h3 className="font-bold text-gray-800">{edu.degree}</h3>
@@ -594,7 +421,7 @@ export default function DoctorDetailPage() {
                                                             <div>
                                                                   <div className="text-sm text-gray-500">Hospital</div>
                                                                   <Link href={`/hospital/${doctor.hospitalId}`} className="text-blue-600 font-medium hover:underline">
-                                                                        {doctor.hospital}
+                                                                        {doctor.hospitalName}
                                                                   </Link>
                                                             </div>
                                                       </div>

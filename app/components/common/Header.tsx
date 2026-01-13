@@ -259,14 +259,15 @@ const Header: React.FC<HeaderProps> = ({
                                                             {/* Active Indicator (Pill) */}
                                                             {isActive && (
                                                                   <motion.div
-                                                                        layoutId="activePill"
+                                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                                        animate={{ opacity: 1, scale: 1 }}
                                                                         className={cn(
                                                                               "absolute inset-0 rounded-full shadow-lg",
                                                                               isMedical
                                                                                     ? "bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 shadow-emerald-500/40"
                                                                                     : "bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 shadow-amber-500/40"
                                                                         )}
-                                                                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                                                        transition={{ duration: 0.2 }}
                                                                   />
                                                             )}
 

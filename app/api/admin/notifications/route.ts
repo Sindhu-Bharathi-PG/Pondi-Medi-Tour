@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
         // Try to fetch from backend
         try {
-            const response = await fetch(`${BACKEND_URL}/admin/notifications`, {
+            const response = await fetch(`${BACKEND_URL}/api/admin/notifications`, {
                 headers: {
                     'Authorization': `Bearer ${session.accessToken}`,
                     'Content-Type': 'application/json'

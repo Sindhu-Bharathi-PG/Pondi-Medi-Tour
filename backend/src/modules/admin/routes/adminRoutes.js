@@ -12,8 +12,13 @@ const {
   approveHospital,
   rejectHospital,
   deleteHospital,
-  getAnalytics
+  getAnalytics,
+  getTopHospitals,
+  getActivityLogs,
+  getAdminSettings,
+  updateAdminSettings
 } = require('../controllers/adminController');
+const packageController = require('../../packages/controllers/packageController');
 
 async function adminRoutes(fastify, options) {
   // Apply admin authentication to all admin routes
@@ -22,6 +27,16 @@ async function adminRoutes(fastify, options) {
   // Dashboard & Analytics
   fastify.get('/stats', getDashboardStats);
   fastify.get('/analytics', getAnalytics);
+  fastify.get('/analytics/top-hospitals', getTopHospitals);
+  fastify.get('/analytics/activity', getActivityLogs);
+
+  // Settings
+  fastify.get('/settings', getAdminSettings);
+  fastify.put('/settings', updateAdminSettings);
+
+  // Packages Management
+  fastify.get('/packages', packageController.getAllPackages);
+  fastify.delete('/packages/:id', packageController.deletePackage);
 
   // User Management
   fastify.get('/users', getAllUsers);

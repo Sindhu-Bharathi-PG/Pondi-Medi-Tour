@@ -12,6 +12,12 @@ export async function GET(request: NextRequest) {
         }
 
         const { searchParams } = new URL(request.url);
+
+        // Set a higher default limit to show more users
+        if (!searchParams.has('limit')) {
+            searchParams.set('limit', '100');
+        }
+
         const queryString = searchParams.toString();
 
         try {
@@ -24,36 +30,43 @@ export async function GET(request: NextRequest) {
                 headers['Authorization'] = `Bearer ${session.accessToken}`;
             }
 
-            const response = await fetch(`${BACKEND_URL}/admin/users${queryString ? `?${queryString}` : ''}`, {
+            const fetchUrl = `${BACKEND_URL}/api/admin/users${queryString ? `?${queryString}` : ''}`;
+            console.log(`[Admin Users API] Fetching from backend: ${fetchUrl}`);
+            console.log(`[Admin Users API] Auth Header Present: ${!!headers['Authorization']}`);
+
+            const response = await fetch(fetchUrl, {
                 headers,
                 cache: 'no-store'
             });
 
+            console.log(`[Admin Users API] Backend response status: ${response.status}`);
+
             if (response.ok) {
                 const data = await response.json();
-                // Transform backend data to frontend format
+                console.log(`[Admin Users API] Success! Received ${data.users?.length || 0} users`);
+
+                // The backend already returns properly formatted data
+                // Just pass it through directly
                 return NextResponse.json({
-                    users: (data.users || []).map((user: { id: string | number; name?: string; email: string; user_type?: string; is_active?: boolean; last_login?: string; created_at?: string }) => ({
-                        id: String(user.id),
-                        name: user.name || 'N/A',
-                        email: user.email,
-                        role: user.user_type || 'patient',
-                        status: user.is_active !== false ? 'active' : 'inactive',
-                        lastLogin: user.last_login,
-                        joinedDate: user.created_at
-                    }))
+                    users: data.users || [],
+                    pagination: data.pagination
                 });
+            } else {
+                console.error(`[Admin Users API] Backend error: ${response.status} ${response.statusText}`);
+                const errorText = await response.text();
+                console.error(`[Admin Users API] Error details: ${errorText}`);
             }
         } catch (backendError) {
-            console.log('Backend not available, returning mock data');
+            console.error('[Admin Users API] Connection failed:', backendError);
         }
 
+        console.warn('[Admin Users API] Falling back to mock data');
         // Return mock data if backend is not available
         return NextResponse.json({
             users: [
-                { id: '1', name: 'Admin User', email: 'admin@test.com', role: 'admin', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-01-01' },
-                { id: '2', name: 'Super Admin', email: 'superadmin@test.com', role: 'superadmin', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-01-01' },
-                { id: '3', name: 'Hospital Admin', email: 'hospital@test.com', role: 'hospital', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-02-15' },
+                { id: '1', name: 'Admin User', email: 'admin@pondimeditour.com', role: 'admin', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-01-01' },
+                { id: '2', name: 'Super Admin', email: 'superadmin@pondimeditour.com', role: 'superadmin', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-01-01' },
+                { id: '3', name: 'Hospital Admin', email: 'hospital@pondimeditour.com', role: 'hospital', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-02-15' },
                 { id: '4', name: 'Test Patient', email: 'patient@test.com', role: 'patient', status: 'active', lastLogin: new Date().toISOString(), joinedDate: '2024-03-01' }
             ]
         });
@@ -78,7 +91,7 @@ export async function POST(request: NextRequest) {
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/admin/users`, {
+            const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -59,7 +59,7 @@ const getInquiry = async (req, reply) => {
         // Ideally, use req.user.role
         
         let condition = eq(inquiries.id, id);
-        if (req.user.role === 'hospital') {
+        if (req.user.userType === 'hospital') {
              const hospitalId = await getHospitalId(req.user.userId);
              if (!hospitalId) return reply.code(403).send({ error: 'Not authorized' });
              condition = and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId));
@@ -82,7 +82,7 @@ const updateInquiry = async (req, reply) => {
     try {
         let condition = eq(inquiries.id, id);
         
-        if (req.user.role === 'hospital') {
+        if (req.user.userType === 'hospital') {
              const hospitalId = await getHospitalId(req.user.userId);
              if (!hospitalId) return reply.code(403).send({ error: 'Not authorized' });
              condition = and(eq(inquiries.id, id), eq(inquiries.hospitalId, hospitalId));
@@ -106,18 +106,40 @@ const updateInquiry = async (req, reply) => {
 // Public: Create inquiry
 const createInquiry = async (req, reply) => {
     try {
-        // Determine hospitalId if provided (e.g. from specific hospital page)
-        // If from general booking page, hospitalId might be null
-        const { hospitalId, ...data } = req.body;
+        const { 
+            hospitalId, 
+            packageId, 
+            inquiryType, 
+            sourcePage,
+            ...data 
+        } = req.body;
         
+        // Auto-detect inquiry type if not provided
+        let detectedType = inquiryType || 'general';
+        if (!inquiryType) {
+            if (packageId) detectedType = 'package';
+            else if (hospitalId) detectedType = 'hospital';
+            else if (data.treatmentType) detectedType = 'treatment';
+        }
+        
+        console.log('Creating inquiry with data:', { ...data, inquiryType: detectedType });
         const [newInquiry] = await db.insert(inquiries)
-            .values({ ...data, hospitalId: hospitalId || null, status: 'pending' })
+            .values({ 
+                ...data, 
+                hospitalId: hospitalId || null,
+                packageId: packageId || null,
+                inquiryType: detectedType,
+                sourcePage: sourcePage || data.referrerUrl || null,
+                status: 'pending',
+                priority: packageId ? 'high' : 'normal' // Package inquiries get priority
+            })
             .returning();
 
         reply.code(201).send(newInquiry);
     } catch (err) {
+        console.error('INQUIRY CREATION ERROR:', err);
         req.log.error(err);
-        reply.code(500).send({ error: 'Internal Server Error' });
+        reply.code(500).send({ error: 'Internal Server Error', message: err.message });
     }
 };
 

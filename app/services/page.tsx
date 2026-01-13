@@ -1,11 +1,13 @@
 "use client";
 
 import { useCurrency } from '@/app/context/CurrencyContext';
+import { API_BASE } from '@/app/hooks/useApi';
+import { normalizeCategory, normalizeDescription, normalizeName, normalizeSuccessRate } from '@/app/utils/normalize';
 import { motion } from 'framer-motion';
-import { Activity, ArrowRight, Award, Baby, Bone, Brain, Calendar, Check, ChevronRight, Clock, DollarSign, Eye, Globe, Heart, Languages, MapPin, Phone, Plane, Scissors, Shield, Sparkles, Star, Stethoscope, Users, Video, Zap } from 'lucide-react';
+import { Activity, ArrowRight, Award, Baby, Bone, Brain, Building2, ChevronRight, Eye, Heart, MapPin, Plane, Scissors, Search, Shield, Sparkles, Stethoscope, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Footer, Header } from '../components/common';
 
 // Country flags for international appeal
@@ -15,72 +17,59 @@ const PATIENT_COUNTRIES = [
       { code: 'AE', name: 'UAE', flag: '🇦🇪', patients: '6,000+' },
       { code: 'AU', name: 'Australia', flag: '🇦🇺', patients: '4,500+' },
       { code: 'CA', name: 'Canada', flag: '🇨🇦', patients: '3,500+' },
-      { code: 'DE', name: 'Germany', flag: '🇩🇪', patients: '3,000+' },
-      { code: 'FR', name: 'France', flag: '🇫🇷', patients: '2,500+' },
-      { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', patients: '2,000+' },
-      { code: 'SG', name: 'Singapore', flag: '🇸🇬', patients: '1,800+' },
-      { code: 'JP', name: 'Japan', flag: '🇯🇵', patients: '1,500+' },
 ];
+
+// Category styling
+const categoryStyles: Record<string, { icon: any; bg: string; text: string; light: string }> = {
+      'Orthopedics': { icon: Bone, bg: 'from-teal-500 to-emerald-500', text: 'text-teal-600', light: 'bg-teal-50' },
+      'IVF & Fertility': { icon: Baby, bg: 'from-rose-500 to-pink-500', text: 'text-rose-600', light: 'bg-rose-50' },
+      'Ophthalmology': { icon: Eye, bg: 'from-emerald-500 to-cyan-500', text: 'text-emerald-600', light: 'bg-emerald-50' },
+      'Cardiology': { icon: Heart, bg: 'from-red-500 to-rose-500', text: 'text-red-600', light: 'bg-red-50' },
+      'Gastroenterology': { icon: Activity, bg: 'from-amber-500 to-orange-500', text: 'text-amber-600', light: 'bg-amber-50' },
+      'Neurology': { icon: Brain, bg: 'from-purple-500 to-indigo-500', text: 'text-purple-600', light: 'bg-purple-50' },
+      'Dental': { icon: Scissors, bg: 'from-cyan-500 to-blue-500', text: 'text-cyan-600', light: 'bg-cyan-50' },
+      'Oncology': { icon: Stethoscope, bg: 'from-green-500 to-teal-500', text: 'text-green-600', light: 'bg-green-50' },
+};
 
 const ServicesPage = () => {
       const { convertAmount, formatCurrency, selectedCurrency } = useCurrency();
       const [services, setServices] = useState<any[]>([]);
+      const [filteredServices, setFilteredServices] = useState<any[]>([]);
       const [isLoading, setIsLoading] = useState(true);
-      const [convertedPrices, setConvertedPrices] = useState<Record<string, { pondy: number; us: number; uk: number; uae: number }>>({});
-
-      // Map categories to icons
-      const categoryIcons: any = {
-            'Orthopedics': Bone,
-            'IVF': Baby,
-            'Ophthalmology': Eye,
-            'Cardiology': Heart,
-            'Gastroenterology': Activity,
-            'Neurology': Brain,
-            'Dental': Scissors,
-            'Oncology': Stethoscope
-      };
-
-      const journeySteps = [
-            { icon: Phone, title: 'Free Consultation', desc: 'Connect via call, WhatsApp, or video', time: 'Day 1' },
-            { icon: DollarSign, title: 'Treatment Quote', desc: 'Detailed cost breakdown within 24hrs', time: 'Day 2' },
-            { icon: Plane, title: 'Visa & Travel', desc: 'Medical visa assistance & flight booking', time: 'Week 1-2' },
-            { icon: MapPin, title: 'Arrival & Pickup', desc: 'Airport pickup & hotel arrangement', time: 'Travel Day' },
-            { icon: Stethoscope, title: 'Treatment', desc: 'World-class medical care', time: 'As scheduled' },
-            { icon: Heart, title: 'Recovery', desc: 'Comfortable recovery with support', time: 'Post-treatment' },
-      ];
+      const [searchQuery, setSearchQuery] = useState('');
+      const [convertedPrices, setConvertedPrices] = useState<Record<string, { pondy: number; us: number }>>({});
+      const resultsRef = useRef<HTMLDivElement>(null);
 
       // Fetch services from API
       useEffect(() => {
             const fetchServices = async () => {
                   try {
-                        const response = await fetch('http://localhost:3001/api/treatments');
+                        const response = await fetch(`${API_BASE}/api/treatments`);
                         const data = await response.json();
 
                         if (data && Array.isArray(data) && data.length > 0) {
-                              // Map DB data to Frontend format
-                              const mappedServices = data.map(t => ({
-                                    id: t.slug || t.id.toString(),
-                                    icon: categoryIcons[t.category] || Stethoscope,
-                                    title: t.name,
-                                    description: t.shortDescription,
-                                    image: t.thumbnailUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
-                                    procedures: t.technology || [],
-                                    savings: t.isPopular ? '70%+' : '60%+',
-                                    pondyPriceINR: t.minPrice || 50000,
-                                    // Fallback prices for comparison if not in DB
-                                    usPriceINR: (t.minPrice || 50000) * 4,
-                                    ukPriceINR: (t.minPrice || 50000) * 3,
-                                    uaePriceINR: (t.minPrice || 50000) * 2.5,
-                                    recovery: t.recoveryTime || 'Varies',
-                                    successRate: t.successRate ? `${t.successRate}%+` : '95%+',
-                                    color: t.category === 'Oncology' ? 'from-green-600 to-[var(--medical-teal)]' : 'from-[var(--medical-teal)] to-[var(--medical-dark-teal)]',
-                                    featured: t.isPopular
-                              }));
+                              const mappedServices = data.map(t => {
+                                    const category = normalizeCategory(t.category);
+                                    const styles = categoryStyles[category] || categoryStyles['Orthopedics'];
+
+                                    return {
+                                          id: t.slug || t.id.toString(),
+                                          title: normalizeName(t.name),
+                                          description: normalizeDescription(t.shortDescription, 150),
+                                          image: t.thumbnailUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
+                                          procedures: Array.isArray(t.technology) ? t.technology : [],
+                                          savings: t.isPopular ? '70%+' : '60%+',
+                                          pondyPriceINR: t.minPrice || 50000,
+                                          usPriceINR: (t.minPrice || 50000) * 4,
+                                          successRate: normalizeSuccessRate(t.successRate),
+                                          featured: t.isPopular,
+                                          hospitalName: normalizeName(t.hospitalName),
+                                          category: category,
+                                          styles: styles
+                                    };
+                              });
                               setServices(mappedServices);
-                        } else {
-                              // If no data in DB, we could use static fallback or show empty state
-                              // For this demo, let's keep the static fallbacks if DB is empty
-                              console.log('No treatments found in DB, using static data');
+                              setFilteredServices(mappedServices);
                         }
                   } catch (error) {
                         console.error('Error fetching services:', error);
@@ -91,634 +80,321 @@ const ServicesPage = () => {
             fetchServices();
       }, []);
 
-      // Convert prices when currency changes or services load
+      // Filter services
       useEffect(() => {
-            const convertPrices = async () => {
-                  if (services.length === 0) return;
-                  const converted: Record<string, { pondy: number; us: number; uk: number; uae: number }> = {};
-                  for (const service of services) {
-                        const pondy = await convertAmount(service.pondyPriceINR, 'INR');
-                        const us = await convertAmount(service.usPriceINR, 'INR');
-                        const uk = await convertAmount(service.ukPriceINR, 'INR');
-                        const uae = await convertAmount(service.uaePriceINR, 'INR');
-                        converted[service.id] = { pondy, us, uk, uae };
-                  }
-                  setConvertedPrices(converted);
-            };
-            convertPrices();
-      }, [selectedCurrency, services]);
+            const lowerQuery = searchQuery.toLowerCase();
+            const filtered = services.filter(service =>
+                  service.title.toLowerCase().includes(lowerQuery) ||
+                  service.category.toLowerCase().includes(lowerQuery) ||
+                  service.description.toLowerCase().includes(lowerQuery)
+            );
+            setFilteredServices(filtered);
+      }, [searchQuery, services]);
 
-      const getPrice = (serviceId: string, type: 'pondy' | 'us' | 'uk' | 'uae') => {
-            return convertedPrices[serviceId]?.[type] || 0;
+      // Price conversion
+      useEffect(() => {
+            if (services.length === 0) return;
+
+            const convertPrices = async () => {
+                  const newPrices: Record<string, { pondy: number; us: number }> = {};
+
+                  // Process in chunks to avoid blocking
+                  for (const service of services) {
+                        const [pondy, us] = await Promise.all([
+                              convertAmount(service.pondyPriceINR, 'INR'),
+                              convertAmount(service.usPriceINR, 'INR')
+                        ]);
+                        newPrices[service.id] = { pondy, us };
+                  }
+                  setConvertedPrices(newPrices);
+            };
+
+            convertPrices();
+      }, [services, selectedCurrency, convertAmount]);
+
+      const getPrice = (id: string, type: 'pondy' | 'us') => {
+            return convertedPrices[id]?.[type] || 0;
       };
 
       return (
-            <div className="min-h-screen bg-[var(--medical-cream)]">
+            <div className="min-h-screen bg-slate-50">
                   <Header />
 
-                  {/* HERO SECTION - Premium Medical Theme */}
-                  <section className="relative pt-24 pb-32 overflow-hidden hero-premium">
-                        {/* Elegant Background */}
-                        <div className="absolute inset-0">
-                              <div className="absolute inset-0 opacity-10">
-                                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551076805-e1869033e561?w=1600')] bg-cover bg-center" />
-                              </div>
-                              <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[var(--medical-gold)]/10 rounded-full blur-3xl" />
-                              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[var(--medical-teal)]/10 rounded-full blur-3xl" />
+                  {/* Hero Section */}
+                  <section className="relative pt-32 pb-20 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900">
+                              <div className="absolute inset-0 opacity-20" style={{
+                                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
+                                    backgroundSize: '32px 32px'
+                              }}></div>
+                              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px] animate-pulse"></div>
+                              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
                         </div>
 
-                        <div className="relative container-premium">
-                              {/* Breadcrumb */}
-                              <nav className="breadcrumb text-white/70 mb-8">
-                                    <Link href="/" className="hover:text-white transition-colors">Home</Link>
-                                    <ChevronRight className="w-4 h-4 breadcrumb-separator" />
-                                    <span className="text-[var(--medical-gold)]">Medical Treatments</span>
-                              </nav>
-
-                              <div className="grid lg:grid-cols-2 gap-12 items-center">
-                                    {/* Left Content */}
-                                    <motion.div
-                                          initial={{ opacity: 0, y: 30 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.8 }}
-                                    >
-                                          {/* Trust Badge */}
-                                          <div className="gov-seal mb-6">
-                                                <Globe className="w-4 h-4" />
-                                                <span>Trusted by 50,000+ International Patients</span>
-                                          </div>
-
-                                          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                                                <span className="text-white">World-Class</span>
-                                                <br />
-                                                <span className="text-[var(--medical-gold)]">
-                                                      Medical Care
-                                                </span>
-                                                <br />
-                                                <span className="text-white/90 text-4xl md:text-5xl">at 70% Less Cost</span>
-                                          </h1>
-
-                                          <p className="text-lg text-white/80 leading-relaxed max-w-xl mb-8">
-                                                Join patients from <span className="text-[var(--medical-gold)] font-semibold">45+ countries</span> who chose India for premium healthcare. Same doctors. Same technology. Unbeatable savings.
-                                          </p>
-
-                                          {/* Country Flags Ticker */}
-                                          <div className="flex items-center gap-3 mb-8 overflow-hidden">
-                                                <span className="text-white/60 text-sm whitespace-nowrap">Patients from:</span>
-                                                <div className="flex gap-2">
-                                                      {PATIENT_COUNTRIES.slice(0, 8).map((country, i) => (
-                                                            <motion.div
-                                                                  key={country.code}
-                                                                  initial={{ opacity: 0, scale: 0 }}
-                                                                  animate={{ opacity: 1, scale: 1 }}
-                                                                  transition={{ delay: i * 0.1 }}
-                                                                  className="text-2xl hover:scale-125 transition-transform cursor-pointer"
-                                                                  title={`${country.name} - ${country.patients} patients`}
-                                                            >
-                                                                  {country.flag}
-                                                            </motion.div>
-                                                      ))}
-                                                      <span className="text-white/50 text-sm self-center">+37 more</span>
-                                                </div>
-                                          </div>
-
-                                          {/* CTA Buttons */}
-                                          <div className="flex flex-wrap gap-4">
-                                                <Link
-                                                      href="/booking"
-                                                      className="group inline-flex items-center gap-3 bg-[var(--medical-gold)] text-[var(--medical-navy)] px-8 py-4 rounded-xl font-semibold text-lg hover:bg-yellow-400 hover:-translate-y-1 transition-all duration-300 shadow-lg"
-                                                >
-                                                      Get Free Quote
-                                                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                                </Link>
-                                                <Link
-                                                      href="/cost-calculator"
-                                                      className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all"
-                                                >
-                                                      <DollarSign className="w-5 h-5" />
-                                                      Calculate Savings
-                                                </Link>
-                                          </div>
-                                    </motion.div>
-
-                                    {/* Right - Stats Cards */}
-                                    <motion.div
-                                          initial={{ opacity: 0, x: 50 }}
-                                          animate={{ opacity: 1, x: 0 }}
-                                          transition={{ duration: 0.8, delay: 0.2 }}
-                                          className="grid grid-cols-2 gap-4"
-                                    >
-                                          {[
-                                                { icon: Shield, value: '150+', label: 'Procedures', sublabel: 'Available' },
-                                                { icon: Users, value: '50K+', label: 'Global', sublabel: 'Patients' },
-                                                { icon: Award, value: '98.5%', label: 'Success', sublabel: 'Rate' },
-                                                { icon: Clock, value: '0', label: 'Wait', sublabel: 'Time' },
-                                          ].map((stat, index) => (
-                                                <motion.div
-                                                      key={stat.label}
-                                                      initial={{ opacity: 0, y: 20 }}
-                                                      animate={{ opacity: 1, y: 0 }}
-                                                      transition={{ delay: 0.4 + index * 0.1 }}
-                                                      className="group card-premium p-6 bg-white/95 backdrop-blur-lg"
-                                                >
-                                                      <div className="w-12 h-12 rounded-xl bg-[var(--medical-light-teal)] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                                            <stat.icon className="w-6 h-6 text-[var(--medical-teal)]" />
-                                                      </div>
-                                                      <div className="text-4xl font-bold text-[var(--medical-navy)] mb-1">{stat.value}</div>
-                                                      <div className="text-[var(--medical-slate)] text-sm">{stat.label}</div>
-                                                      <div className="text-gray-400 text-xs">{stat.sublabel}</div>
-                                                </motion.div>
-                                          ))}
-                                    </motion.div>
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* INTERNATIONAL TRUST SIGNALS */}
-                  <section className="py-8 bg-white border-b border-gray-100">
-                        <div className="container-premium">
-                              <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-                                    {[
-                                          { label: 'JCI Accredited', icon: Award, desc: 'International Standard' },
-                                          { label: 'NABH Certified', icon: Shield, desc: 'National Quality' },
-                                          { label: 'ISO 9001:2015', icon: Check, desc: 'Quality Systems' },
-                                          { label: 'US/UK Trained', icon: Award, desc: 'Surgeons' },
-                                          { label: '11 Languages', icon: Languages, desc: 'Support Available' },
-                                    ].map((item) => (
-                                          <div key={item.label} className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-[var(--medical-light-teal)] flex items-center justify-center">
-                                                      <item.icon className="w-5 h-5 text-[var(--medical-teal)]" />
-                                                </div>
-                                                <div>
-                                                      <div className="font-semibold text-[var(--medical-navy)]">{item.label}</div>
-                                                      <div className="text-xs text-gray-500">{item.desc}</div>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* FEATURED TREATMENTS */}
-                  <section className="section-premium">
-                        <div className="container-premium">
+                        <div className="relative container mx-auto px-4 text-center">
                               <motion.div
                                     initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-16"
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="max-w-3xl mx-auto"
                               >
-                                    <div className="certified-badge mx-auto mb-4">
+                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full text-purple-200 mb-6 border border-white/10">
                                           <Sparkles className="w-4 h-4" />
-                                          Most Popular Worldwide
+                                          <span className="text-sm font-medium">World-Class Healthcare at 70% Less Cost</span>
                                     </div>
-                                    <h2 className="section-title">
-                                          Featured Medical Treatments
-                                    </h2>
-                                    <p className="section-subtitle mx-auto">
-                                          Premium procedures chosen by international patients for exceptional outcomes and savings
-                                    </p>
-                              </motion.div>
 
-                              {/* Featured Grid */}
-                              <div className="grid lg:grid-cols-3 gap-8 mb-16">
-                                    {isLoading ? (
-                                          <div className="col-span-3 text-center py-20">
-                                                <div className="animate-spin w-10 h-10 border-4 border-[var(--medical-teal)] border-t-transparent rounded-full mx-auto mb-4"></div>
-                                                <p className="text-[var(--medical-navy)] font-medium">Loading treatments...</p>
+                                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                                          Find Your Perfect <br />
+                                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Medical Treatment</span>
+                                    </h1>
+
+                                    <p className="text-lg text-indigo-100 mb-10 max-w-2xl mx-auto">
+                                          Explore premium treatments from JCI-accredited hospitals in Pondicherry, India.
+                                          Combine world-class care with a relaxing recovery vacation.
+                                    </p>
+
+                                    {/* Search Bar */}
+                                    <div className="bg-white p-2 rounded-2xl shadow-xl max-w-2xl mx-auto flex items-center gap-2">
+                                          <div className="flex-1 flex items-center gap-3 px-4">
+                                                <Search className="w-5 h-5 text-gray-400" />
+                                                <input
+                                                      type="text"
+                                                      placeholder="Search treatments (e.g., Knee Replacement, IVF)..."
+                                                      className="w-full py-3 outline-none text-gray-700 placeholder-gray-400"
+                                                      value={searchQuery}
+                                                      onChange={(e) => setSearchQuery(e.target.value)}
+                                                />
                                           </div>
-                                    ) : services.filter(s => s.featured).map((service, index) => (
-                                          <motion.div
-                                                key={service.id}
-                                                initial={{ opacity: 0, y: 30 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="group card-premium overflow-hidden"
-                                          >
-                                                {/* Image Header */}
-                                                <div className="relative h-56 overflow-hidden">
-                                                      <Image
-                                                            src={service.image}
-                                                            alt={service.title}
-                                                            fill
-                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                                      />
-                                                      <div className={`absolute inset-0 bg-gradient-to-t ${service.color} opacity-80`} />
-                                                      <div className="absolute inset-0 flex flex-col justify-between p-6">
-                                                            <div className="flex items-start justify-between">
-                                                                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                                                                        <service.icon className="w-7 h-7 text-white" />
-                                                                  </div>
-                                                                  <div className="bg-[var(--medical-gold)] text-[var(--medical-navy)] rounded-full px-3 py-1">
-                                                                        <span className="text-sm font-bold">Save {service.savings}</span>
-                                                                  </div>
-                                                            </div>
-                                                            <div>
-                                                                  <h3 className="text-2xl font-bold text-white mb-2">{service.title}</h3>
-                                                                  <div className="flex items-center gap-2 text-white/90 text-sm">
-                                                                        <Star className="w-4 h-4 fill-current" />
-                                                                        <span>{service.successRate} success rate</span>
-                                                                  </div>
-                                                            </div>
-                                                      </div>
-                                                </div>
-
-                                                {/* Content */}
-                                                <div className="p-6">
-                                                      <p className="text-[var(--medical-slate)] text-sm mb-6 line-clamp-2">{service.description}</p>
-
-                                                      {/* Price Comparison */}
-                                                      <div className="bg-[var(--medical-cream)] rounded-2xl p-4 mb-6">
-                                                            <div className="flex items-center justify-between mb-3">
-                                                                  <span className="text-gray-500 text-sm">Treatment Cost</span>
-                                                                  <span className="text-[var(--medical-teal)] font-bold text-lg">
-                                                                        {formatCurrency(getPrice(service.id, 'pondy'))}
-                                                                  </span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between text-sm">
-                                                                  <span className="text-gray-400">vs. USA</span>
-                                                                  <span className="text-gray-400 line-through">
-                                                                        {formatCurrency(getPrice(service.id, 'us'))}
-                                                                  </span>
-                                                            </div>
-                                                            <div className="mt-3 pt-3 border-t border-gray-200">
-                                                                  <div className="flex items-center justify-between">
-                                                                        <span className="text-[var(--medical-teal)] font-medium">Your Savings</span>
-                                                                        <span className="text-[var(--medical-gold)] font-bold text-lg">
-                                                                              {formatCurrency(getPrice(service.id, 'us') - getPrice(service.id, 'pondy'))}
-                                                                        </span>
-                                                                  </div>
-                                                            </div>
-                                                      </div>
-
-                                                      {/* Procedures */}
-                                                      <div className="flex flex-wrap gap-2 mb-6">
-                                                            {service.procedures.slice(0, 3).map((proc, i) => (
-                                                                  <span key={i} className="bg-[var(--medical-light-teal)] text-[var(--medical-teal)] px-3 py-1 rounded-full text-xs font-medium">
-                                                                        {proc}
-                                                                  </span>
-                                                            ))}
-                                                            {service.procedures.length > 3 && (
-                                                                  <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs">
-                                                                        +{service.procedures.length - 3} more
-                                                                  </span>
-                                                            )}
-                                                      </div>
-
-                                                      {/* CTA */}
-                                                      <Link
-                                                            href={`/services/${service.id}`}
-                                                            className="w-full py-4 rounded-xl font-semibold text-white bg-[var(--medical-teal)] flex items-center justify-center gap-2 hover:bg-[var(--medical-dark-teal)] hover:shadow-lg transition-all group-hover:gap-4"
-                                                      >
-                                                            View Details
-                                                            <ArrowRight className="w-5 h-5" />
-                                                      </Link>
-                                                </div>
-                                          </motion.div>
-                                    ))}
-                              </div>
-
-                              {/* All Services Grid */}
-                              <h3 className="text-2xl font-bold text-[var(--medical-navy)] mb-8 text-center">All Medical Specialties</h3>
-                              <div className="grid md:grid-cols-2 gap-6">
-                                    {isLoading ? (
-                                          <div className="col-span-2 text-center py-10">
-                                                <p className="text-gray-400">Loading categorized treatments...</p>
-                                          </div>
-                                    ) : services.filter(s => !s.featured).map((service, index) => (
-                                          <motion.div
-                                                key={service.id}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.05 }}
-                                                className="group card-premium overflow-hidden flex"
-                                          >
-                                                <div className="relative w-40 shrink-0">
-                                                      <Image
-                                                            src={service.image}
-                                                            alt={service.title}
-                                                            fill
-                                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                      />
-                                                      <div className={`absolute inset-0 bg-gradient-to-r ${service.color} opacity-80`} />
-                                                      <div className="absolute inset-0 flex items-center justify-center">
-                                                            <service.icon className="w-10 h-10 text-white" />
-                                                      </div>
-                                                </div>
-                                                <div className="flex-1 p-5">
-                                                      <h4 className="text-lg font-bold text-[var(--medical-navy)] mb-2">{service.title}</h4>
-                                                      <p className="text-[var(--medical-slate)] text-sm mb-3 line-clamp-2">{service.description}</p>
-                                                      <div className="flex items-center gap-4 mb-3 text-sm">
-                                                            <span className="text-[var(--medical-teal)] font-semibold">
-                                                                  {formatCurrency(getPrice(service.id, 'pondy'))}
-                                                            </span>
-                                                            <span className="text-gray-300">|</span>
-                                                            <span className="text-[var(--medical-gold)] font-medium">Save {service.savings}</span>
-                                                      </div>
-                                                      <Link
-                                                            href={`/services/${service.id}`}
-                                                            className="text-[var(--medical-teal)] font-semibold flex items-center gap-1 hover:gap-2 transition-all text-sm"
-                                                      >
-                                                            Learn More
-                                                            <ChevronRight className="w-4 h-4" />
-                                                      </Link>
-                                                </div>
-                                          </motion.div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* GLOBAL COST COMPARISON */}
-                  <section className="section-premium-alt">
-                        <div className="container-premium">
-                              <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-16"
-                              >
-                                    <h2 className="section-title">
-                                          Compare Your Savings
-                                    </h2>
-                                    <p className="section-subtitle mx-auto">
-                                          See how much you can save compared to healthcare costs in your home country
-                                    </p>
+                                          <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                                Search
+                                          </button>
+                                    </div>
                               </motion.div>
 
-                              <div className="overflow-x-auto">
-                                    <table className="w-full min-w-[800px] bg-white rounded-2xl shadow-lg overflow-hidden">
-                                          <thead>
-                                                <tr className="bg-[var(--medical-navy)]">
-                                                      <th className="px-6 py-4 text-left text-white font-medium">Procedure</th>
-                                                      <th className="px-6 py-4 text-center text-[var(--medical-gold)] font-semibold">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                  <span>🇮🇳</span> India
-                                                            </div>
-                                                      </th>
-                                                      <th className="px-6 py-4 text-center text-white/80 font-medium">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                  <span>🇺🇸</span> USA
-                                                            </div>
-                                                      </th>
-                                                      <th className="px-6 py-4 text-center text-white/80 font-medium">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                  <span>🇬🇧</span> UK
-                                                            </div>
-                                                      </th>
-                                                      <th className="px-6 py-4 text-center text-white/80 font-medium">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                  <span>🇦🇪</span> UAE
-                                                            </div>
-                                                      </th>
-                                                      <th className="px-6 py-4 text-center text-[var(--medical-gold)] font-medium">Savings</th>
-                                                </tr>
-                                          </thead>
-                                          <tbody>
-                                                {services.slice(0, 5).map((service, idx) => (
-                                                      <motion.tr
-                                                            key={service.id}
-                                                            initial={{ opacity: 0 }}
-                                                            whileInView={{ opacity: 1 }}
-                                                            viewport={{ once: true }}
-                                                            className={`border-b border-gray-100 hover:bg-[var(--medical-cream)] transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                                                      >
-                                                            <td className="px-6 py-4">
-                                                                  <div className="flex items-center gap-3">
-                                                                        <service.icon className="w-5 h-5 text-[var(--medical-teal)]" />
-                                                                        <span className="text-[var(--medical-navy)] font-medium">{service.title}</span>
-                                                                  </div>
-                                                            </td>
-                                                            <td className="px-6 py-4 text-center">
-                                                                  <span className="text-[var(--medical-teal)] font-bold">
-                                                                        {formatCurrency(getPrice(service.id, 'pondy'))}
-                                                                  </span>
-                                                            </td>
-                                                            <td className="px-6 py-4 text-center text-gray-400 line-through">
-                                                                  {formatCurrency(getPrice(service.id, 'us'))}
-                                                            </td>
-                                                            <td className="px-6 py-4 text-center text-gray-400 line-through">
-                                                                  {formatCurrency(getPrice(service.id, 'uk'))}
-                                                            </td>
-                                                            <td className="px-6 py-4 text-center text-gray-400 line-through">
-                                                                  {formatCurrency(getPrice(service.id, 'uae'))}
-                                                            </td>
-                                                            <td className="px-6 py-4 text-center">
-                                                                  <span className="bg-[var(--medical-light-teal)] text-[var(--medical-teal)] font-bold px-4 py-1.5 rounded-full">
-                                                                        {service.savings}
-                                                                  </span>
-                                                            </td>
-                                                      </motion.tr>
-                                                ))}
-                                          </tbody>
-                                    </table>
+                              {/* Trust Signals */}
+                              <div className="mt-16 flex flex-wrap justify-center gap-8 text-white/60">
+                                    <div className="flex items-center gap-2">
+                                          <Shield className="w-5 h-5 text-emerald-400" />
+                                          <span>JCI Accredited Hospitals</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                          <Users className="w-5 h-5 text-blue-400" />
+                                          <span>50,000+ Happy Patients</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                          <Award className="w-5 h-5 text-amber-400" />
+                                          <span>US/UK Trained Surgeons</span>
+                                    </div>
                               </div>
                         </div>
                   </section>
 
-                  {/* WHY INTERNATIONAL PATIENTS CHOOSE US */}
-                  <section className="section-premium">
-                        <div className="container-premium">
-                              <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-16"
-                              >
-                                    <h2 className="section-title">
-                                          Why International Patients Choose Us
-                                    </h2>
-                                    <p className="section-subtitle mx-auto">
-                                          Designed specifically for patients traveling from abroad
-                                    </p>
-                              </motion.div>
-
-                              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {[
-                                          { icon: Clock, title: 'Zero Wait Time', desc: 'Immediate scheduling vs. months of waiting abroad', highlight: '0 Days Wait' },
-                                          { icon: Languages, title: 'Multi-lingual Staff', desc: 'Medical coordinators fluent in 11 languages', highlight: '11 Languages' },
-                                          { icon: Plane, title: 'Visa Assistance', desc: 'Complete medical visa support and documentation', highlight: 'Full Support' },
-                                          { icon: MapPin, title: 'Airport Pickup', desc: 'Private transfers and luxury accommodation', highlight: 'VIP Service' },
-                                          { icon: Video, title: 'Virtual Consults', desc: 'Pre-arrival video consultations with specialists', highlight: 'Free Consult' },
-                                          { icon: Calendar, title: 'Fast Recovery', desc: 'Combine treatment with wellness retreat', highlight: 'Heal & Relax' },
-                                    ].map((item, index) => (
-                                          <motion.div
-                                                key={item.title}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="group card-premium p-6"
-                                          >
-                                                <div className="flex items-start justify-between mb-4">
-                                                      <div className="w-12 h-12 rounded-xl bg-[var(--medical-light-teal)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                            <item.icon className="w-6 h-6 text-[var(--medical-teal)]" />
-                                                      </div>
-                                                      <span className="bg-[var(--medical-gold)]/10 text-[var(--medical-gold)] text-xs font-semibold px-3 py-1 rounded-full border border-[var(--medical-gold)]/30">
-                                                            {item.highlight}
-                                                      </span>
-                                                </div>
-                                                <h3 className="text-xl font-bold text-[var(--medical-navy)] mb-2">{item.title}</h3>
-                                                <p className="text-[var(--medical-slate)]">{item.desc}</p>
-                                          </motion.div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* PATIENT JOURNEY TIMELINE */}
-                  <section className="section-premium-alt">
-                        <div className="container-premium">
-                              <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-16"
-                              >
-                                    <h2 className="section-title">
-                                          Your Treatment Journey
-                                    </h2>
-                                    <p className="section-subtitle mx-auto">
-                                          A simple, stress-free process from inquiry to recovery
-                                    </p>
-                              </motion.div>
-
-                              <div className="relative max-w-4xl mx-auto">
-                                    {/* Timeline line */}
-                                    <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--medical-teal)] via-[var(--medical-gold)] to-transparent hidden md:block" />
-
-                                    {journeySteps.map((step, index) => (
-                                          <motion.div
-                                                key={step.title}
-                                                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                                                whileInView={{ opacity: 1, x: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className={`relative flex items-center gap-6 mb-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                                          >
-                                                <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                                                      <div className="card-premium p-6 inline-block">
-                                                            <div className="text-[var(--medical-gold)] text-sm font-medium mb-1">{step.time}</div>
-                                                            <h3 className="text-xl font-bold text-[var(--medical-navy)] mb-2">{step.title}</h3>
-                                                            <p className="text-[var(--medical-slate)]">{step.desc}</p>
-                                                      </div>
-                                                </div>
-
-                                                {/* Center icon */}
-                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[var(--medical-teal)] to-[var(--medical-dark-teal)] flex items-center justify-center shrink-0 shadow-lg z-10">
-                                                      <step.icon className="w-6 h-6 text-white" />
-                                                </div>
-
-                                                <div className="flex-1 hidden md:block" />
-                                          </motion.div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* GLOBAL TESTIMONIALS */}
-                  <section className="section-premium">
-                        <div className="container-premium">
-                              <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-center mb-16"
-                              >
-                                    <h2 className="section-title">
-                                          Hear From Our Global Patients
-                                    </h2>
-                                    <p className="section-subtitle mx-auto">
-                                          Real stories from patients who traveled to India for treatment
-                                    </p>
-                              </motion.div>
-
-                              <div className="grid md:grid-cols-3 gap-6">
-                                    {[
-                                          { name: 'Sarah Mitchell', country: 'USA', flag: '🇺🇸', procedure: 'Knee Replacement', quote: 'I saved $25,000 and received world-class care. The doctors were incredible and spoke perfect English.', rating: 5 },
-                                          { name: 'Mohammed Al-Said', country: 'UAE', flag: '🇦🇪', procedure: 'Cardiac Surgery', quote: 'Zero wait time compared to 6 months back home. The hospital felt like a 5-star hotel.', rating: 5 },
-                                          { name: 'Emma Thompson', country: 'UK', flag: '🇬🇧', procedure: 'IVF Treatment', quote: 'After 3 failed attempts in UK, we succeeded here on the first try. Forever grateful!', rating: 5 },
-                                    ].map((testimonial, index) => (
-                                          <motion.div
-                                                key={testimonial.name}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="card-premium p-6"
-                                          >
-                                                <div className="flex items-center gap-3 mb-4">
-                                                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--medical-teal)] to-[var(--medical-dark-teal)] flex items-center justify-center text-white font-bold">
-                                                            {testimonial.name.charAt(0)}
-                                                      </div>
-                                                      <div>
-                                                            <div className="text-[var(--medical-navy)] font-semibold">{testimonial.name}</div>
-                                                            <div className="text-gray-500 text-sm flex items-center gap-2">
-                                                                  <span>{testimonial.flag}</span>
-                                                                  <span>{testimonial.country}</span>
+                  {/* Treatments Grid */}
+                  <section className="py-20">
+                        <div className="container mx-auto px-4">
+                              {isLoading ? (
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                          {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                <div key={i} className="h-full bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100/50 animate-pulse">
+                                                      <div className="relative h-64 bg-gradient-to-br from-gray-200 to-gray-300" />
+                                                      <div className="p-7 pt-5">
+                                                            <div className="mb-4">
+                                                                  <div className="h-3 bg-gray-200 rounded w-24 mb-2" />
+                                                                  <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-2" />
+                                                                  <div className="h-4 bg-gray-100 rounded w-full mb-1" />
+                                                                  <div className="h-4 bg-gray-100 rounded w-2/3" />
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                                  <div className="h-16 bg-gray-100 rounded-2xl" />
+                                                                  <div className="h-16 bg-gray-100 rounded-2xl" />
+                                                            </div>
+                                                            <div className="flex gap-2 mb-6">
+                                                                  <div className="h-8 bg-gray-100 rounded-lg w-20" />
+                                                                  <div className="h-8 bg-gray-100 rounded-lg w-24" />
+                                                                  <div className="h-8 bg-gray-100 rounded-lg w-16" />
+                                                            </div>
+                                                            <div className="pt-6 border-t border-gray-100">
+                                                                  <div className="h-8 bg-gray-100 rounded-lg w-32 ml-auto" />
                                                             </div>
                                                       </div>
                                                 </div>
-                                                <div className="flex gap-1 mb-3">
-                                                      {[...Array(testimonial.rating)].map((_, i) => (
-                                                            <Star key={i} className="w-4 h-4 text-[var(--medical-gold)] fill-current" />
-                                                      ))}
-                                                </div>
-                                                <p className="text-[var(--medical-slate)] mb-4 italic">&quot;{testimonial.quote}&quot;</p>
-                                                <div className="text-[var(--medical-teal)] text-sm font-medium">{testimonial.procedure}</div>
-                                          </motion.div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* FINAL CTA */}
-                  <section className="py-24 relative overflow-hidden hero-premium">
-                        <div className="absolute inset-0 opacity-10">
-                              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZ2LTJoLTJ2Mmgyem0tNiA2di00aC0ydjRoMnptMC02di0yaC0ydjJoMnoiLz48L2c+PC9nPjwvc3ZnPg==')]" />
-                        </div>
-
-                        <div className="relative container-premium text-center">
-                              <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                              >
-                                    <div className="flex justify-center gap-2 mb-6">
-                                          {PATIENT_COUNTRIES.slice(0, 6).map(c => (
-                                                <span key={c.code} className="text-3xl">{c.flag}</span>
                                           ))}
                                     </div>
-                                    <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                                          Join 50,000+ International Patients
-                                    </h2>
-                                    <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                                          Start your journey to world-class healthcare at a fraction of the cost.
-                                          Free consultation. No obligations.
-                                    </p>
-                                    <div className="flex flex-wrap justify-center gap-4">
-                                          <Link
-                                                href="/booking"
-                                                className="group bg-[var(--medical-gold)] text-[var(--medical-navy)] px-10 py-5 rounded-xl font-bold text-lg hover:bg-yellow-400 hover:scale-105 transition-all duration-300 flex items-center gap-3 shadow-lg"
-                                          >
-                                                <Zap className="w-6 h-6" />
-                                                Get Free Quote Now
-                                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                          </Link>
-                                          <Link
-                                                href="/telemedicine"
-                                                className="bg-white/10 backdrop-blur-md text-white px-10 py-5 rounded-xl font-bold text-lg border border-white/30 hover:bg-white/20 transition-all flex items-center gap-3"
-                                          >
-                                                <Video className="w-6 h-6" />
-                                                Book Video Consult
-                                          </Link>
+                              ) : (
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                          {filteredServices.map((service, index) => {
+                                                const Icon = service.styles.icon;
+
+                                                return (
+                                                      <motion.div
+                                                            key={service.id}
+                                                            initial={{ opacity: 0, y: 30 }}
+                                                            whileInView={{ opacity: 1, y: 0 }}
+                                                            viewport={{ once: true }}
+                                                            transition={{ delay: (index % 3) * 0.1 }}
+                                                            className="h-full"
+                                                      >
+                                                            <Link href={`/services/${service.id}`} className="block h-full group">
+                                                                  <div className="relative h-full bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col border border-gray-100/50 group-hover:border-[var(--medical-teal)]/20">
+
+                                                                        {/* Image Section - Unified Style */}
+                                                                        <div className="relative h-64 overflow-hidden">
+                                                                              <Image
+                                                                                    src={service.image}
+                                                                                    alt={service.title}
+                                                                                    fill
+                                                                                    loading="lazy"
+                                                                                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                                                              />
+                                                                              <div className={`absolute inset-0 bg-gradient-to-t ${service.styles.bg} opacity-80`} />
+
+                                                                              {/* Top Badges */}
+                                                                              <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
+                                                                                    <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-lg">
+                                                                                          <Icon className={`w-6 h-6 ${service.styles.text}`} />
+                                                                                    </div>
+                                                                                    <div className="bg-white/90 backdrop-blur-md text-[var(--medical-teal)] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2">
+                                                                                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--medical-teal)] animate-pulse" />
+                                                                                          Save {service.savings}
+                                                                                    </div>
+                                                                              </div>
+
+                                                                              {/* Success Rate Badge - Floating */}
+                                                                              <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-xl border border-white/20 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                                                                                    <div className="flex flex-col items-center">
+                                                                                          <div className="flex items-center gap-1 text-[var(--medical-gold)] mb-0.5">
+                                                                                                <Award className="w-4 h-4 fill-current" />
+                                                                                                <span className="text-sm font-black text-[var(--medical-navy)]">{service.successRate}</span>
+                                                                                          </div>
+                                                                                          <div className="text-[10px] text-gray-500 font-bold">Success Rate</div>
+                                                                                    </div>
+                                                                              </div>
+                                                                        </div>
+
+                                                                        {/* Content Area - Unified Style */}
+                                                                        <div className="p-7 pt-5 flex-1 flex flex-col">
+                                                                              <div className="mb-4">
+                                                                                    <div className={`text-xs font-black uppercase tracking-widest ${service.styles.text} mb-2`}>{service.category}</div>
+                                                                                    <h3 className="text-xl font-black text-[var(--medical-navy)] group-hover:text-[var(--medical-teal)] transition-colors duration-300 leading-tight mb-2">
+                                                                                          {service.title}
+                                                                                    </h3>
+                                                                                    <p className="text-gray-500 text-sm font-medium line-clamp-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                                                                          {service.description}
+                                                                                    </p>
+                                                                              </div>
+
+                                                                              {/* Key Info Grid */}
+                                                                              <div className="grid grid-cols-2 gap-4 mb-6">
+                                                                                    <div className={`flex items-center gap-3 ${service.styles.light} p-3 rounded-2xl group-hover:bg-[var(--medical-light-teal)]/30 transition-colors`}>
+                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm">
+                                                                                                <Building2 className={`w-4 h-4 ${service.styles.text}`} />
+                                                                                          </div>
+                                                                                          <div className="flex flex-col">
+                                                                                                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Hospital</span>
+                                                                                                <span className="text-xs font-bold text-[var(--medical-navy)] truncate max-w-[80px]">{service.hospitalName}</span>
+                                                                                          </div>
+                                                                                    </div>
+                                                                                    <div className={`flex items-center gap-3 ${service.styles.light} p-3 rounded-2xl group-hover:bg-[var(--medical-light-teal)]/30 transition-colors`}>
+                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm">
+                                                                                                <Sparkles className={`w-4 h-4 ${service.styles.text}`} />
+                                                                                          </div>
+                                                                                          <div className="flex flex-col">
+                                                                                                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Price</span>
+                                                                                                <span className={`text-xs font-bold ${service.styles.text}`}>{formatCurrency(getPrice(service.id, 'pondy'))}</span>
+                                                                                          </div>
+                                                                                    </div>
+                                                                              </div>
+
+                                                                              {/* Technology/Procedures Tags */}
+                                                                              <div className="flex flex-wrap gap-2 mb-6">
+                                                                                    {service.procedures.slice(0, 3).map((proc: string, i: number) => (
+                                                                                          <span key={i} className={`text-[10px] font-black uppercase tracking-wider ${service.styles.text} ${service.styles.light} px-3 py-1.5 rounded-lg border ${service.styles.text.replace('text-', 'border-')}/10`}>
+                                                                                                {proc}
+                                                                                          </span>
+                                                                                    ))}
+                                                                                    {service.procedures.length > 3 && (
+                                                                                          <span className="text-[10px] font-black text-gray-400 self-center">
+                                                                                                +{service.procedures.length - 3} More
+                                                                                          </span>
+                                                                                    )}
+                                                                              </div>
+
+                                                                              {/* Footer - Unified Style */}
+                                                                              <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
+                                                                                    <div className="flex flex-col">
+                                                                                          <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">vs USA Price</span>
+                                                                                          <span className="text-xs text-gray-400 line-through">{formatCurrency(getPrice(service.id, 'us'))}</span>
+                                                                                    </div>
+
+                                                                                    <div className="flex items-center gap-2 text-[var(--medical-teal)] font-black text-sm uppercase tracking-widest group/link">
+                                                                                          Details
+                                                                                          <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${service.styles.bg} text-white flex items-center justify-center group-hover/link:translate-x-1 transition-transform shadow-lg`}>
+                                                                                                <ChevronRight className="w-5 h-5" />
+                                                                                          </div>
+                                                                                    </div>
+                                                                              </div>
+                                                                        </div>
+                                                                  </div>
+                                                            </Link>
+                                                      </motion.div>
+                                                );
+                                          })}
                                     </div>
-                                    <p className="text-white/70 mt-8 text-sm">
-                                          💬 Available 24/7 via WhatsApp, Zoom, or Phone
-                                    </p>
-                              </motion.div>
+                              )}
+                        </div>
+                  </section>
+
+                  {/* International Patients - Banner */}
+                  <section className="py-20 bg-white border-t border-slate-100">
+                        <div className="container mx-auto px-4">
+                              <div className="text-center mb-12">
+                                    <h2 className="text-3xl font-bold text-slate-800 mb-4">Trusted by Patients Worldwide</h2>
+                                    <p className="text-slate-500 max-w-2xl mx-auto">We welcome thousands of international patients annually, providing dedicated support services for a seamless medical journey.</p>
+                              </div>
+
+                              <div className="flex flex-wrap justify-center gap-6">
+                                    {PATIENT_COUNTRIES.map((country) => (
+                                          <div key={country.code} className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100 flex items-center gap-3">
+                                                <span className="text-2xl">{country.flag}</span>
+                                                <div className="text-left">
+                                                      <div className="font-bold text-slate-700">{country.name}</div>
+                                                      <div className="text-xs text-slate-500">{country.patients} Patients</div>
+                                                </div>
+                                          </div>
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* Process Steps */}
+                  <section className="py-20 bg-slate-50">
+                        <div className="container mx-auto px-4">
+                              <div className="text-center mb-16">
+                                    <h2 className="text-3xl font-bold text-slate-800 mb-4">Your Journey to Recovery</h2>
+                                    <p className="text-slate-500">Simple, transparent, and guided every step of the way</p>
+                              </div>
+
+                              <div className="grid md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                                    {[
+                                          { icon: Plane, title: "Plan", desc: "Consultation & Visa" },
+                                          { icon: MapPin, title: "Arrive", desc: "Airport Pickup & Hotel" },
+                                          { icon: Activity, title: "Treat", desc: "Procedure & Care" },
+                                          { icon: Heart, title: "Recover", desc: "Rehab & Sightseeing" }
+                                    ].map((step, idx) => (
+                                          <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative group hover:shadow-md transition-all">
+                                                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                                      <step.icon className="w-6 h-6" />
+                                                </div>
+                                                <h3 className="font-bold text-slate-800 mb-1">{step.title}</h3>
+                                                <p className="text-sm text-slate-500">{step.desc}</p>
+
+                                                {idx < 3 && (
+                                                      <div className="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
+                                                            <ArrowRight className="w-4 h-4 text-slate-300" />
+                                                      </div>
+                                                )}
+                                          </div>
+                                    ))}
+                              </div>
                         </div>
                   </section>
 

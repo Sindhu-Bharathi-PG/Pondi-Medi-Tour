@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const timeRange = searchParams.get('timeRange') || '30d';
 
-        const response = await fetch(`${BACKEND_URL}/admin/analytics?timeRange=${timeRange}`, {
+        const response = await fetch(`${BACKEND_URL}/api/admin/analytics?timeRange=${timeRange}`, {
             headers: {
                 'Authorization': `Bearer ${session.accessToken}`,
                 'Content-Type': 'application/json'

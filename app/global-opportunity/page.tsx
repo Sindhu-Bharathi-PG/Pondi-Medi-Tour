@@ -1,15 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import {
+      ArrowRight,
+      Award,
+      CheckCircle,
+      ChevronRight,
+      Clock, DollarSign,
+      Globe,
+      Heart,
+      Plane,
+      Target,
+      TrendingUp, Users
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Header, Footer } from '../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
-import {
-      TrendingUp, Users, Heart, Globe, Clock, DollarSign, Award, Leaf,
-      Building2, Star, ChevronRight, ArrowRight, CheckCircle, Target,
-      Briefcase, Plane, Shield
-} from 'lucide-react';
 
 // Market Growth Drivers
 const growthDrivers = [
@@ -18,7 +25,7 @@ const growthDrivers = [
       { icon: Clock, title: 'Healthcare Wait Times', desc: 'UK/Canada: 6-12 month waits, Germany: 8-week specialist waits', opportunity: 'Same-week scheduling in Pondicherry' },
       { icon: DollarSign, title: 'Rising Healthcare Costs', desc: 'US costs 2x Europe, 3-4x India. Insurance deductibles increasing', opportunity: 'Cost savings primary driver for patients' },
       { icon: Globe, title: 'Indian Diaspora', desc: '18+ million worldwide, aging diaspora parents 50-65 years', opportunity: 'Combine medical care with family visits' },
-      { icon: TrendingUp, title: 'Post-COVID Wellness Surge', desc: '+40% wellness bookings 2021-2024, longer retreat stays', opportunity: 'Telemedicine + in-person hybrid model' },
+      { icon: TrendingUp, title: 'Post-COVID Wellness Surge', desc: '+40% wellness bookings 2021-2024, longer retreat stays', opportunity: 'Hybrid care models with extended stays' },
 ];
 
 // India's Competitive Advantages

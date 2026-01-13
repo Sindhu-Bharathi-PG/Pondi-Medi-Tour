@@ -16,7 +16,7 @@ async function inquiryRoutes(fastify, options) {
 
     protectedRoutes.get('/', async (req, reply) => {
         // Dispatch based on role
-        if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+        if (req.user.userType === 'admin' || req.user.userType === 'superadmin') {
             return inquiryController.getAllInquiries(req, reply);
         } else {
             return inquiryController.getInquiries(req, reply);

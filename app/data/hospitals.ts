@@ -1,4 +1,4 @@
-import { Activity, Building2, Microscope, Stethoscope, Trophy, User } from 'lucide-react';
+import { Activity, Building2, Microscope, Trophy, User } from 'lucide-react';
 
 export interface Hospital {
       id: number | string;
@@ -67,7 +67,7 @@ export const hospitals: Hospital[] = [
             about: 'JIPMER is an Institute of National Importance (INI) and a premier medical institution in India. It offers high-quality medical care ranging from basic to super-specialty services. JIPMER is known for its free treatment for poor patients and heavily subsidized rates for others, making world-class healthcare accessible to all.',
             highlights: ['50+ US/UK trained cardiologists', '1,100+ active beds', '24/7 Trauma Center', 'World-class research', 'AI-assisted diagnostics'],
             equipment: ['64-slice CT scanner', '3T MRI', 'Digital Operating Theaters', 'Advanced Blood Bank', 'Robotic Surgery Suite', 'Linear Accelerator'],
-            facilities: ['Modern ICU', 'Telemedicine Center', 'International Patient Wing', '24/7 Pharmacy', 'Banking services', 'Patient Guest House'],
+            facilities: ['Modern ICU', 'International Patient Wing', '24/7 Pharmacy', 'Banking services', 'Patient Guest House'],
             internationalPatients: '5000+',
             successRate: '98.5%',
             contact: {

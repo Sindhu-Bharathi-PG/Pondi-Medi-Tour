@@ -152,25 +152,29 @@ export default function HospitalsManagementPage() {
     };
 
     const StatusBadge = ({ status }: { status: string }) => {
+        const normalizedStatus = status?.toLowerCase() || 'pending';
+
         const styles = {
             active: "bg-emerald-50 text-emerald-700 border-emerald-200",
             pending: "bg-amber-50 text-amber-700 border-amber-200",
-            rejected: "bg-rose-50 text-rose-700 border-rose-200"
+            rejected: "bg-rose-50 text-rose-700 border-rose-200",
+            default: "bg-slate-50 text-slate-700 border-slate-200"
         };
 
         const icons = {
             active: CheckCircle,
             pending: Clock,
-            rejected: XCircle
+            rejected: XCircle,
+            default: Building2
         };
 
-        const Icon = icons[status as keyof typeof icons];
-        const style = styles[status as keyof typeof styles];
+        const Icon = icons[normalizedStatus as keyof typeof icons] || icons.default;
+        const style = styles[normalizedStatus as keyof typeof styles] || styles.default;
 
         return (
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${style}`}>
                 <Icon className="w-3.5 h-3.5" />
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                {status ? (status.charAt(0).toUpperCase() + status.slice(1)) : 'Unknown'}
             </span>
         );
     };

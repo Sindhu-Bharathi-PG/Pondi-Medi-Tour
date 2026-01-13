@@ -234,6 +234,8 @@ export default function ClassicDashboard() {
                     </div>
                 </div>
 
+
+
                 {/* Carousel + Quick Actions Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Photo Gallery Carousel - Half Width */}

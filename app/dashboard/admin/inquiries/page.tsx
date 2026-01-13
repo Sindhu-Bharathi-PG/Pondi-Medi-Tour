@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Clock, Mail, MessageSquare, Search, User } from "lucide-react";
+import { Building2, CheckCircle2, Clock, Mail, MessageSquare, Package, Search, Stethoscope, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Inquiry {
@@ -11,6 +11,13 @@ interface Inquiry {
     message: string;
     status: 'pending' | 'responded';
     createdAt: string;
+    hospitalId?: number | null;
+    hospitalName?: string;
+    packageId?: number | null;
+    inquiryType?: 'general' | 'hospital' | 'package' | 'treatment';
+    treatmentType?: string;
+    phone?: string;
+    country?: string;
 }
 
 export default function AdminInquiriesPage() {
@@ -18,6 +25,7 @@ export default function AdminInquiriesPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState('all'); // all | pending | responded
+    const [typeFilter, setTypeFilter] = useState('all'); // all | general | hospital | package | treatment
 
     useEffect(() => {
         fetchInquiries();
@@ -94,8 +102,27 @@ export default function AdminInquiriesPage() {
             (inquiry.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
             (inquiry.subject?.toLowerCase() || '').includes(searchQuery.toLowerCase());
         const matchesFilter = filter === 'all' || inquiry.status === filter;
-        return matchesSearch && matchesFilter;
+        const matchesType = typeFilter === 'all' || (inquiry.inquiryType || 'general') === typeFilter;
+        return matchesSearch && matchesFilter && matchesType;
     });
+
+    const getInquiryTypeBadge = (inquiry: Inquiry) => {
+        const type = inquiry.inquiryType || 'general';
+        const badges = {
+            general: { bg: 'bg-gray-100', text: 'text-gray-700', icon: MessageSquare, label: 'General' },
+            hospital: { bg: 'bg-blue-100', text: 'text-blue-700', icon: Building2, label: inquiry.hospitalName || 'Hospital' },
+            package: { bg: 'bg-purple-100', text: 'text-purple-700', icon: Package, label: 'Package' },
+            treatment: { bg: 'bg-teal-100', text: 'text-teal-700', icon: Stethoscope, label: inquiry.treatmentType || 'Treatment' }
+        };
+        const badge = badges[type];
+        const Icon = badge.icon;
+        return (
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
+                <Icon className="w-3.5 h-3.5" />
+                {badge.label}
+            </span>
+        );
+    };
 
     return (
         <div className="space-y-6">
@@ -107,7 +134,7 @@ export default function AdminInquiriesPage() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex flex-col gap-4 mb-6">
                 <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -118,25 +145,59 @@ export default function AdminInquiriesPage() {
                         className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none shadow-sm"
                     />
                 </div>
-                <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
-                    <button
-                        onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'all' ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                    >
-                        All
-                    </button>
-                    <button
-                        onClick={() => setFilter('pending')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'pending' ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                    >
-                        Pending
-                    </button>
-                    <button
-                        onClick={() => setFilter('responded')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'responded' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                    >
-                        Responded
-                    </button>
+                <div className="flex flex-wrap gap-3">
+                    <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'all' ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            All Status
+                        </button>
+                        <button
+                            onClick={() => setFilter('pending')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'pending' ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Pending
+                        </button>
+                        <button
+                            onClick={() => setFilter('responded')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'responded' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Responded
+                        </button>
+                    </div>
+                    <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
+                        <button
+                            onClick={() => setTypeFilter('all')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'all' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            All Types
+                        </button>
+                        <button
+                            onClick={() => setTypeFilter('general')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'general' ? 'bg-gray-100 text-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            General
+                        </button>
+                        <button
+                            onClick={() => setTypeFilter('hospital')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'hospital' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Hospital
+                        </button>
+                        <button
+                            onClick={() => setTypeFilter('package')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'package' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Package
+                        </button>
+                        <button
+                            onClick={() => setTypeFilter('treatment')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'treatment' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Treatment
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -180,10 +241,13 @@ export default function AdminInquiriesPage() {
 
                                 {/* Content */}
                                 <div className="flex-1">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                                            {inquiry.subject}
-                                        </h3>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
+                                                {inquiry.subject}
+                                            </h3>
+                                            {getInquiryTypeBadge(inquiry)}
+                                        </div>
                                         <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
                                             {new Date(inquiry.createdAt).toLocaleString()}
                                         </span>

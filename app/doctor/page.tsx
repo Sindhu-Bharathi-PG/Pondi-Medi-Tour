@@ -1,14 +1,37 @@
 "use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Award, Star, GraduationCap, Clock, ChevronRight, Search, Heart, Stethoscope, Globe, Users, MapPin, Building2, ArrowRight, TrendingUp, Activity } from 'lucide-react';
+import { API_BASE } from '@/app/hooks/useApi';
+import { motion } from 'framer-motion';
+import { Activity, ArrowRight, Award, Building2, ChevronRight, Globe, Search, Star, Stethoscope, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { Header, Footer } from '../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../components/common';
 
-// Doctor data with hospital and service linking
-const doctors = [
+// Doctor interface
+interface Doctor {
+      id: number;
+      name: string;
+      image: string;
+      specialty: string;
+      serviceSlug: string;
+      subSpecialty: string;
+      credentials: string;
+      experience: string;
+      hospital: string;
+      hospitalId: string;
+      rating: number;
+      reviews: number;
+      surgeries: number;
+      languages: string[];
+      education: string[];
+      bio: string;
+      featured: boolean;
+      available: boolean;
+}
+
+// Static fallback data
+const staticDoctors: Doctor[] = [
       {
             id: 1,
             name: 'Dr. V. Veerappan',
@@ -29,121 +52,91 @@ const doctors = [
             featured: true,
             available: true,
       },
-      {
-            id: 2,
-            name: 'Dr. V. M. Thomas',
-            image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400',
-            specialty: 'IVF & Fertility',
-            serviceSlug: 'ivf',
-            subSpecialty: 'Reproductive Medicine',
-            credentials: 'PhD, FSAB (Reproductive Biotechnology)',
-            experience: '25+ years',
-            hospital: 'Indira IVF Centre',
-            hospitalId: '2',
-            rating: 4.9,
-            reviews: 680,
-            surgeries: 10000,
-            languages: ['English', 'Malayalam', 'Tamil'],
-            education: ['PhD - IISc Bangalore', 'FSAB - European Society'],
-            bio: 'Renowned embryologist with thousands of successful IVF cycles worldwide.',
-            featured: true,
-            available: true,
-      },
-      {
-            id: 3,
-            name: 'Dr. Ramya R',
-            image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400',
-            specialty: 'IVF & Fertility',
-            serviceSlug: 'ivf',
-            subSpecialty: 'Infertility Consultant',
-            credentials: 'MBBS, DGO, FRM',
-            experience: '11+ years',
-            hospital: 'Indira IVF Centre',
-            hospitalId: '2',
-            rating: 4.8,
-            reviews: 320,
-            surgeries: 2500,
-            languages: ['English', 'Tamil', 'Hindi'],
-            education: ['MBBS - Stanley Medical', 'DGO - Govt General Hospital', 'FRM - Singapore'],
-            bio: 'Passionate fertility specialist dedicated to making parenthood dreams come true.',
-            featured: true,
-            available: true,
-      },
-      {
-            id: 4,
-            name: 'Dr. Suresh Kumar',
-            image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400',
-            specialty: 'Cardiology',
-            serviceSlug: 'cardiology',
-            subSpecialty: 'Interventional Cardiology',
-            credentials: 'DM Cardiology, FACC (USA)',
-            experience: '18+ years',
-            hospital: 'JIPMER',
-            hospitalId: '1',
-            rating: 4.9,
-            reviews: 520,
-            surgeries: 4000,
-            languages: ['English', 'Tamil', 'Telugu'],
-            education: ['MBBS - JIPMER', 'DM Cardio - AIIMS', 'Fellowship - Cleveland Clinic'],
-            bio: 'Cleveland Clinic trained interventional cardiologist specializing in complex angioplasty.',
-            featured: false,
-            available: true,
-      },
-      {
-            id: 5,
-            name: 'Dr. Priya Sharma',
-            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
-            specialty: 'Gastroenterology',
-            serviceSlug: 'gastroenterology',
-            subSpecialty: 'Bariatric Surgery',
-            credentials: 'MS, MCh, FAIS',
-            experience: '15+ years',
-            hospital: 'GEM Hospital',
-            hospitalId: '2',
-            rating: 4.8,
-            reviews: 380,
-            surgeries: 3200,
-            languages: ['English', 'Hindi', 'Tamil'],
-            education: ['MBBS - Maulana Azad', 'MS - PGI Chandigarh', 'MCh - GEM Hospital'],
-            bio: 'Leading bariatric surgeon with expertise in laparoscopic and robotic procedures.',
-            featured: false,
-            available: true,
-      },
-      {
-            id: 6,
-            name: 'Dr. Aravind Mohan',
-            image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400',
-            specialty: 'Ophthalmology',
-            serviceSlug: 'ophthalmology',
-            subSpecialty: 'Cataract & Retina',
-            credentials: 'MS, DNB, FICO',
-            experience: '20+ years',
-            hospital: 'Aravind Eye Hospital',
-            hospitalId: '1',
-            rating: 4.9,
-            reviews: 890,
-            surgeries: 15000,
-            languages: ['English', 'Tamil', 'Malayalam'],
-            education: ['MBBS - Madras Medical', 'MS Ophth - Aravind', 'Fellowship - Moorfields UK'],
-            bio: 'World-renowned retina specialist with expertise from Moorfields Eye Hospital, UK.',
-            featured: false,
-            available: true,
-      },
 ];
 
-const specialties = [
-      { id: 'all', label: 'All Specialties', count: doctors.length },
-      { id: 'Orthopedics', label: 'Orthopedics', count: doctors.filter(d => d.specialty === 'Orthopedics').length },
-      { id: 'IVF & Fertility', label: 'IVF & Fertility', count: doctors.filter(d => d.specialty === 'IVF & Fertility').length },
-      { id: 'Cardiology', label: 'Cardiology', count: doctors.filter(d => d.specialty === 'Cardiology').length },
-      { id: 'Gastroenterology', label: 'Gastroenterology', count: doctors.filter(d => d.specialty === 'Gastroenterology').length },
-      { id: 'Ophthalmology', label: 'Ophthalmology', count: doctors.filter(d => d.specialty === 'Ophthalmology').length },
-];
+// Transform DB doctor to match interface
+const transformDbDoctor = (dbDoctor: any): Doctor => ({
+      id: dbDoctor.id,
+      name: dbDoctor.name?.replace('[TEST] ', '') || 'Unknown Doctor',
+      image: dbDoctor.imageUrl || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400',
+      specialty: dbDoctor.specialty || 'General Medicine',
+      serviceSlug: dbDoctor.specialty?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'general',
+      subSpecialty: dbDoctor.subSpecialty || dbDoctor.specialty || '',
+      credentials: dbDoctor.credentials || '',
+      experience: dbDoctor.experience || '10+ years',
+      hospital: dbDoctor.hospitalName?.replace('[TEST] ', '') || 'Partner Hospital',
+      hospitalId: String(dbDoctor.hospitalId || 1),
+      rating: parseFloat(dbDoctor.rating) || 4.5,
+      reviews: dbDoctor.reviewsCount || 100,
+      surgeries: dbDoctor.surgeriesCount || 1000,
+      languages: dbDoctor.languages || ['English'],
+      education: Array.isArray(dbDoctor.education)
+            ? dbDoctor.education.map((e: any) => typeof e === 'string' ? e : `${e.degree} - ${e.institution}`)
+            : [],
+      bio: dbDoctor.bio?.replace('[TEST DATA] ', '') || '',
+      featured: dbDoctor.isFeatured || false,
+      available: dbDoctor.isAvailable !== false,
+});
 
 export default function DoctorPage() {
       const [activeSpecialty, setActiveSpecialty] = useState('all');
       const [searchQuery, setSearchQuery] = useState('');
+      const [doctors, setDoctors] = useState<Doctor[]>(staticDoctors);
+      const [specialties, setSpecialties] = useState<{ id: string, label: string, count: number }[]>([]);
+      const [loading, setLoading] = useState(true);
       const [counts, setCounts] = useState<Record<number, number>>({});
+
+      // Fetch doctors from API
+      useEffect(() => {
+            const fetchDoctors = async () => {
+                  try {
+                        const res = await fetch(`${API_BASE}/api/doctors`);
+                        if (res.ok) {
+                              const dbDoctors = await res.json();
+                              const doctorList = Array.isArray(dbDoctors) ? dbDoctors : [];
+
+                              if (doctorList.length > 0) {
+                                    const transformedDoctors = doctorList.map(transformDbDoctor);
+                                    setDoctors(transformedDoctors);
+
+                                    // Build specialties from fetched data
+                                    const specCounts = transformedDoctors.reduce((acc: Record<string, number>, d) => {
+                                          acc[d.specialty] = (acc[d.specialty] || 0) + 1;
+                                          return acc;
+                                    }, {});
+
+                                    const specs = [
+                                          { id: 'all', label: 'All Specialties', count: transformedDoctors.length },
+                                          ...Object.entries(specCounts).map(([spec, count]) => ({
+                                                id: spec, label: spec, count: count as number
+                                          }))
+                                    ];
+                                    setSpecialties(specs);
+                              }
+                        }
+                  } catch (error) {
+                        console.error('Failed to fetch doctors:', error);
+                  }
+                  setLoading(false);
+            };
+            fetchDoctors();
+      }, []);
+
+      // Set default specialties if none from API
+      useEffect(() => {
+            if (specialties.length === 0) {
+                  const specCounts = doctors.reduce((acc: Record<string, number>, d) => {
+                        acc[d.specialty] = (acc[d.specialty] || 0) + 1;
+                        return acc;
+                  }, {});
+                  setSpecialties([
+                        { id: 'all', label: 'All Specialties', count: doctors.length },
+                        ...Object.entries(specCounts).map(([spec, count]) => ({
+                              id: spec, label: spec, count: count as number
+                        }))
+                  ]);
+            }
+      }, [doctors, specialties.length]);
 
       const stats = [
             { value: '200+', label: 'Expert Doctors', icon: Stethoscope, target: 200 },
@@ -316,8 +309,8 @@ export default function DoctorPage() {
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => setActiveSpecialty(specialty.id)}
                                                 className={`px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2 ${activeSpecialty === specialty.id
-                                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                                                            : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
+                                                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                                                      : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
                                                       }`}
                                           >
                                                 {specialty.label}
@@ -332,7 +325,7 @@ export default function DoctorPage() {
                   </section>
 
                   {/* Featured Doctors */}
-                  {featuredDoctors.length > 0 && (
+                  {!loading && featuredDoctors.length > 0 && (
                         <section className="py-16 bg-white">
                               <div className="container mx-auto px-4">
                                     <motion.div
@@ -345,7 +338,7 @@ export default function DoctorPage() {
                                           <h2 className="text-3xl font-bold text-gray-800">Top Rated Specialists</h2>
                                     </motion.div>
 
-                                    <div className="grid lg:grid-cols-3 gap-8">
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                                           {featuredDoctors.map((doctor, index) => (
                                                 <motion.div
                                                       key={doctor.id}
@@ -444,64 +437,86 @@ export default function DoctorPage() {
                                     </h2>
                               </motion.div>
 
-                              <div className="grid md:grid-cols-2 gap-6">
-                                    {allDoctors.map((doctor, index) => (
-                                          <motion.div
-                                                key={doctor.id}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.05 }}
-                                                whileHover={{ scale: 1.02 }}
-                                                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex gap-6 border border-gray-100"
-                                          >
-                                                <div className="relative w-28 h-28 rounded-xl overflow-hidden shrink-0">
-                                                      <Image
-                                                            src={doctor.image}
-                                                            alt={doctor.name}
-                                                            fill
-                                                            className="object-cover"
-                                                      />
+                              {loading ? (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                          {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                <div key={i} className="bg-white rounded-xl shadow-lg p-6 flex gap-6 border border-gray-100 animate-pulse">
+                                                      <div className="w-28 h-28 rounded-xl bg-gray-200 shrink-0" />
+                                                      <div className="flex-1">
+                                                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+                                                            <div className="h-4 bg-gray-100 rounded w-1/2 mb-3" />
+                                                            <div className="h-3 bg-gray-100 rounded w-full mb-2" />
+                                                            <div className="flex gap-4 mb-4">
+                                                                  <div className="h-4 bg-gray-100 rounded w-20" />
+                                                                  <div className="h-4 bg-gray-100 rounded w-24" />
+                                                            </div>
+                                                      </div>
+                                                      <div className="flex flex-col justify-center shrink-0">
+                                                            <div className="h-10 bg-gray-200 rounded-lg w-28" />
+                                                      </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                      <div className="flex items-start justify-between mb-2">
-                                                            <div>
-                                                                  <h3 className="text-lg font-bold text-gray-800">{doctor.name}</h3>
+                                          ))}
+                                    </div>
+                              ) : (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                          {allDoctors.map((doctor, index) => (
+                                                <motion.div
+                                                      key={doctor.id}
+                                                      initial={{ opacity: 0, y: 20 }}
+                                                      whileInView={{ opacity: 1, y: 0 }}
+                                                      viewport={{ once: true }}
+                                                      transition={{ delay: index * 0.05 }}
+                                                      whileHover={{ scale: 1.02 }}
+                                                      className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 flex gap-6 border border-gray-100"
+                                                >
+                                                      <div className="relative w-28 h-28 rounded-xl overflow-hidden shrink-0">
+                                                            <Image
+                                                                  src={doctor.image}
+                                                                  alt={doctor.name}
+                                                                  fill
+                                                                  className="object-cover"
+                                                            />
+                                                      </div>
+                                                      <div className="flex-1 min-w-0">
+                                                            <div className="flex items-start justify-between mb-2">
+                                                                  <div>
+                                                                        <h3 className="text-lg font-bold text-gray-800">{doctor.name}</h3>
+                                                                        <Link
+                                                                              href={`/services/${doctor.serviceSlug}`}
+                                                                              className="text-blue-600 text-sm hover:underline"
+                                                                        >
+                                                                              {doctor.subSpecialty}
+                                                                        </Link>
+                                                                  </div>
+                                                                  <div className="flex items-center gap-1 bg-yellow-50 text-yellow-700 px-2 py-1 rounded shrink-0">
+                                                                        <Star className="w-4 h-4 fill-current" />
+                                                                        <span className="font-semibold text-sm">{doctor.rating}</span>
+                                                                  </div>
+                                                            </div>
+                                                            <p className="text-gray-500 text-sm mb-3 truncate">{doctor.credentials}</p>
+                                                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                                                                  <span>{doctor.experience}</span>
+                                                                  <span className="text-gray-300">|</span>
                                                                   <Link
-                                                                        href={`/services/${doctor.serviceSlug}`}
-                                                                        className="text-blue-600 text-sm hover:underline"
+                                                                        href={`/hospital/${doctor.hospitalId}`}
+                                                                        className="hover:text-blue-600 hover:underline transition-colors"
                                                                   >
-                                                                        {doctor.subSpecialty}
+                                                                        {doctor.hospital}
                                                                   </Link>
                                                             </div>
-                                                            <div className="flex items-center gap-1 bg-yellow-50 text-yellow-700 px-2 py-1 rounded shrink-0">
-                                                                  <Star className="w-4 h-4 fill-current" />
-                                                                  <span className="font-semibold text-sm">{doctor.rating}</span>
-                                                            </div>
                                                       </div>
-                                                      <p className="text-gray-500 text-sm mb-3 truncate">{doctor.credentials}</p>
-                                                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                                                            <span>{doctor.experience}</span>
-                                                            <span className="text-gray-300">|</span>
+                                                      <div className="flex flex-col justify-center gap-2 shrink-0">
                                                             <Link
-                                                                  href={`/hospital/${doctor.hospitalId}`}
-                                                                  className="hover:text-blue-600 hover:underline transition-colors"
+                                                                  href={`/doctor/${doctor.id}`}
+                                                                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all text-center"
                                                             >
-                                                                  {doctor.hospital}
+                                                                  View Details
                                                             </Link>
                                                       </div>
-                                                </div>
-                                                <div className="flex flex-col justify-center gap-2 shrink-0">
-                                                      <Link
-                                                            href={`/doctor/${doctor.id}`}
-                                                            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all text-center"
-                                                      >
-                                                            View Details
-                                                      </Link>
-                                                </div>
-                                          </motion.div>
-                                    ))}
-                              </div>
+                                                </motion.div>
+                                          ))}
+                                    </div>
+                              )}
                         </div>
                   </section>
 

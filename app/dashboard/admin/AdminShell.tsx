@@ -1,9 +1,8 @@
 "use client";
 
-import { LogOut, Menu } from "lucide-react";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import AdminNotifications from "./components/AdminNotifications";
 import AdminSidebar from "./components/AdminSidebar";
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
@@ -14,49 +13,58 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     const userEmail = session?.user?.email || 'admin@pondimeditour.com';
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-gray-50 flex">
             <AdminSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
             />
 
             <div className="flex-1 flex flex-col min-w-0">
-                {/* Header - Both Mobile & Desktop */}
-                <header className="bg-white border-b border-slate-200 px-4 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+                {/* Header - Clean White Theme */}
+                <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-30">
                     {/* Left: Menu button (mobile) */}
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition"
+                        className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition"
                     >
-                        <Menu className="w-6 h-6 text-slate-700" />
+                        <Menu className="w-6 h-6 text-gray-700" />
                     </button>
 
-                    {/* Center: Title (mobile) / Left: Welcome (desktop) */}
-                    <div className="lg:flex-1">
-                        <h1 className="text-lg font-bold text-slate-900 lg:hidden">Admin Panel</h1>
-                        <div className="hidden lg:block">
-                            <p className="text-sm text-slate-500">Welcome back,</p>
-                            <h2 className="font-bold text-slate-900">{userName}</h2>
+                    {/* Center: Search Bar (desktop) */}
+                    <div className="hidden lg:flex flex-1 max-w-md">
+                        <div className="relative w-full">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none text-gray-700 placeholder:text-gray-400"
+                            />
                         </div>
                     </div>
 
+                    {/* Mobile Title */}
+                    <h1 className="text-lg font-bold text-gray-900 lg:hidden">Admin Panel</h1>
+
                     {/* Right: Actions */}
-                    <div className="flex items-center gap-2 lg:gap-4">
+                    <div className="flex items-center gap-3">
                         {/* Notifications */}
-                        <AdminNotifications />
+                        <button className="relative p-2.5 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition">
+                            <Bell className="w-5 h-5" />
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
 
                         {/* User Dropdown - Desktop */}
-                        <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-slate-200">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-500/25">
+                        <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-gray-200">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-500/25">
                                 {userName.charAt(0).toUpperCase()}
                             </div>
                             <div className="hidden xl:block">
-                                <p className="text-sm font-medium text-slate-900">{userName}</p>
-                                <p className="text-xs text-slate-500">{userEmail}</p>
+                                <p className="text-sm font-semibold text-gray-900">{userName}</p>
+                                <p className="text-xs text-gray-500">{userEmail}</p>
                             </div>
                             <button
                                 onClick={() => signOut({ callbackUrl: '/login/admin' })}
-                                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
                                 title="Logout"
                             >
                                 <LogOut className="w-4 h-4" />
@@ -66,11 +74,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 </header>
 
                 {/* Main Content */}
-                <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+                <main className="flex-1 overflow-y-auto p-4 lg:p-8 bg-gray-50">
                     {children}
                 </main>
             </div>
         </div>
     );
 }
-

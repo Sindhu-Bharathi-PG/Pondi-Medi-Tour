@@ -2,6 +2,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+
 export async function GET(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -9,15 +11,23 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Return mock activity data (can be enhanced with real activity logs later)
-        return NextResponse.json({
-            success: true,
-            data: [
-                { targetType: 'user', actionType: 'create', description: 'New user registered', metadata: { targetName: 'john@example.com' }, createdAt: new Date(Date.now() - 5 * 60000).toISOString() },
-                { targetType: 'hospital', actionType: 'approve', description: 'Hospital approved', metadata: { targetName: 'Apollo Hospital' }, createdAt: new Date(Date.now() - 15 * 60000).toISOString() },
-                { targetType: 'inquiry', actionType: 'create', description: 'New inquiry received', metadata: { targetName: 'Sarah Johnson' }, createdAt: new Date(Date.now() - 60 * 60000).toISOString() },
-            ]
+        const { searchParams } = new URL(request.url);
+        const limit = searchParams.get('limit') || '10';
+
+        const response = await fetch(`${BACKEND_URL}/api/admin/analytics/activity?limit=${limit}`, {
+            headers: {
+                'Authorization': `Bearer ${session.accessToken}`,
+                'Content-Type': 'application/json'
+            }
         });
+
+        if (!response.ok) {
+            console.warn('Backend failed to return activity, using fallback');
+            return NextResponse.json({ success: true, data: [] });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error fetching activity:', error);
         return NextResponse.json({ success: true, data: [] });

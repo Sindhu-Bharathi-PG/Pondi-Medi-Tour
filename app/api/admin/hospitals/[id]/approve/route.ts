@@ -20,7 +20,7 @@ export async function PATCH(
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/admin/hospitals/${params.id}/approve`, {
+            const response = await fetch(`${BACKEND_URL}/api/admin/hospitals/${params.id}/approve`, {
                 method: 'PATCH',
                 headers
             });

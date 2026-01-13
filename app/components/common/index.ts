@@ -21,6 +21,7 @@ export {
     SkeletonTableRow
 } from './CommonLoader';
 export { default as FloatingAccessibility } from './FloatingAccessibility';
+export { default as FloatingQuoteWidget } from './FloatingQuoteWidget';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { default as ModeToggle, ModeToggleCompact } from './ModeToggle';
 export { default as SearchBar } from './SearchBar';

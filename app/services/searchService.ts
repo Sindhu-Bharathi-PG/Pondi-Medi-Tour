@@ -200,19 +200,6 @@ export const pageRegistry: SearchableCard[] = [
     icon: 'Calendar',
   },
   {
-    id: 'telemedicine',
-    title: 'Telemedicine',
-    description: 'Virtual consultations with specialists from anywhere in the world.',
-    category: 'medical',
-    type: 'service',
-    url: '/telemedicine',
-    tags: ['telemedicine', 'virtual', 'online consultation', 'video call'],
-    keywords: ['telemedicine', 'online consultation', 'video call', 'remote consultation', 'virtual doctor'],
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400',
-    badge: 'New',
-    icon: 'Video',
-  },
-  {
     id: 'visa',
     title: 'Visa Assistance',
     description: 'Complete medical visa support. Get approved in 72 hours.',
@@ -429,7 +416,7 @@ export function getWellnessPages(): SearchableCard[] {
  */
 export function getQuickActionPages(): SearchableCard[] {
   return pageRegistry.filter(card =>
-    ['booking', 'contact', 'telemedicine', 'cost-calculator'].includes(card.id)
+    ['booking', 'contact', 'cost-calculator'].includes(card.id)
   );
 }
 
@@ -461,7 +448,7 @@ export function getRelatedPages(currentPageId: string, limit: number = 3): Searc
       let relevance = 0;
       if (card.category === currentPage.category) relevance += 10;
       if (card.type === currentPage.type) relevance += 5;
-      
+
       card.tags.forEach(tag => {
         if (currentPage.tags.includes(tag)) relevance += 3;
       });

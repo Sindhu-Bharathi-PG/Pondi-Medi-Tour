@@ -1,15 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import {
+      ArrowRight,
+      Award,
+      Building2,
+      CheckCircle,
+      ChevronRight,
+      Clock,
+      DollarSign,
+      Globe, Heart,
+      Leaf,
+      Shield,
+      Sparkles,
+      TrendingUp,
+      Users
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Header, Footer } from '../components/common';
+import { useEffect, useState } from 'react';
+import { Footer, Header } from '../components/common';
 import { useScrolled } from '../hooks';
-import {
-      Globe, Heart, Sparkles, Leaf, DollarSign, Award, Clock, Shield,
-      Users, Plane, ChevronRight, ArrowRight, CheckCircle, TrendingUp,
-      Building2, Star, Play
-} from 'lucide-react';
 
 // Treatment Categories
 const treatmentCategories = [
@@ -327,7 +337,7 @@ export default function MedicalTourismPage() {
                                     <div className="grid md:grid-cols-2 gap-6">
                                           {[
                                                 { icon: Shield, title: 'Accreditation', desc: 'International standards (JCI, NABH, ISO)' },
-                                                { icon: Globe, title: 'Telemedicine Follow-up', desc: 'Post-operative care via video consultation' },
+                                                { icon: Globe, title: 'Follow-up Care', desc: 'Post-operative support and monitoring' },
                                                 { icon: Building2, title: 'Insurance Coverage', desc: 'Growing international insurance inclusion' },
                                                 { icon: Award, title: 'Legal Framework', desc: 'Clear contracts, transparent pricing, grievance redressal' },
                                           ].map((item, i) => (

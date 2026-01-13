@@ -93,6 +93,7 @@ fastify.post('/api/auth/login', {
 }, async (request, reply) => {
   const { email, password } = request.body;
   console.log('LOGIN attempt:', email);
+  console.log('Active DB URL:', process.env.DATABASE_URL); // Verify DB connection
 
   try {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -101,6 +102,9 @@ fastify.post('/api/auth/login', {
       console.log('User not found:', email);
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
+
+    console.log('User found ID:', user.id);
+    console.log('Stored Hash:', user.password); // Verify Hash
 
     const isValid = await bcrypt.compare(password, user.password);
     console.log('Password valid:', isValid);
@@ -242,8 +246,8 @@ fastify.register(require('./modules/admin/routes/adminRoutes'), { prefix: '/api/
 // Admin analytics routes (NEW)
 fastify.register(require('./modules/admin/routes/analyticsRoutes'), { prefix: '/api/admin' });
 
-// Admin settings routes (NEW)
-fastify.register(require('./modules/admin/routes/settingsRoutes'), { prefix: '/api/admin' });
+// NOTE: Settings routes are already defined in adminRoutes.js - do NOT re-register here
+// to avoid FST_ERR_DUPLICATED_ROUTE error
 
 // CMS routes (superadmin auth required inside module)
 fastify.register(require('./modules/cms/routes/cmsRoutes'), { prefix: '/api/cms' });
@@ -275,6 +279,11 @@ fastify.register(require('./modules/doctors/routes/doctorRoutes'), { prefix: '/a
 
 // Treatments (public browsing)
 fastify.register(require('./modules/treatments/routes/treatmentRoutes'), { prefix: '/api/treatments' });
+
+// Packages (public browsing)
+fastify.register(require('./modules/packages/routes/packageRoutes'), { prefix: '/api/packages' });
+
+
 
 // ============================================
 // ERROR HANDLERS

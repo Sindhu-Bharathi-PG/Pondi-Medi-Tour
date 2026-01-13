@@ -11,22 +11,19 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Return default settings (can be stored in DB later)
-        return NextResponse.json({
-            success: true,
-            data: {
-                adminName: session.user.name || 'Admin',
-                adminEmail: session.user.email || 'admin@pondimeditour.com',
-                emailNotifications: true,
-                inquiryAlerts: true,
-                hospitalApprovalAlerts: true,
-                weeklyReports: false,
-                twoFactorAuth: false,
-                sessionTimeout: 30,
-                maintenanceMode: false,
-                autoApproveHospitals: false,
+        const response = await fetch(`${BACKEND_URL}/api/admin/settings`, {
+            headers: {
+                'Authorization': `Bearer ${session.accessToken}`,
+                'Content-Type': 'application/json'
             }
         });
+
+        if (!response.ok) {
+            throw new Error('Backend request failed');
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error fetching settings:', error);
         return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
@@ -42,13 +39,21 @@ export async function PUT(request: NextRequest) {
 
         const body = await request.json();
 
-        // In a real implementation, save settings to database
-        console.log('Settings to save:', body);
-
-        return NextResponse.json({
-            success: true,
-            message: 'Settings saved successfully'
+        const response = await fetch(`${BACKEND_URL}/api/admin/settings`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${session.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
         });
+
+        if (!response.ok) {
+            throw new Error('Backend request failed');
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error saving settings:', error);
         return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });

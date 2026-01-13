@@ -1,372 +1,233 @@
 "use client";
 
 import { useCurrency } from '@/app/context/CurrencyContext';
+import { useQuote } from '@/app/context/QuoteContext';
+import { API_BASE } from '@/app/hooks/useApi';
+import { normalizeName, normalizeSuccessRate } from '@/app/utils/normalize';
 import { motion } from 'framer-motion';
-import { Activity, ArrowLeft, ArrowRight, Award, Baby, Bone, Brain, Building, Calendar, Check, ChevronRight, Clock, DollarSign, Eye, Heart, MapPin, Phone, Plane, Scissors, Shield, Star, Stethoscope, Users, Video } from 'lucide-react';
+import { Activity, ArrowLeft, ArrowRight, Baby, Bone, Brain, Building, Check, ChevronRight, Clock, Eye, Heart, Loader2, MapPin, Phone, Scissors, Shield, Sparkles, Star, Stethoscope, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Footer, Header } from '../../components/common';
 
-// Hospital data for linking treatments to hospitals
-const hospitalsData: Record<number, { name: string; fullName: string; location: string }> = {
-      1: { name: 'JIPMER', fullName: 'Jawaharlal Institute of Postgraduate Medical Education & Research', location: 'Gorimedu, Pondicherry' },
-      2: { name: 'Apollo Pondicherry', fullName: 'Apollo Speciality Hospitals Pondicherry', location: 'Ariyankuppam, Pondicherry' },
-      3: { name: 'MGMCRI', fullName: 'Mahatma Gandhi Medical College & Research Institute', location: 'Pillaiyarkuppam, Pondicherry' },
-      4: { name: 'GEM Hospital', fullName: 'GEM Hospital & Research Centre', location: 'East Coast Road, Pondicherry' },
-      5: { name: 'Aravind Eye Hospital', fullName: 'Aravind Eye Hospital', location: 'Cuddalore Road, Pondicherry' },
-      6: { name: 'PIMS', fullName: 'Pondicherry Institute of Medical Sciences', location: 'Kalapet, Pondicherry' },
+// Category to icon mapping
+const categoryIcons: Record<string, React.ElementType> = {
+      'Orthopedics': Bone,
+      'IVF & Fertility': Baby,
+      'Ophthalmology': Eye,
+      'Cardiology': Heart,
+      'Gastroenterology': Activity,
+      'Neurology': Brain,
+      'Dental': Scissors,
+      'Oncology': Stethoscope,
 };
 
-// Treatment data (could be moved to a shared data file or fetched from API)
-const treatmentsData: Record<string, TreatmentType> = {
-      'orthopedics': {
-            id: 'orthopedics',
-            icon: Bone,
-            title: 'Orthopedics & Joint Replacement',
-            subtitle: 'World-Class Joint Care Excellence',
-            description: 'Experience world-class joint replacement with 95%+ patient satisfaction at 5-year follow-up. Our FRCS-trained surgeons bring international fellowship experience from leading hospitals in the US and UK.',
-            longDescription: 'Our orthopedic department specializes in advanced joint replacement surgeries using the latest robotic-assisted technology. With minimally invasive techniques, patients experience faster recovery, less pain, and better outcomes. Our surgeons have performed over 10,000 successful joint replacements.',
-            image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1200',
-            procedures: [
-                  { name: 'Total Knee Replacement', priceINR: 416500, recoveryDays: '45-60 days' },
-                  { name: 'Hip Replacement', priceINR: 499800, recoveryDays: '45-60 days' },
-                  { name: 'Spine Surgery', priceINR: 666400, recoveryDays: '30-90 days' },
-                  { name: 'ACL Reconstruction', priceINR: 249900, recoveryDays: '6-9 months' },
-                  { name: 'Shoulder Arthroscopy', priceINR: 208250, recoveryDays: '3-6 months' },
-            ],
-            avgPriceINR: 708000,
-            usPriceINR: 2916000,
-            savings: '70%',
-            recovery: '6-12 weeks',
-            successRate: '95%+',
-            hospitalStay: '3-5 days',
-            color: 'from-[var(--medical-teal)] to-[var(--medical-dark-teal)]',
-            highlights: [
-                  'Robotic-assisted surgery available',
-                  'US/UK fellowship trained surgeons',
-                  'Imported prosthetics from US & Europe',
-                  'Dedicated physiotherapy team',
-            ],
-            accreditations: ['JCI', 'NABH', 'ISO 9001'],
-            hospitals: [1, 2, 6],
-      },
-      'ivf': {
-            id: 'ivf',
-            icon: Baby,
-            title: 'IVF & Fertility Treatment',
-            subtitle: 'Your Path to Parenthood',
-            description: 'Advanced reproductive medicine with 45%+ live birth rate for patients under 35. Our 35+ IVF specialists follow international protocols and use cutting-edge embryology labs.',
-            longDescription: 'Our fertility center offers comprehensive reproductive solutions with state-of-the-art embryology labs and experienced specialists. We provide personalized treatment plans, genetic screening, and emotional support throughout your journey to parenthood.',
-            image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=1200',
-            procedures: [
-                  { name: 'IVF Treatment (Single Cycle)', priceINR: 249900, recoveryDays: '14 days to test' },
-                  { name: 'IUI', priceINR: 41650, recoveryDays: '14 days to test' },
-                  { name: 'ICSI', priceINR: 291600, recoveryDays: '14 days to test' },
-                  { name: 'Egg Freezing', priceINR: 166600, recoveryDays: '1-2 days' },
-                  { name: 'Donor Programs', priceINR: 416500, recoveryDays: 'Varies' },
-            ],
-            avgPriceINR: 291600,
-            usPriceINR: 1499400,
-            savings: '80%',
-            recovery: '14 days',
-            successRate: '45%+ (age <35)',
-            hospitalStay: 'Outpatient',
-            color: 'from-rose-600 to-pink-500',
-            highlights: [
-                  '45%+ live birth rate (under 35)',
-                  'State-of-the-art embryology lab',
-                  'Genetic screening available',
-                  'Counseling & emotional support',
-            ],
-            accreditations: ['NABH', 'ISO 9001'],
-            hospitals: [2, 3],
-      },
-      'ophthalmology': {
-            id: 'ophthalmology',
-            icon: Eye,
-            title: 'Eye Surgery & LASIK',
-            subtitle: 'Vision Restoration Excellence',
-            description: 'Leading eye care with 99%+ vision improvement rate. Partner hospital Aravind Eye Hospital performs 15,000+ cataract surgeries annually with world-renowned expertise.',
-            longDescription: 'Our ophthalmology department offers comprehensive eye care from routine check-ups to complex surgeries. With advanced laser technology and experienced surgeons, we restore vision with precision and care. Our partnership with Aravind Eye Hospital brings world-class expertise.',
-            image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200',
-            procedures: [
-                  { name: 'Cataract Surgery (Phaco)', priceINR: 49980, recoveryDays: '7 days' },
-                  { name: 'LASIK', priceINR: 83300, recoveryDays: '1-2 days' },
-                  { name: 'Retina Treatment', priceINR: 166600, recoveryDays: '2-4 weeks' },
-                  { name: 'Glaucoma Surgery', priceINR: 124950, recoveryDays: '2-4 weeks' },
-                  { name: 'Cornea Transplant', priceINR: 249900, recoveryDays: '6-12 months' },
-            ],
-            avgPriceINR: 99960,
-            usPriceINR: 666400,
-            savings: '85%',
-            recovery: '3-7 days',
-            successRate: '99%+',
-            hospitalStay: 'Day care',
-            color: 'from-[var(--medical-teal)] to-emerald-500',
-            highlights: [
-                  'Bladeless LASIK technology',
-                  '15,000+ cataract surgeries/year',
-                  'Aravind Eye Hospital partnership',
-                  'Same-day discharge',
-            ],
-            accreditations: ['NABH', 'ISO 9001'],
-            hospitals: [5],
-      },
-      'cardiology': {
-            id: 'cardiology',
-            icon: Heart,
-            title: 'Cardiac Surgery',
-            subtitle: 'Heart Care You Can Trust',
-            description: 'Interventional cardiology at JIPMER with 98.5% success rate and <1% mortality. Our 50+ board-certified cardiologists handle complex cases with precision.',
-            longDescription: 'Our cardiac care unit offers comprehensive heart treatment from diagnosis to rehabilitation. With advanced cath labs, hybrid operating rooms, and experienced cardiac surgeons, we provide life-saving care with excellent outcomes.',
-            image: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=1200',
-            procedures: [
-                  { name: 'Bypass Surgery (CABG)', priceINR: 833000, recoveryDays: '8-12 weeks' },
-                  { name: 'Angioplasty + Stent', priceINR: 333200, recoveryDays: '1-2 weeks' },
-                  { name: 'Valve Replacement', priceINR: 999600, recoveryDays: '6-8 weeks' },
-                  { name: 'Pacemaker Implant', priceINR: 416500, recoveryDays: '1-2 weeks' },
-                  { name: 'Heart Transplant', priceINR: 2499000, recoveryDays: '3-6 months' },
-            ],
-            avgPriceINR: 999600,
-            usPriceINR: 4165000,
-            savings: '76%',
-            recovery: '8-12 weeks',
-            successRate: '98.5%',
-            hospitalStay: '5-10 days',
-            color: 'from-red-600 to-rose-500',
-            highlights: [
-                  '98.5% surgery success rate',
-                  '<1% mortality rate',
-                  'Hybrid OR available',
-                  '24/7 cardiac emergency',
-            ],
-            accreditations: ['JCI', 'NABH', 'ISO 9001'],
-            hospitals: [1, 2],
-      },
-      'gastroenterology': {
-            id: 'gastroenterology',
-            icon: Activity,
-            title: 'Gastroenterology & Bariatric',
-            subtitle: 'Digestive Health Specialists',
-            description: 'Asia\'s premier GI center at GEM Hospital with JCI accreditation. World-class laparoscopic expertise for bariatric and digestive surgeries.',
-            longDescription: 'Our gastroenterology department offers advanced minimally invasive surgeries for weight loss and digestive conditions. With GEM Hospital partnership, we bring Asia\'s best laparoscopic expertise to our patients.',
-            image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=1200',
-            procedures: [
-                  { name: 'Gastric Bypass', priceINR: 499800, recoveryDays: '2-3 weeks' },
-                  { name: 'Sleeve Gastrectomy', priceINR: 416500, recoveryDays: '2-3 weeks' },
-                  { name: 'Liver Transplant', priceINR: 2082500, recoveryDays: '3-6 months' },
-                  { name: 'Colorectal Surgery', priceINR: 333200, recoveryDays: '4-6 weeks' },
-                  { name: 'Endoscopy (Diagnostic)', priceINR: 16660, recoveryDays: 'Same day' },
-            ],
-            avgPriceINR: 499800,
-            usPriceINR: 1666000,
-            savings: '70%',
-            recovery: '7-14 days',
-            successRate: '97%+',
-            hospitalStay: '2-5 days',
-            color: 'from-amber-600 to-orange-500',
-            highlights: [
-                  'GEM Hospital partnership',
-                  'Minimally invasive techniques',
-                  'Comprehensive weight loss program',
-                  'Post-surgery nutrition support',
-            ],
-            accreditations: ['JCI', 'NABH'],
-            hospitals: [4],
-      },
-      'neurology': {
-            id: 'neurology',
-            icon: Brain,
-            title: 'Neurology & Neurosurgery',
-            subtitle: 'Advanced Brain & Spine Care',
-            description: 'Advanced brain and spine surgery with robotic assistance and minimally invasive techniques. Complex neurological conditions treated with precision.',
-            longDescription: 'Our neurosciences department provides comprehensive care for brain and spine conditions. With advanced navigation systems, robotic assistance, and experienced neurosurgeons, we handle the most complex cases with excellent outcomes.',
-            image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200',
-            procedures: [
-                  { name: 'Brain Tumor Surgery', priceINR: 999600, recoveryDays: '2-4 weeks' },
-                  { name: 'Spine Fusion', priceINR: 666400, recoveryDays: '3-6 months' },
-                  { name: 'Epilepsy Surgery', priceINR: 833000, recoveryDays: '4-6 weeks' },
-                  { name: 'Stroke Treatment', priceINR: 333200, recoveryDays: 'Varies' },
-                  { name: 'Deep Brain Stimulation', priceINR: 1665500, recoveryDays: '2-4 weeks' },
-            ],
-            avgPriceINR: 1249500,
-            usPriceINR: 4998000,
-            savings: '75%',
-            recovery: '2-4 weeks',
-            successRate: '96%+',
-            hospitalStay: '5-14 days',
-            color: 'from-purple-600 to-indigo-500',
-            highlights: [
-                  'Robotic-assisted surgery',
-                  'Navigation-guided procedures',
-                  'Minimally invasive spine surgery',
-                  'Comprehensive rehab program',
-            ],
-            accreditations: ['NABH', 'ISO 9001'],
-            hospitals: [1, 2, 3],
-      },
-      'dental': {
-            id: 'dental',
-            icon: Scissors,
-            title: 'Dental Care & Implants',
-            subtitle: 'Premium Dental Excellence',
-            description: 'Full mouth rehabilitation with 98%+ 10-year implant survival rate. 25+ dental specialists with cosmetic dentistry expertise.',
-            longDescription: 'Our dental center offers comprehensive dental care from routine cleanings to complex full mouth rehabilitations. With advanced implant technology and cosmetic expertise, we create beautiful, lasting smiles.',
-            image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1200',
-            procedures: [
-                  { name: 'Single Dental Implant', priceINR: 41650, recoveryDays: '3-6 months' },
-                  { name: 'Full Mouth Implants (All-on-4)', priceINR: 499800, recoveryDays: '3-6 months' },
-                  { name: 'Porcelain Veneers (per tooth)', priceINR: 16660, recoveryDays: '2-3 days' },
-                  { name: 'Root Canal', priceINR: 8330, recoveryDays: '1-2 days' },
-                  { name: 'Smile Makeover', priceINR: 166600, recoveryDays: '1-2 weeks' },
-            ],
-            avgPriceINR: 49980,
-            usPriceINR: 333200,
-            savings: '85%',
-            recovery: '3-10 days',
-            successRate: '98%+',
-            hospitalStay: 'Outpatient',
-            color: 'from-cyan-600 to-[var(--medical-teal)]',
-            highlights: [
-                  '98%+ 10-year implant survival',
-                  'Same-day dental implants available',
-                  'Digital smile design',
-                  'Painless procedures',
-            ],
-            accreditations: ['ISO 9001'],
-            hospitals: [2, 3, 6],
-      },
-      'oncology': {
-            id: 'oncology',
-            icon: Stethoscope,
-            title: 'Cancer Treatment',
-            subtitle: 'Comprehensive Cancer Care',
-            description: 'Comprehensive oncology care with 30+ oncologists using the latest chemotherapy, targeted therapy, and radiation protocols.',
-            longDescription: 'Our cancer center provides complete oncology care from diagnosis through treatment and survivorship. With tumor boards, precision medicine, and compassionate care, we fight cancer with the latest evidence-based treatments.',
-            image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200',
-            procedures: [
-                  { name: 'Chemotherapy (per cycle)', priceINR: 41650, recoveryDays: 'Varies' },
-                  { name: 'Radiation Therapy (course)', priceINR: 249900, recoveryDays: 'Varies' },
-                  { name: 'Surgical Oncology', priceINR: 499800, recoveryDays: '2-6 weeks' },
-                  { name: 'Immunotherapy', priceINR: 333200, recoveryDays: 'Varies' },
-                  { name: 'Bone Marrow Transplant', priceINR: 2082500, recoveryDays: '3-6 months' },
-            ],
-            avgPriceINR: 666400,
-            usPriceINR: 2082500,
-            savings: '65%',
-            recovery: 'Varies',
-            successRate: 'Stage-dependent',
-            hospitalStay: 'Varies',
-            color: 'from-green-600 to-[var(--medical-teal)]',
-            highlights: [
-                  'Multidisciplinary tumor boards',
-                  'Precision medicine available',
-                  'Palliative care team',
-                  'Survivorship programs',
-            ],
-            accreditations: ['NABH', 'ISO 9001'],
-            hospitals: [1, 2, 3],
-      },
+// Category to gradient colors
+const categoryGradients: Record<string, { bg: string; accent: string; light: string; text: string }> = {
+      'Orthopedics': { bg: 'from-teal-600 via-cyan-600 to-emerald-600', accent: 'bg-teal-500', light: 'bg-teal-50', text: 'text-teal-600' },
+      'IVF & Fertility': { bg: 'from-rose-500 via-pink-500 to-fuchsia-500', accent: 'bg-rose-500', light: 'bg-rose-50', text: 'text-rose-600' },
+      'Ophthalmology': { bg: 'from-emerald-500 via-teal-500 to-cyan-500', accent: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-600' },
+      'Cardiology': { bg: 'from-red-500 via-rose-500 to-pink-500', accent: 'bg-red-500', light: 'bg-red-50', text: 'text-red-600' },
+      'Gastroenterology': { bg: 'from-amber-500 via-orange-500 to-yellow-500', accent: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-600' },
+      'Neurology': { bg: 'from-purple-600 via-violet-600 to-indigo-600', accent: 'bg-purple-500', light: 'bg-purple-50', text: 'text-purple-600' },
+      'Dental': { bg: 'from-cyan-500 via-sky-500 to-blue-500', accent: 'bg-cyan-500', light: 'bg-cyan-50', text: 'text-cyan-600' },
+      'Oncology': { bg: 'from-green-500 via-emerald-500 to-teal-500', accent: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
 };
 
-interface Procedure {
+interface Treatment {
+      id: number;
       name: string;
-      priceINR: number;
-      recoveryDays: string;
-}
-
-interface TreatmentType {
-      id: string;
-      icon: React.ElementType;
-      title: string;
-      subtitle: string;
-      description: string;
-      longDescription: string;
-      image: string;
-      procedures: Procedure[];
-      avgPriceINR: number;
-      usPriceINR: number;
-      savings: string;
-      recovery: string;
-      successRate: string;
-      hospitalStay: string;
-      color: string;
-      highlights: string[];
-      accreditations: string[];
-      hospitals: number[];
+      slug: string;
+      category: string;
+      subCategory?: string;
+      shortDescription: string;
+      fullDescription?: string;
+      procedureSteps?: any[];
+      technology?: string[];
+      successRate?: number;
+      hospitalStay?: string;
+      recoveryTime?: string;
+      preRequisites?: string[];
+      minPrice?: number;
+      maxPrice?: number;
+      insuranceCovered?: boolean;
+      thumbnailUrl?: string;
+      isPopular?: boolean;
+      hospitalId?: number;
+      hospitalName?: string;
+      hospitalSlug?: string;
 }
 
 export default function TreatmentDetailPage() {
       const params = useParams();
       const treatmentId = params.id as string;
-      const treatment = treatmentsData[treatmentId];
 
       const { convertAmount, formatCurrency, selectedCurrency } = useCurrency();
-      const [convertedPrices, setConvertedPrices] = useState<{ avg: number; us: number; procedures: number[] }>({
-            avg: 0,
-            us: 0,
-            procedures: [],
+      const { openQuoteWidget } = useQuote();
+      const [treatment, setTreatment] = useState<Treatment | null>(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
+      const [convertedPrices, setConvertedPrices] = useState<{ min: number; max: number; usPrice: number }>({
+            min: 0,
+            max: 0,
+            usPrice: 0,
       });
+
+      useEffect(() => {
+            const fetchTreatment = async () => {
+                  try {
+                        setLoading(true);
+                        const res = await fetch(`${API_BASE}/api/treatments/${treatmentId}`);
+
+                        if (res.ok) {
+                              const data = await res.json();
+                              setTreatment(data);
+                        } else if (res.status === 404) {
+                              setError('Treatment not found');
+                        } else {
+                              setError('Failed to load treatment');
+                        }
+                  } catch (err) {
+                        console.error('Error fetching treatment:', err);
+                        setError('Failed to load treatment');
+                  } finally {
+                        setLoading(false);
+                  }
+            };
+
+            fetchTreatment();
+      }, [treatmentId]);
 
       useEffect(() => {
             if (!treatment) return;
 
             const convert = async () => {
-                  const avg = await convertAmount(treatment.avgPriceINR, 'INR');
-                  const us = await convertAmount(treatment.usPriceINR, 'INR');
-                  const procedures = await Promise.all(
-                        treatment.procedures.map(p => convertAmount(p.priceINR, 'INR'))
-                  );
-                  setConvertedPrices({ avg, us, procedures });
+                  const minPrice = treatment.minPrice || 50000;
+                  const maxPrice = treatment.maxPrice || minPrice * 2;
+                  const usPrice = minPrice * 4;
+
+                  const [min, max, us] = await Promise.all([
+                        convertAmount(minPrice, 'INR'),
+                        convertAmount(maxPrice, 'INR'),
+                        convertAmount(usPrice, 'INR'),
+                  ]);
+
+                  setConvertedPrices({ min, max, usPrice: us });
             };
             convert();
-      }, [treatment, selectedCurrency]);
+      }, [treatment, selectedCurrency, convertAmount]);
 
-      if (!treatment) {
-            notFound();
+      if (loading) {
+            return (
+                  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+                        <div className="text-center">
+                              <div className="relative">
+                                    <div className="w-20 h-20 border-4 border-purple-500/30 rounded-full animate-pulse"></div>
+                                    <Loader2 className="w-12 h-12 text-purple-400 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                              </div>
+                              <p className="text-purple-200 mt-6 font-medium">Loading treatment details...</p>
+                        </div>
+                  </div>
+            );
       }
 
-      const Icon = treatment.icon;
+      if (error || !treatment) {
+            return (
+                  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+                        <Header />
+                        <div className="container mx-auto px-4 py-24 text-center">
+                              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 max-w-lg mx-auto border border-white/20">
+                                    <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                          <Stethoscope className="w-10 h-10 text-red-400" />
+                                    </div>
+                                    <h1 className="text-3xl font-bold text-white mb-4">Treatment Not Found</h1>
+                                    <p className="text-gray-300 mb-8">The treatment you are looking for does not exist.</p>
+                                    <Link
+                                          href="/services"
+                                          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                                    >
+                                          <ArrowLeft className="w-5 h-5" />
+                                          Browse Treatments
+                                    </Link>
+                              </div>
+                        </div>
+                        <Footer />
+                  </div>
+            );
+      }
+
+      const category = treatment.category || 'Orthopedics';
+      const Icon = categoryIcons[category] || Stethoscope;
+      const colors = categoryGradients[category] || categoryGradients['Orthopedics'];
+
+      const title = normalizeName(treatment.name);
+      const description = treatment.shortDescription || '';
+      const fullDescription = treatment.fullDescription || description;
+      const successRate = normalizeSuccessRate(treatment.successRate ?? null);
+      const hospitalName = treatment.hospitalName ? normalizeName(treatment.hospitalName) : null;
+      const technologies = treatment.technology || [];
+      const procedureSteps = treatment.procedureSteps || [];
+      const preRequisites = treatment.preRequisites || [];
+      const savings = '70%';
 
       return (
-            <div className="min-h-screen bg-[var(--medical-cream)]">
+            <div className="min-h-screen bg-slate-50">
                   <Header />
 
                   {/* Hero Section */}
-                  <section className="relative pt-24 pb-16 overflow-hidden">
-                        <div className="absolute inset-0">
-                              <Image
-                                    src={treatment.image}
-                                    alt={treatment.title}
-                                    fill
-                                    className="object-cover"
+                  <section className="relative pt-20 pb-32 overflow-hidden">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg}`}>
+                              <div
+                                    className="absolute inset-0 opacity-20"
+                                    style={{
+                                          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)',
+                                          backgroundSize: '24px 24px'
+                                    }}
                               />
-                              <div className={`absolute inset-0 bg-gradient-to-r ${treatment.color} opacity-90`} />
+                              <div className="absolute -top-40 -right-40 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
+                              <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
                         </div>
 
-                        <div className="relative container-premium">
-                              {/* Breadcrumb */}
-                              <nav className="breadcrumb text-white/70 mb-8">
+                        <div className="absolute right-0 top-20 w-1/3 h-full hidden lg:block">
+                              <div className="relative w-full h-full">
+                                    <Image
+                                          src={treatment.thumbnailUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800'}
+                                          alt={title}
+                                          fill
+                                          className="object-cover opacity-30"
+                                    />
+                              </div>
+                        </div>
+
+                        <div className="relative container mx-auto px-4">
+                              <nav className="flex items-center gap-2 text-white/70 mb-8 text-sm">
                                     <Link href="/" className="hover:text-white transition-colors">Home</Link>
-                                    <ChevronRight className="w-4 h-4 breadcrumb-separator" />
+                                    <ChevronRight className="w-4 h-4" />
                                     <Link href="/services" className="hover:text-white transition-colors">Treatments</Link>
-                                    <ChevronRight className="w-4 h-4 breadcrumb-separator" />
-                                    <span className="text-white">{treatment.title}</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                    <span className="text-white font-medium">{title}</span>
                               </nav>
 
-                              <div className="max-w-4xl">
+                              <div className="max-w-3xl">
                                     <motion.div
                                           initial={{ opacity: 0, y: 20 }}
                                           animate={{ opacity: 1, y: 0 }}
-                                          className="flex items-center gap-4 mb-6"
+                                          className="flex items-center gap-3 mb-6"
                                     >
-                                          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                                          <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4">
                                                 <Icon className="w-8 h-8 text-white" />
                                           </div>
-                                          <div>
-                                                <div className="gov-seal">{treatment.subtitle}</div>
+                                          <div className="flex items-center gap-3">
+                                                <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-semibold">
+                                                      {category}
+                                                </span>
+                                                {treatment.isPopular && (
+                                                      <span className="bg-amber-400 text-amber-900 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5">
+                                                            <Sparkles className="w-4 h-4" /> Popular
+                                                      </span>
+                                                )}
                                           </div>
                                     </motion.div>
 
@@ -374,205 +235,293 @@ export default function TreatmentDetailPage() {
                                           initial={{ opacity: 0, y: 20 }}
                                           animate={{ opacity: 1, y: 0 }}
                                           transition={{ delay: 0.1 }}
-                                          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+                                          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
                                     >
-                                          {treatment.title}
+                                          {title}
                                     </motion.h1>
 
                                     <motion.p
                                           initial={{ opacity: 0, y: 20 }}
                                           animate={{ opacity: 1, y: 0 }}
                                           transition={{ delay: 0.2 }}
-                                          className="text-xl text-white/90 mb-8 max-w-2xl"
+                                          className="text-xl text-white/90 mb-10 leading-relaxed"
                                     >
-                                          {treatment.description}
+                                          {description}
                                     </motion.p>
 
-                                    {/* Quick Stats */}
                                     <motion.div
                                           initial={{ opacity: 0, y: 20 }}
                                           animate={{ opacity: 1, y: 0 }}
                                           transition={{ delay: 0.3 }}
-                                          className="flex flex-wrap gap-6"
+                                          className="grid grid-cols-2 md:grid-cols-4 gap-4"
                                     >
-                                          <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-                                                <div className="text-white/70 text-sm">Success Rate</div>
-                                                <div className="text-white font-bold text-xl">{treatment.successRate}</div>
+                                          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                                                <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                                                      <Star className="w-4 h-4" /> Success Rate
+                                                </div>
+                                                <div className="text-2xl font-bold text-white">{successRate}</div>
                                           </div>
-                                          <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-                                                <div className="text-white/70 text-sm">Average Savings</div>
-                                                <div className="text-[var(--medical-gold)] font-bold text-xl">{treatment.savings}</div>
+                                          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                                                <div className="flex items-center gap-2 text-amber-300 text-sm mb-1">
+                                                      <Zap className="w-4 h-4" /> Savings
+                                                </div>
+                                                <div className="text-2xl font-bold text-amber-300">{savings}</div>
                                           </div>
-                                          <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-                                                <div className="text-white/70 text-sm">Recovery</div>
-                                                <div className="text-white font-bold text-xl">{treatment.recovery}</div>
-                                          </div>
-                                          <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-                                                <div className="text-white/70 text-sm">Hospital Stay</div>
-                                                <div className="text-white font-bold text-xl">{treatment.hospitalStay}</div>
-                                          </div>
+                                          {treatment.recoveryTime && (
+                                                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                                                      <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                                                            <Clock className="w-4 h-4" /> Recovery
+                                                      </div>
+                                                      <div className="text-2xl font-bold text-white">{treatment.recoveryTime}</div>
+                                                </div>
+                                          )}
+                                          {treatment.hospitalStay && (
+                                                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                                                      <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                                                            <Building className="w-4 h-4" /> Stay
+                                                      </div>
+                                                      <div className="text-2xl font-bold text-white">{treatment.hospitalStay}</div>
+                                                </div>
+                                          )}
                                     </motion.div>
                               </div>
                         </div>
                   </section>
 
                   {/* Main Content */}
-                  <section className="section-premium">
-                        <div className="container-premium">
+                  <section className="relative -mt-16 pb-20">
+                        <div className="container mx-auto px-4">
                               <div className="grid lg:grid-cols-3 gap-8">
-                                    {/* Left Column - Procedures */}
                                     <div className="lg:col-span-2 space-y-8">
                                           {/* About */}
-                                          <div className="card-premium p-8">
-                                                <h2 className="text-2xl font-bold text-[var(--medical-navy)] mb-4">About This Treatment</h2>
-                                                <p className="text-[var(--medical-slate)] leading-relaxed">{treatment.longDescription}</p>
-                                          </div>
-
-                                          {/* Procedures & Pricing */}
-                                          <div className="card-premium p-8">
-                                                <h2 className="text-2xl font-bold text-[var(--medical-navy)] mb-6">Procedures & Pricing</h2>
-                                                <div className="space-y-4">
-                                                      {treatment.procedures.map((proc, idx) => (
-                                                            <div key={proc.name} className="flex items-center justify-between p-4 bg-[var(--medical-cream)] rounded-xl">
-                                                                  <div>
-                                                                        <div className="font-semibold text-[var(--medical-navy)]">{proc.name}</div>
-                                                                        <div className="text-sm text-gray-500 flex items-center gap-2">
-                                                                              <Clock className="w-4 h-4" />
-                                                                              Recovery: {proc.recoveryDays}
-                                                                        </div>
-                                                                  </div>
-                                                                  <div className="text-right">
-                                                                        <div className="text-lg font-bold text-[var(--medical-teal)]">
-                                                                              {formatCurrency(convertedPrices.procedures[idx] || 0)}
-                                                                        </div>
-                                                                  </div>
-                                                            </div>
-                                                      ))}
+                                          <motion.div
+                                                initial={{ opacity: 0, y: 30 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.4 }}
+                                                className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100"
+                                          >
+                                                <div className="flex items-center gap-3 mb-6">
+                                                      <div className={`w-12 h-12 ${colors.light} rounded-2xl flex items-center justify-center`}>
+                                                            <Stethoscope className={`w-6 h-6 ${colors.text}`} />
+                                                      </div>
+                                                      <h2 className="text-2xl font-bold text-slate-800">About This Treatment</h2>
                                                 </div>
-                                          </div>
+                                                <p className="text-slate-600 leading-relaxed text-lg">{fullDescription}</p>
+                                          </motion.div>
 
-                                          {/* Why Choose Us */}
-                                          <div className="card-premium p-8">
-                                                <h2 className="text-2xl font-bold text-[var(--medical-navy)] mb-6">Why Choose Us</h2>
-                                                <div className="grid sm:grid-cols-2 gap-4">
-                                                      {treatment.highlights.map((highlight) => (
-                                                            <div key={highlight} className="flex items-start gap-3">
-                                                                  <div className="w-6 h-6 rounded-full bg-[var(--medical-light-teal)] flex items-center justify-center shrink-0 mt-0.5">
-                                                                        <Check className="w-4 h-4 text-[var(--medical-teal)]" />
-                                                                  </div>
-                                                                  <span className="text-[var(--medical-slate)]">{highlight}</span>
+                                          {/* Procedure Steps */}
+                                          {procedureSteps.length > 0 && (
+                                                <motion.div
+                                                      initial={{ opacity: 0, y: 30 }}
+                                                      animate={{ opacity: 1, y: 0 }}
+                                                      transition={{ delay: 0.5 }}
+                                                      className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100"
+                                                >
+                                                      <div className="flex items-center gap-3 mb-6">
+                                                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                                                  <Activity className="w-6 h-6 text-white" />
                                                             </div>
-                                                      ))}
-                                                </div>
-                                          </div>
+                                                            <h2 className="text-2xl font-bold text-slate-800">Procedure Steps</h2>
+                                                      </div>
+                                                      <div className="space-y-4">
+                                                            {procedureSteps.map((step: any, idx: number) => {
+                                                                  const stepTitle = typeof step === 'string' ? step : (step.title || step.description || `Step ${idx + 1}`);
+                                                                  const stepDescription = typeof step === 'object' && step.description ? step.description : null;
 
-                                          {/* Hospitals in Pondicherry */}
-                                          <div className="card-premium p-8">
-                                                <h2 className="text-2xl font-bold text-[var(--medical-navy)] mb-6 flex items-center gap-3">
-                                                      <Building className="w-7 h-7 text-[var(--medical-teal)]" />
-                                                      Hospitals in Pondicherry
-                                                </h2>
-                                                <p className="text-[var(--medical-slate)] mb-6">
-                                                      The following partner hospitals in Pondicherry offer {treatment.title.toLowerCase()} services with world-class care.
-                                                </p>
-                                                <div className="space-y-4">
-                                                      {treatment.hospitals.map((hospitalId) => {
-                                                            const hospital = hospitalsData[hospitalId];
-                                                            if (!hospital) return null;
-                                                            return (
-                                                                  <div key={hospitalId} className="flex items-center justify-between p-4 bg-[var(--medical-cream)] rounded-xl hover:shadow-md transition-all">
-                                                                        <div>
-                                                                              <div className="font-semibold text-[var(--medical-navy)]">{hospital.name}</div>
-                                                                              <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                                                                                    <MapPin className="w-4 h-4" />
-                                                                                    {hospital.location}
+                                                                  return (
+                                                                        <div key={idx} className="flex gap-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
+                                                                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl flex items-center justify-center font-bold shrink-0">
+                                                                                    {idx + 1}
+                                                                              </div>
+                                                                              <div>
+                                                                                    <p className="text-slate-800 font-semibold">{stepTitle}</p>
+                                                                                    {stepDescription && stepDescription !== stepTitle && (
+                                                                                          <p className="text-slate-500 text-sm mt-1">{stepDescription}</p>
+                                                                                    )}
                                                                               </div>
                                                                         </div>
-                                                                        <Link
-                                                                              href={`/hospital/${hospitalId}`}
-                                                                              className="flex items-center gap-2 bg-[var(--medical-teal)] text-white px-4 py-2 rounded-lg font-medium hover:bg-[var(--medical-dark-teal)] transition-colors text-sm"
-                                                                        >
-                                                                              Hospital Details
-                                                                              <ChevronRight className="w-4 h-4" />
-                                                                        </Link>
+                                                                  );
+                                                            })}
+                                                      </div>
+                                                </motion.div>
+                                          )}
+
+                                          {/* Technologies */}
+                                          {technologies.length > 0 && (
+                                                <motion.div
+                                                      initial={{ opacity: 0, y: 30 }}
+                                                      animate={{ opacity: 1, y: 0 }}
+                                                      transition={{ delay: 0.6 }}
+                                                      className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-xl p-8 text-white"
+                                                >
+                                                      <div className="flex items-center gap-3 mb-6">
+                                                            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center">
+                                                                  <Zap className="w-6 h-6 text-white" />
+                                                            </div>
+                                                            <h2 className="text-2xl font-bold">Advanced Technology</h2>
+                                                      </div>
+                                                      <div className="grid sm:grid-cols-2 gap-3">
+                                                            {technologies.map((tech: string, idx: number) => (
+                                                                  <div key={idx} className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+                                                                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center shrink-0">
+                                                                              <Check className="w-5 h-5 text-white" />
+                                                                        </div>
+                                                                        <span className="text-white/90">{tech}</span>
                                                                   </div>
-                                                            );
-                                                      })}
-                                                </div>
-                                          </div>
-                                    </div>
-
-                                    {/* Right Column - Sticky CTA */}
-                                    <div className="lg:col-span-1">
-                                          <div className="sticky top-24 space-y-6">
-                                                {/* Price Card */}
-                                                <div className="card-premium p-6">
-                                                      <div className="text-center mb-6">
-                                                            <div className="text-gray-500 text-sm mb-1">Starting From</div>
-                                                            <div className="text-4xl font-bold text-[var(--medical-teal)]">
-                                                                  {formatCurrency(convertedPrices.avg)}
-                                                            </div>
-                                                            <div className="flex items-center justify-center gap-2 mt-2">
-                                                                  <span className="text-gray-400 line-through text-sm">
-                                                                        {formatCurrency(convertedPrices.us)} (USA)
-                                                                  </span>
-                                                            </div>
-                                                            <div className="bg-[var(--medical-gold)]/10 text-[var(--medical-gold)] font-bold px-4 py-2 rounded-full inline-block mt-3">
-                                                                  Save {treatment.savings}
-                                                            </div>
-                                                      </div>
-
-                                                      <Link
-                                                            href="/booking"
-                                                            className="w-full py-4 rounded-xl font-semibold text-white bg-[var(--medical-teal)] flex items-center justify-center gap-2 hover:bg-[var(--medical-dark-teal)] transition-all mb-3"
-                                                      >
-                                                            Get Free Quote
-                                                            <ArrowRight className="w-5 h-5" />
-                                                      </Link>
-
-                                                      <Link
-                                                            href="/telemedicine"
-                                                            className="w-full py-4 rounded-xl font-semibold text-[var(--medical-teal)] bg-[var(--medical-light-teal)] flex items-center justify-center gap-2 hover:bg-[var(--medical-teal)]/20 transition-all"
-                                                      >
-                                                            <Video className="w-5 h-5" />
-                                                            Video Consultation
-                                                      </Link>
-                                                </div>
-
-                                                {/* Contact Options */}
-                                                <div className="card-premium p-6">
-                                                      <h3 className="font-semibold text-[var(--medical-navy)] mb-4">Need Help?</h3>
-                                                      <div className="space-y-3 text-sm">
-                                                            <a href="tel:+911234567890" className="flex items-center gap-3 text-[var(--medical-slate)] hover:text-[var(--medical-teal)]">
-                                                                  <Phone className="w-4 h-4" /> +91 123 456 7890
-                                                            </a>
-                                                            <a href="#" className="flex items-center gap-3 text-[var(--medical-slate)] hover:text-[var(--medical-teal)]">
-                                                                  <MapPin className="w-4 h-4" /> Pondicherry, India
-                                                            </a>
-                                                      </div>
-                                                </div>
-
-                                                {/* Accreditations */}
-                                                <div className="card-premium p-6">
-                                                      <h3 className="font-semibold text-[var(--medical-navy)] mb-4">Accreditations</h3>
-                                                      <div className="flex flex-wrap gap-2">
-                                                            {treatment.accreditations.map((acc) => (
-                                                                  <span key={acc} className="bg-[var(--medical-light-teal)] text-[var(--medical-teal)] px-3 py-1 rounded-full text-sm font-medium">
-                                                                        {acc}
-                                                                  </span>
                                                             ))}
                                                       </div>
+                                                </motion.div>
+                                          )}
+
+                                          {/* Pre-requisites */}
+                                          {preRequisites.length > 0 && (
+                                                <motion.div
+                                                      initial={{ opacity: 0, y: 30 }}
+                                                      animate={{ opacity: 1, y: 0 }}
+                                                      transition={{ delay: 0.7 }}
+                                                      className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100"
+                                                >
+                                                      <div className="flex items-center gap-3 mb-6">
+                                                            <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center">
+                                                                  <Shield className="w-6 h-6 text-white" />
+                                                            </div>
+                                                            <h2 className="text-2xl font-bold text-slate-800">Pre-requisites</h2>
+                                                      </div>
+                                                      <div className="grid sm:grid-cols-2 gap-3">
+                                                            {preRequisites.map((req: string, idx: number) => (
+                                                                  <div key={idx} className="flex items-start gap-3 bg-amber-50 rounded-xl px-4 py-3 border border-amber-100">
+                                                                        <Shield className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                                                        <span className="text-slate-700">{req}</span>
+                                                                  </div>
+                                                            ))}
+                                                      </div>
+                                                </motion.div>
+                                          )}
+
+                                          {/* Hospital */}
+                                          {hospitalName && (
+                                                <motion.div
+                                                      initial={{ opacity: 0, y: 30 }}
+                                                      animate={{ opacity: 1, y: 0 }}
+                                                      transition={{ delay: 0.8 }}
+                                                      className={`bg-gradient-to-r ${colors.bg} rounded-3xl shadow-xl p-8 text-white`}
+                                                >
+                                                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                            <div className="flex items-center gap-4">
+                                                                  <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                                                                        <Building className="w-8 h-8 text-white" />
+                                                                  </div>
+                                                                  <div>
+                                                                        <div className="text-white/70 text-sm mb-1">Available At</div>
+                                                                        <h3 className="text-2xl font-bold">{hospitalName}</h3>
+                                                                        <div className="flex items-center gap-2 text-white/80 mt-1">
+                                                                              <MapPin className="w-4 h-4" /> Pondicherry, India
+                                                                        </div>
+                                                                  </div>
+                                                            </div>
+                                                            {treatment.hospitalSlug && (
+                                                                  <Link
+                                                                        href={`/hospital/${treatment.hospitalSlug}`}
+                                                                        className="bg-white text-slate-800 px-6 py-3 rounded-xl font-semibold hover:bg-white/90 transition-colors flex items-center gap-2"
+                                                                  >
+                                                                        View Hospital
+                                                                        <ChevronRight className="w-5 h-5" />
+                                                                  </Link>
+                                                            )}
+                                                      </div>
+                                                </motion.div>
+                                          )}
+                                    </div>
+
+                                    {/* Sidebar */}
+                                    <div className="lg:col-span-1">
+                                          <motion.div
+                                                initial={{ opacity: 0, x: 30 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.5 }}
+                                                className="sticky top-24 space-y-6"
+                                          >
+                                                {/* Price Card */}
+                                                <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+                                                      <div className={`bg-gradient-to-r ${colors.bg} p-6 text-white text-center`}>
+                                                            <div className="text-white/70 text-sm mb-1">Starting From</div>
+                                                            <div className="text-4xl font-bold">{formatCurrency(convertedPrices.min)}</div>
+                                                            {convertedPrices.max > convertedPrices.min && (
+                                                                  <div className="text-white/80 text-sm mt-1">up to {formatCurrency(convertedPrices.max)}</div>
+                                                            )}
+                                                      </div>
+
+                                                      <div className="p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
+                                                            <div className="flex items-center justify-between">
+                                                                  <div>
+                                                                        <div className="text-slate-500 text-sm line-through">{formatCurrency(convertedPrices.usPrice)}</div>
+                                                                        <div className="text-slate-600 text-xs">USA Price</div>
+                                                                  </div>
+                                                                  <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold px-4 py-2 rounded-full text-sm">
+                                                                        Save {savings}
+                                                                  </div>
+                                                            </div>
+                                                      </div>
+
+                                                      <div className="p-6 space-y-3">
+                                                            <button
+                                                                  onClick={() => openQuoteWidget({
+                                                                        treatmentType: title,
+                                                                        hospitalId: treatment.hospitalId,
+                                                                        hospitalName: hospitalName || undefined,
+                                                                        source: 'treatment-detail'
+                                                                  })}
+                                                                  className={`w-full py-4 rounded-2xl font-semibold text-white bg-gradient-to-r ${colors.bg} flex items-center justify-center gap-2 hover:opacity-90 transition-all`}
+                                                            >
+                                                                  Get Free Quote
+                                                                  <ArrowRight className="w-5 h-5" />
+                                                            </button>
+                                                      </div>
                                                 </div>
-                                          </div>
+
+                                                {/* Contact */}
+                                                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 border border-slate-100">
+                                                      <h3 className="font-bold text-slate-800 mb-4">Need Help?</h3>
+                                                      <div className="space-y-3">
+                                                            <a href="tel:+911234567890" className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-colors p-3 bg-slate-50 rounded-xl">
+                                                                  <div className={`w-10 h-10 ${colors.light} rounded-xl flex items-center justify-center`}>
+                                                                        <Phone className={`w-5 h-5 ${colors.text}`} />
+                                                                  </div>
+                                                                  <span className="font-medium">+91 123 456 7890</span>
+                                                            </a>
+                                                            <div className="flex items-center gap-3 text-slate-600 p-3 bg-slate-50 rounded-xl">
+                                                                  <div className={`w-10 h-10 ${colors.light} rounded-xl flex items-center justify-center`}>
+                                                                        <MapPin className={`w-5 h-5 ${colors.text}`} />
+                                                                  </div>
+                                                                  <span className="font-medium">Pondicherry, India</span>
+                                                            </div>
+                                                      </div>
+                                                </div>
+
+                                                {/* Insurance */}
+                                                {treatment.insuranceCovered && (
+                                                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-6 border border-green-200">
+                                                            <div className="flex items-center gap-4">
+                                                                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+                                                                        <Shield className="w-7 h-7 text-white" />
+                                                                  </div>
+                                                                  <div>
+                                                                        <div className="font-bold text-green-800">Insurance Covered</div>
+                                                                        <div className="text-sm text-green-600">May be covered by international insurance</div>
+                                                                  </div>
+                                                            </div>
+                                                      </div>
+                                                )}
+                                          </motion.div>
                                     </div>
                               </div>
                         </div>
                   </section>
 
-                  {/* Back to Services */}
-                  <section className="py-8 border-t border-gray-100">
-                        <div className="container-premium">
-                              <Link href="/services" className="inline-flex items-center gap-2 text-[var(--medical-teal)] font-semibold hover:gap-3 transition-all">
+                  {/* Back Link */}
+                  <section className="py-8 border-t border-slate-200 bg-white">
+                        <div className="container mx-auto px-4">
+                              <Link href="/services" className={`inline-flex items-center gap-2 ${colors.text} font-semibold hover:gap-3 transition-all`}>
                                     <ArrowLeft className="w-5 h-5" />
                                     Back to All Treatments
                               </Link>

@@ -312,6 +312,58 @@ const updateInquiry = async (request, reply) => {
 };
 
 // ============================================
+// REVIEWS
+// ============================================
+
+const getMyReviews = async (request, reply) => {
+  try {
+    const { reviews } = require('../../../database/schema');
+    const { sql } = require('drizzle-orm');
+    
+    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    if (!hospitalId) {
+      return reply.code(404).send({ error: 'No hospital linked to this user' });
+    }
+
+    // Fetch all reviews for this hospital
+    const reviewsList = await db.select().from(reviews)
+      .where(eq(reviews.hospitalId, hospitalId))
+      .orderBy(desc(reviews.createdAt));
+
+    // Calculate statistics
+    const stats = await db.select({
+      totalReviews: sql`COUNT(*)::int`,
+      averageRating: sql`COALESCE(ROUND(AVG(${reviews.rating})::numeric, 1), 0.0)`,
+      fiveStarCount: sql`SUM(CASE WHEN ${reviews.rating} = 5 THEN 1 ELSE 0 END)::int`,
+      fourStarCount: sql`SUM(CASE WHEN ${reviews.rating} = 4 THEN 1 ELSE 0 END)::int`,
+      threeStarCount: sql`SUM(CASE WHEN ${reviews.rating} = 3 THEN 1 ELSE 0 END)::int`,
+      twoStarCount: sql`SUM(CASE WHEN ${reviews.rating} = 2 THEN 1 ELSE 0 END)::int`,
+      oneStarCount: sql`SUM(CASE WHEN ${reviews.rating} = 1 THEN 1 ELSE 0 END)::int`,
+      verifiedCount: sql`SUM(CASE WHEN ${reviews.isVerified} = true THEN 1 ELSE 0 END)::int`
+    })
+    .from(reviews)
+    .where(eq(reviews.hospitalId, hospitalId));
+
+    return {
+      reviews: reviewsList,
+      stats: stats[0] || {
+        totalReviews: 0,
+        averageRating: 0,
+        fiveStarCount: 0,
+        fourStarCount: 0,
+        threeStarCount: 0,
+        twoStarCount: 0,
+        oneStarCount: 0,
+        verifiedCount: 0
+      }
+    };
+  } catch (error) {
+    console.error('Get reviews error:', error);
+    return reply.code(500).send({ error: 'Failed to fetch reviews' });
+  }
+};
+
+// ============================================
 // PACKAGES CRUD
 // ============================================
 
@@ -419,6 +471,8 @@ module.exports = {
   // Inquiries
   getMyInquiries,
   updateInquiry,
+  // Reviews
+  getMyReviews,
   // Packages
   getMyPackages,
   addPackage,

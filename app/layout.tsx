@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import ClientProviders from "./components/ClientProviders";
+import "./globals.css";
+
+import { FloatingQuoteWidget } from "./components/common";
+import { QuoteProvider } from "./context/QuoteContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,7 +26,10 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ClientProviders>
-          {children}
+          <QuoteProvider>
+            {children}
+            <FloatingQuoteWidget />
+          </QuoteProvider>
         </ClientProviders>
       </body>
     </html>

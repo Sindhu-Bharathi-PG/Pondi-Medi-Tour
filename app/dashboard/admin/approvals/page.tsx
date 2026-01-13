@@ -26,12 +26,17 @@ export default function ApprovalsPage() {
     const fetchPendingItems = async () => {
         setLoading(true);
         try {
+            console.log(`fetching pending items for filter: ${filter}`);
             // Currently backend only supports hospital approvals. 
             // In future we can add endpoints for doctors/treatments.
             if (filter === 'all' || filter === 'hospital') {
                 const response = await fetch('/api/admin/hospitals?status=pending');
+                console.log('pending items response:', response.status);
+
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('pending items data:', data);
+
                     const hospitals: PendingItem[] = (data.hospitals || []).map((h: any) => ({
                         id: h.id,
                         type: 'hospital',
@@ -61,6 +66,8 @@ export default function ApprovalsPage() {
                 // Remove from list
                 setPendingItems(prev => prev.filter(item => item.id !== id));
                 toast.success('Hospital approved successfully');
+                // Refresh list to be sure
+                fetchPendingItems();
             } else {
                 toast.error('Failed to approve hospital');
             }
@@ -86,6 +93,8 @@ export default function ApprovalsPage() {
             if (response.ok) {
                 setPendingItems(prev => prev.filter(item => item.id !== id));
                 toast.success('Hospital rejected successfully');
+                // Refresh list
+                fetchPendingItems();
             } else {
                 toast.error('Failed to reject hospital');
             }

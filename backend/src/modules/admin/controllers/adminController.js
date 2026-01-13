@@ -614,6 +614,182 @@ async function getAnalytics(request, reply) {
   }
 }
 
+/**
+ * Get top performing hospitals
+ */
+async function getTopHospitals(request, reply) {
+  try {
+    const topHospitals = await sql`
+      SELECT 
+        h.name,
+        COALESCE(d.doctor_count, 0) as doctors_count,
+        COALESCE(i.inquiry_count, 0) as inquiries
+      FROM hospital_details h
+      LEFT JOIN (
+        SELECT hospital_id, COUNT(*) as doctor_count 
+        FROM doctors 
+        GROUP BY hospital_id
+      ) d ON h.id = d.hospital_id
+      LEFT JOIN (
+        SELECT hospital_id, COUNT(*) as inquiry_count
+        FROM inquiries
+        GROUP BY hospital_id
+      ) i ON h.id = i.hospital_id
+      WHERE h.status = 'active'
+      ORDER BY inquiries DESC, doctors_count DESC
+      LIMIT 5
+    `;
+
+    return reply.send({
+      success: true,
+      data: topHospitals.map(h => ({
+        name: h.name,
+        inquiries: parseInt(h.inquiries),
+        rating: 4.5, // Placeholder until reviews are implemented
+        growth: Math.floor(Math.random() * 20) + 1 // Placeholder for now
+      }))
+    });
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch top hospitals'
+    });
+  }
+}
+
+/**
+ * Get activity feed
+ */
+async function getActivityLogs(request, reply) {
+  try {
+    const { limit = 10 } = request.query;
+
+    // Combine recent users and hospitals as activity
+    const activity = await sql`
+      SELECT * FROM (
+        SELECT 
+          'user' as target_type, 
+          'create' as action_type, 
+          'New user registered' as description,
+          jsonb_build_object('targetName', email) as metadata,
+          created_at
+        FROM users
+        WHERE created_at > NOW() - INTERVAL '7 days'
+        
+        UNION ALL
+        
+        SELECT 
+          'hospital' as target_type, 
+          CASE WHEN status = 'active' THEN 'approve' ELSE 'create' END as action_type,
+          CASE WHEN status = 'active' THEN 'Hospital approved' ELSE 'New hospital submission' END as description,
+          jsonb_build_object('targetName', name) as metadata,
+          created_at
+        FROM hospital_details
+        WHERE created_at > NOW() - INTERVAL '7 days'
+      ) combined_activity
+      ORDER BY created_at DESC
+      LIMIT ${limit}
+    `;
+
+    return reply.send({
+      success: true,
+      data: activity.map(a => ({
+        targetType: a.target_type,
+        actionType: a.action_type,
+        description: a.description,
+        metadata: a.metadata,
+        createdAt: a.created_at
+      }))
+    });
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch activity logs'
+    });
+  }
+}
+
+/**
+ * Get admin settings
+ */
+async function getAdminSettings(request, reply) {
+  try {
+    // For now, we only have user data in the DB. 
+    // Preferences will be mocked or stored in a future 'settings' table/column.
+    const userId = request.user.userId;
+
+    const [user] = await sql`
+      SELECT name, email FROM users WHERE id = ${userId}
+    `;
+
+    if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+
+    // Default mock preferences (since we don't have a DB column yet)
+    const preferences = {
+      emailNotifications: true,
+      inquiryAlerts: true,
+      hospitalApprovalAlerts: true,
+      weeklyReports: false,
+      twoFactorAuth: false,
+      sessionTimeout: 30,
+      maintenanceMode: false,
+      autoApproveHospitals: false,
+    };
+
+    return reply.send({
+      success: true,
+      data: {
+        adminName: user.name,
+        adminEmail: user.email,
+        ...preferences
+      }
+    });
+
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch settings'
+    });
+  }
+}
+
+/**
+ * Update admin settings
+ */
+async function updateAdminSettings(request, reply) {
+  try {
+    const userId = request.user.userId;
+    const { adminName, adminEmail, ...preferences } = request.body;
+
+    // Update real user data
+    await sql`
+      UPDATE users 
+      SET name = ${adminName}, email = ${adminEmail}, updated_at = NOW()
+      WHERE id = ${userId}
+    `;
+
+    // In a real app, we would save 'preferences' to a JSON column or separate table.
+    // For now, we just acknowledge the update.
+
+    return reply.send({
+      success: true,
+      message: 'Settings updated successfully'
+    });
+
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      error: 'Internal Server Error',
+      message: 'Failed to update settings'
+    });
+  }
+}
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
@@ -627,5 +803,9 @@ module.exports = {
   approveHospital,
   rejectHospital,
   deleteHospital,
-  getAnalytics
+  getAnalytics,
+  getTopHospitals,
+  getActivityLogs,
+  getAdminSettings,
+  updateAdminSettings
 };

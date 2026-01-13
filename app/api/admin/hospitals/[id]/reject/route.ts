@@ -23,7 +23,7 @@ export async function PATCH(
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/admin/hospitals/${params.id}/reject`, {
+            const response = await fetch(`${BACKEND_URL}/api/admin/hospitals/${params.id}/reject`, {
                 method: 'PATCH',
                 headers,
                 body: JSON.stringify({ reason })

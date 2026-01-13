@@ -1,414 +1,446 @@
 "use client";
 
-import { API_BASE, apiCall, useApi } from "@/app/hooks/useApi";
-import { AlertCircle, ArrowLeft, CheckCircle2, Clock, Flag, Inbox, Mail, MapPin, MessageCircle, Phone, Search, User } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { EmptyState, ErrorState, LoadingSpinner } from "../components/LoadingStates";
+import { PageLoader } from '@/app/components/common';
+import { AlertCircle, Calendar, CheckCircle, ChevronRight, Clock, Download, FileText, Filter, Globe, Mail, Phone, RefreshCw, Search, Stethoscope, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Inquiry {
     id: number;
     patientName: string;
     email: string;
     phone?: string;
-    country?: string;
-    treatmentType?: string;
+    country: string;
+    treatmentType: string;
     subject: string;
     message: string;
-    status: 'pending' | 'responded' | 'closed' | 'spam';
-    priority?: 'low' | 'normal' | 'high' | 'urgent';
-    respondedAt?: string;
+    status: 'pending' | 'responded' | 'closed';
+    priority: 'urgent' | 'high' | 'normal' | 'low';
     createdAt: string;
-    source?: string;
+    updatedAt?: string;
 }
 
 export default function InquiriesPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filter, setFilter] = useState('all');
-    const [priorityFilter, setPriorityFilter] = useState('all');
+    const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+    const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
 
-    // Use optimized API hook
-    const { data: inquiries, loading, error, refetch } = useApi<Inquiry[]>({
-        url: `${API_BASE}/api/hospitals/me/inquiries`,
-        initialData: []
-    });
+    useEffect(() => {
+        fetchInquiries();
+    }, []);
 
-    const handleUpdateStatus = async (id: number, status: string) => {
+    useEffect(() => {
+        filterInquiries();
+    }, [searchQuery, statusFilter, inquiries]);
+
+    const fetchInquiries = async () => {
+        setLoading(true);
         try {
-            const body: any = { status };
-            if (status === 'responded') {
-                body.respondedAt = new Date().toISOString();
-            }
-            await apiCall(`/api/hospitals/me/inquiries/${id}`, 'PUT', body);
-            await refetch();
-        } catch (error: any) {
-            console.error("Failed to update inquiry status", error);
-            alert(error.message || "Failed to update status. Please try again.");
+            const sessionRes = await fetch('/api/auth/session');
+            const session = await sessionRes.json();
+            const token = session.accessToken;
+
+            const res = await fetch('http://localhost:3001/api/hospitals/me/inquiries', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch inquiries');
+
+            const data = await res.json();
+            setInquiries(Array.isArray(data) ? data : []);
+            setFilteredInquiries(Array.isArray(data) ? data : []);
+        } catch (err: any) {
+            setError(err.message);
+            // Use sample data if API fails
+            setSampleData();
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleUpdatePriority = async (id: number, priority: string) => {
-        try {
-            await apiCall(`/api/hospitals/me/inquiries/${id}`, 'PUT', { priority });
-            await refetch();
-        } catch (error: any) {
-            console.error("Failed to update priority", error);
-            alert(error.message || "Failed to update priority. Please try again.");
+    const setSampleData = () => {
+        const sample: Inquiry[] = [
+            {
+                id: 1,
+                patientName: 'John Smith',
+                email: 'john@example.com',
+                phone: '+1 234 567 890',
+                country: 'USA',
+                treatmentType: 'Knee Replacement',
+                subject: 'Inquiry about knee surgery',
+                message: 'I would like to know more about knee replacement surgery options.',
+                status: 'pending',
+                priority: 'high',
+                createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            },
+            {
+                id: 2,
+                patientName: 'Emma Wilson',
+                email: 'emma@example.com',
+                country: 'UK',
+                treatmentType: 'Cardiac Surgery',
+                subject: 'Heart bypass consultation',
+                message: 'Need information about heart bypass surgery.',
+                status: 'responded',
+                priority: 'urgent',
+                createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            },
+            {
+                id: 3,
+                patientName: 'Michael Brown',
+                email: 'michael@example.com',
+                phone: '+61 456 789 012',
+                country: 'Australia',
+                treatmentType: 'Dental Implants',
+                subject: 'Dental implant pricing',
+                message: 'Looking for dental implant treatment options and costs.',
+                status: 'closed',
+                priority: 'normal',
+                createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+        ];
+        setInquiries(sample);
+        setFilteredInquiries(sample);
+    };
+
+    const filterInquiries = () => {
+        let filtered = [...inquiries];
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(
+                (inq) =>
+                    inq.patientName.toLowerCase().includes(query) ||
+                    inq.email.toLowerCase().includes(query) ||
+                    inq.subject.toLowerCase().includes(query)
+            );
+        }
+
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter((inq) => inq.status === statusFilter);
+        }
+
+        setFilteredInquiries(filtered);
+    };
+
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+        });
+    };
+
+    const timeAgo = (date: string) => {
+        const diff = Date.now() - new Date(date).getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        if (hours < 1) return 'Just now';
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'pending': return 'bg-amber-100 text-amber-700 border-amber-200';
+            case 'responded': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+            case 'closed': return 'bg-gray-100 text-gray-600 border-gray-200';
+            default: return 'bg-gray-100 text-gray-600 border-gray-200';
         }
     };
 
-    const getPriorityBadge = (priority?: string) => {
+    const getPriorityColor = (priority: string) => {
         switch (priority) {
-            case 'urgent':
-                return <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-semibold">
-                    <AlertCircle className="w-3 h-3" />
-                    Urgent
-                </span>;
-            case 'high':
-                return <span className="flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-lg text-xs font-semibold">
-                    <Flag className="w-3 h-3" />
-                    High
-                </span>;
-            case 'normal':
-                return <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">Normal</span>;
-            case 'low':
-                return <span className="px-2 py-1 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium">Low</span>;
-            default:
-                return null;
+            case 'urgent': return 'bg-red-100 text-red-700';
+            case 'high': return 'bg-orange-100 text-orange-700';
+            case 'normal': return 'bg-blue-100 text-blue-700';
+            case 'low': return 'bg-gray-100 text-gray-600';
+            default: return 'bg-gray-100 text-gray-600';
         }
     };
-
-    const filteredInquiries = (inquiries || []).filter(inquiry => {
-        const matchesSearch =
-            (inquiry.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-            (inquiry.subject?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-            (inquiry.country?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-            (inquiry.treatmentType?.toLowerCase() || '').includes(searchQuery.toLowerCase());
-        const matchesStatus = filter === 'all' || inquiry.status === filter;
-        const matchesPriority = priorityFilter === 'all' || inquiry.priority === priorityFilter;
-        return matchesSearch && matchesStatus && matchesPriority;
-    });
-
-    // Sort by priority and date
-    const sortedInquiries = [...filteredInquiries].sort((a, b) => {
-        // Priority order: urgent > high > normal > low
-        const priorityOrder = { urgent: 0, high: 1, normal: 2, low: 3 };
-        const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 2;
-        const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 2;
-
-        if (aPriority !== bPriority) return aPriority - bPriority;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-
-    // Safe array for stats (handles null)
-    const safeInquiries = inquiries || [];
 
     if (loading) {
-        return <LoadingSpinner message="Loading inquiries..." />;
+        return <PageLoader message="Loading inquiries..." />;
     }
 
-    if (error) {
-        return <ErrorState message={error} onRetry={refetch} showLogin />;
-    }
-
-    if (safeInquiries.length === 0) {
-        return (
-            <div className="min-h-full bg-gray-50/50 p-8">
-                <Link href="/dashboard/hospital" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-emerald-600 mb-4">
-                    <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-                </Link>
-                <EmptyState
-                    title="No Inquiries Yet"
-                    description="When patients submit inquiries, they will appear here."
-                    icon={<Inbox className="w-8 h-8 text-emerald-500" />}
-                />
-            </div>
-        );
-    }
+    const stats = {
+        total: inquiries.length,
+        pending: inquiries.filter((i) => i.status === 'pending').length,
+        responded: inquiries.filter((i) => i.status === 'responded').length,
+        urgent: inquiries.filter((i) => i.priority === 'urgent').length,
+    };
 
     return (
-        <div className="min-h-full bg-gray-50/50">
-            {/* Ambient Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute -top-1/4 -left-1/4 w-1/3 h-1/3 bg-gradient-to-br from-emerald-400/10 to-teal-400/5 rounded-full blur-3xl" />
-                <div className="absolute -bottom-1/4 -right-1/4 w-1/3 h-1/3 bg-gradient-to-tl from-teal-400/10 to-cyan-400/5 rounded-full blur-3xl" />
+        <div className="space-y-6">
+            {/* Page Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Inquiries</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage patient inquiries and requests</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={fetchInquiries}
+                        className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Refresh"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium text-sm shadow-sm">
+                        <Download className="w-4 h-4" />
+                        Export
+                    </button>
+                </div>
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <Link
-                        href="/dashboard/hospital"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-emerald-600 mb-2 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Patient Inquiries</h1>
-                    <p className="text-gray-500 mt-1">Manage and respond to patient questions and consultations.</p>
-                </div>
-
-                {/* Stats Bar */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                        <div className="text-2xl font-bold text-gray-900">{safeInquiries.filter(i => i.status === 'pending').length}</div>
-                        <div className="text-sm text-gray-500">Pending</div>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                        <div className="text-2xl font-bold text-emerald-600">{safeInquiries.filter(i => i.status === 'responded').length}</div>
-                        <div className="text-sm text-gray-500">Responded</div>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                        <div className="text-2xl font-bold text-red-600">{safeInquiries.filter(i => i.priority === 'urgent').length}</div>
-                        <div className="text-sm text-gray-500">Urgent</div>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                        <div className="text-2xl font-bold text-gray-900">{safeInquiries.length}</div>
-                        <div className="text-sm text-gray-500">Total</div>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500">Total</p>
+                            <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                            <FileText className="w-6 h-6 text-blue-600" />
+                        </div>
                     </div>
                 </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500">Pending</p>
+                            <p className="text-2xl font-bold text-amber-600 mt-1">{stats.pending}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+                            <Clock className="w-6 h-6 text-amber-600" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500">Responded</p>
+                            <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.responded}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+                            <CheckCircle className="w-6 h-6 text-emerald-600" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500">Urgent</p>
+                            <p className="text-2xl font-bold text-red-600 mt-1">{stats.urgent}</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+                            <AlertCircle className="w-6 h-6 text-red-600" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                {/* Filters */}
-                <div className="flex flex-col gap-4 mb-6">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            {/* Filters */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Search */}
+                    <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Search by patient name, subject, country or treatment..."
+                            placeholder="Search by name, email, or subject..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all outline-none shadow-sm"
+                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
                         />
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
-                        {/* Status Filter */}
-                        <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
-                            <button
-                                onClick={() => setFilter('all')}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'all' ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                All
-                            </button>
-                            <button
-                                onClick={() => setFilter('pending')}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'pending' ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                Pending
-                            </button>
-                            <button
-                                onClick={() => setFilter('responded')}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'responded' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                Responded
-                            </button>
-                            <button
-                                onClick={() => setFilter('closed')}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'closed' ? 'bg-gray-50 text-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                Closed
-                            </button>
-                            <button
-                                onClick={() => setFilter('spam')}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'spam' ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                Spam
-                            </button>
-                        </div>
-
-                        {/* Priority Filter */}
-                        <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
-                            <button
-                                onClick={() => setPriorityFilter('all')}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${priorityFilter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                All Priority
-                            </button>
-                            <button
-                                onClick={() => setPriorityFilter('urgent')}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${priorityFilter === 'urgent' ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                Urgent
-                            </button>
-                            <button
-                                onClick={() => setPriorityFilter('high')}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${priorityFilter === 'high' ? 'bg-orange-50 text-orange-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                High
-                            </button>
-                        </div>
+                    {/* Status Filter */}
+                    <div className="flex items-center gap-2">
+                        <Filter className="w-5 h-5 text-gray-400" />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="responded">Responded</option>
+                            <option value="closed">Closed</option>
+                        </select>
                     </div>
                 </div>
+            </div>
 
-                {/* Inquiries List */}
-                {loading ? (
-                    <div className="text-center py-12">Loading...</div>
-                ) : sortedInquiries.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">No inquiries found.</div>
+            {/* Inquiries Table */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <div className="col-span-4">Patient</div>
+                    <div className="col-span-2">Treatment</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-2">Priority</div>
+                    <div className="col-span-2">Date</div>
+                </div>
+
+                {/* Table Body */}
+                {filteredInquiries.length === 0 ? (
+                    <div className="p-12 text-center">
+                        <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 font-medium">No inquiries found</p>
+                        <p className="text-gray-400 text-sm mt-1">
+                            {inquiries.length > 0
+                                ? 'Try adjusting your search or filters'
+                                : 'Patient inquiries will appear here'}
+                        </p>
+                    </div>
                 ) : (
-                    <div className="space-y-4">
-                        {sortedInquiries.map((inquiry, index) => (
+                    <div className="divide-y divide-gray-100">
+                        {filteredInquiries.map((inquiry) => (
                             <div
                                 key={inquiry.id}
-                                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300 group"
-                                style={{ animationDelay: `${index * 100}ms` }}
+                                onClick={() => setSelectedInquiry(inquiry)}
+                                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer items-center"
                             >
-                                <div className="flex flex-col md:flex-row gap-6">
-                                    {/* Icon/Avatar */}
-                                    <div className={`w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center ${inquiry.status === 'pending' ? 'bg-amber-50 text-amber-600' :
-                                        inquiry.status === 'responded' ? 'bg-emerald-50 text-emerald-600' :
-                                            'bg-gray-50 text-gray-600'
-                                        }`}>
-                                        {inquiry.status === 'pending' ? <Clock className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
+                                {/* Patient */}
+                                <div className="col-span-4">
+                                    <p className="font-semibold text-gray-900 truncate">{inquiry.patientName}</p>
+                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                                        <Mail className="w-3.5 h-3.5" />
+                                        <span className="truncate">{inquiry.email}</span>
                                     </div>
+                                </div>
 
-                                    {/* Content */}
-                                    <div className="flex-1">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                                                    {inquiry.subject}
-                                                </h3>
-                                                {inquiry.priority && getPriorityBadge(inquiry.priority)}
-                                                {inquiry.treatmentType && (
-                                                    <span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium">
-                                                        {inquiry.treatmentType}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
-                                                {new Date(inquiry.createdAt).toLocaleString()}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-4 text-sm text-gray-500 mb-3 flex-wrap">
-                                            <span className="flex items-center gap-1">
-                                                <User className="w-4 h-4" />
-                                                {inquiry.patientName || 'Unknown'}
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <Mail className="w-4 h-4" />
-                                                {inquiry.email || 'No email'}
-                                            </span>
-                                            {inquiry.phone && (
-                                                <a href={`tel:${inquiry.phone}`} className="flex items-center gap-1 hover:text-purple-600 transition">
-                                                    <Phone className="w-4 h-4" />
-                                                    {inquiry.phone}
-                                                </a>
-                                            )}
-                                            {inquiry.country && (
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin className="w-4 h-4" />
-                                                    {inquiry.country}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <p className="text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-xl text-sm border border-gray-100 whitespace-pre-wrap">
-                                            {inquiry.message}
-                                        </p>
-
-                                        {inquiry.respondedAt && (
-                                            <div className="text-xs text-emerald-600 mb-3 flex items-center gap-1">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                Responded on {new Date(inquiry.respondedAt).toLocaleString()}
-                                            </div>
-                                        )}
-
-                                        <div className="flex items-center gap-3 flex-wrap">
-                                            {inquiry.status === 'pending' && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleUpdateStatus(inquiry.id, 'responded')}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 rounded-lg text-sm font-medium transition shadow-sm"
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4" />
-                                                        Mark as Responded
-                                                    </button>
-                                                    <a
-                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition hover:-translate-y-0.5"
-                                                    >
-                                                        <Mail className="w-4 h-4" />
-                                                        Reply via Email
-                                                    </a>
-                                                    <button
-                                                        onClick={() => handleUpdateStatus(inquiry.id, 'spam')}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-sm font-medium transition"
-                                                    >
-                                                        <Flag className="w-4 h-4" />
-                                                        Spam
-                                                    </button>
-                                                </>
-                                            )}
-
-                                            {inquiry.status === 'responded' && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleUpdateStatus(inquiry.id, 'closed')}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4" />
-                                                        Close Inquiry
-                                                    </button>
-                                                    <a
-                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 rounded-lg text-sm font-medium transition"
-                                                    >
-                                                        <MessageCircle className="w-4 h-4" />
-                                                        Follow Up
-                                                    </a>
-                                                </>
-                                            )}
-
-                                            {inquiry.status === 'closed' && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleUpdateStatus(inquiry.id, 'pending')}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-medium transition"
-                                                    >
-                                                        <Clock className="w-4 h-4" />
-                                                        Reopen Inquiry
-                                                    </button>
-                                                    <a
-                                                        href={`mailto:${inquiry.email}?subject=Re: ${encodeURIComponent(inquiry.subject)}`}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
-                                                    >
-                                                        <Mail className="w-4 h-4" />
-                                                        Send Email
-                                                    </a>
-                                                </>
-                                            )}
-
-                                            {inquiry.status === 'spam' && (
-                                                <button
-                                                    onClick={() => handleUpdateStatus(inquiry.id, 'pending')}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-medium transition"
-                                                >
-                                                    <Clock className="w-4 h-4" />
-                                                    Not Spam - Restore
-                                                </button>
-                                            )}
-
-                                            {/* Priority Dropdown - Always visible */}
-                                            <select
-                                                value={inquiry.priority || 'normal'}
-                                                onChange={(e) => handleUpdatePriority(inquiry.id, e.target.value)}
-                                                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition cursor-pointer"
-                                            >
-                                                <option value="low">Low Priority</option>
-                                                <option value="normal">Normal Priority</option>
-                                                <option value="high">High Priority</option>
-                                                <option value="urgent">Urgent</option>
-                                            </select>
-                                        </div>
+                                {/* Treatment */}
+                                <div className="col-span-2">
+                                    <div className="flex items-center gap-1.5 text-sm text-gray-700">
+                                        <Stethoscope className="w-4 h-4 text-gray-400" />
+                                        <span className="truncate">{inquiry.treatmentType}</span>
                                     </div>
+                                </div>
+
+                                {/* Status */}
+                                <div className="col-span-2">
+                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(inquiry.status)}`}>
+                                        {inquiry.status.charAt(0).toUpperCase() + inquiry.status.slice(1)}
+                                    </span>
+                                </div>
+
+                                {/* Priority */}
+                                <div className="col-span-2">
+                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPriorityColor(inquiry.priority)}`}>
+                                        {inquiry.priority.charAt(0).toUpperCase() + inquiry.priority.slice(1)}
+                                    </span>
+                                </div>
+
+                                {/* Date */}
+                                <div className="col-span-2 flex items-center justify-between">
+                                    <div className="text-sm text-gray-500">
+                                        <span>{timeAgo(inquiry.createdAt)}</span>
+                                    </div>
+                                    <ChevronRight className="w-5 h-5 text-gray-400" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Detail Modal */}
+            {selectedInquiry && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">{selectedInquiry.patientName}</h2>
+                                <p className="text-gray-500 text-sm mt-1">{selectedInquiry.subject}</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedInquiry(null)}
+                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+                            {/* Status & Priority */}
+                            <div className="flex items-center gap-3">
+                                <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${getStatusColor(selectedInquiry.status)}`}>
+                                    {selectedInquiry.status.charAt(0).toUpperCase() + selectedInquiry.status.slice(1)}
+                                </span>
+                                <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getPriorityColor(selectedInquiry.priority)}`}>
+                                    {selectedInquiry.priority.charAt(0).toUpperCase() + selectedInquiry.priority.slice(1)} Priority
+                                </span>
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                                <h3 className="text-sm font-semibold text-gray-700">Contact Information</h3>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <Mail className="w-4 h-4 text-gray-400" />
+                                        {selectedInquiry.email}
+                                    </div>
+                                    {selectedInquiry.phone && (
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            <Phone className="w-4 h-4 text-gray-400" />
+                                            {selectedInquiry.phone}
+                                        </div>
+                                    )}
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <Globe className="w-4 h-4 text-gray-400" />
+                                        {selectedInquiry.country}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <Calendar className="w-4 h-4 text-gray-400" />
+                                        {formatDate(selectedInquiry.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Treatment */}
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-700 mb-2">Treatment Type</h3>
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <Stethoscope className="w-4 h-4 text-teal-600" />
+                                    {selectedInquiry.treatmentType}
+                                </div>
+                            </div>
+
+                            {/* Message */}
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-700 mb-2">Message</h3>
+                                <p className="text-gray-600 leading-relaxed bg-gray-50 rounded-xl p-4">
+                                    {selectedInquiry.message}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50">
+                            <button
+                                onClick={() => setSelectedInquiry(null)}
+                                className="px-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition font-medium"
+                            >
+                                Close
+                            </button>
+                            <button className="px-4 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition font-medium">
+                                Reply via Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

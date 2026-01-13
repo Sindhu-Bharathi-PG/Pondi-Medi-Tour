@@ -5,6 +5,8 @@ const managementController = require('../controllers/hospitalManagement');
 module.exports = async function (fastify, opts) {
   // Public routes
   fastify.get('/', hospitalController.getAllHospitals);
+  fastify.get('/doctors', hospitalController.getAllDoctors);
+  fastify.get('/doctors/:id', hospitalController.getDoctor);
   fastify.get('/:id', hospitalController.getHospital);
   
   // Dashboard stats (authenticated)
@@ -45,6 +47,11 @@ module.exports = async function (fastify, opts) {
   // ============================================
   fastify.get('/me/inquiries', { preHandler: fastify.authenticate }, managementController.getMyInquiries);
   fastify.put('/me/inquiries/:id', { preHandler: fastify.authenticate }, managementController.updateInquiry);
+  
+  // ============================================
+  // REVIEWS (authenticated)
+  // ============================================
+  fastify.get('/me/reviews', { preHandler: fastify.authenticate }, managementController.getMyReviews);
   
   // Admin-only routes
   fastify.post('/', hospitalController.createHospital);

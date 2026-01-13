@@ -19,7 +19,7 @@ export async function GET(
             headers['Authorization'] = `Bearer ${session.accessToken}`;
         }
 
-        const response = await fetch(`${BACKEND_URL}/admin/users/${params.id}`, {
+        const response = await fetch(`${BACKEND_URL}/api/admin/users/${params.id}`, {
             headers,
             cache: 'no-store'
         });
@@ -52,7 +52,7 @@ export async function PUT(
             headers['Authorization'] = `Bearer ${session.accessToken}`;
         }
 
-        const response = await fetch(`${BACKEND_URL}/admin/users/${params.id}`, {
+        const response = await fetch(`${BACKEND_URL}/api/admin/users/${params.id}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(body)
@@ -85,7 +85,7 @@ export async function DELETE(
             headers['Authorization'] = `Bearer ${session.accessToken}`;
         }
 
-        const response = await fetch(`${BACKEND_URL}/admin/users/${params.id}`, {
+        const response = await fetch(`${BACKEND_URL}/api/admin/users/${params.id}`, {
             method: 'DELETE',
             headers
         });

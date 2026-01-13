@@ -1,181 +1,175 @@
 "use client";
 
-import { ArrowLeft, Check, Clock, FileText, Plus, Search, User, X } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { PageLoader } from '@/app/components/common';
+import { Calendar as CalendarIcon, List } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import AppointmentCalendar from '../components/AppointmentCalendar';
+
+interface Appointment {
+    id: number;
+    patientName: string;
+    patientPhone: string;
+    patientEmail?: string;
+    appointmentDate: string;
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+    reason: string;
+    doctorId?: number;
+    doctorName?: string;
+    notes?: string;
+}
 
 export default function AppointmentsPage() {
-    const [activeTab, setActiveTab] = useState('upcoming');
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
 
-    const appointments = [
-        {
-            id: 1,
-            patientName: "Michael Scott",
-            doctorName: "Dr. James Wilson",
-            date: "Today, Oct 24",
-            time: "09:00 AM - 10:00 AM",
-            type: "Neurology Consultation",
-            status: "scheduled",
-            avatar: "MS"
-        },
-        {
-            id: 2,
-            patientName: "Pam Beesly",
-            doctorName: "Dr. Sarah Johnson",
-            date: "Today, Oct 24",
-            time: "11:30 AM - 12:00 PM",
-            type: "Follow-up",
-            status: "confirmed",
-            avatar: "PB"
-        },
-        {
-            id: 3,
-            patientName: "Jim Halpert",
-            doctorName: "Dr. Sarah Johnson",
-            date: "Tomorrow, Oct 25",
-            time: "02:00 PM - 03:00 PM",
-            type: "General Checkup",
-            status: "pending",
-            avatar: "JH"
+    useEffect(() => {
+        fetchAppointments();
+    }, []);
+
+    const fetchAppointments = async () => {
+        setLoading(true);
+        try {
+            const sessionRes = await fetch('/api/auth/session');
+            const session = await sessionRes.json();
+            const token = session.accessToken;
+
+            const res = await fetch('http://localhost:3001/api/hospitals/me/appointments', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setAppointments(data);
+            } else {
+                // Use sample data for demo
+                setSampleData();
+            }
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
+            setSampleData();
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
+
+    const setSampleData = () => {
+        const now = new Date();
+        const sampleAppointments: Appointment[] = [
+            {
+                id: 1,
+                patientName: 'John Doe',
+                patientPhone: '+1234567890',
+                patientEmail: 'john@example.com',
+                appointmentDate: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'confirmed',
+                reason: 'Knee Replacement Consultation',
+                doctorName: 'Dr. Smith',
+            },
+            {
+                id: 2,
+                patientName: 'Jane Smith',
+                patientPhone: '+0987654321',
+                appointmentDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'pending',
+                reason: 'Cardiac Check-up',
+                doctorName: 'Dr. Johnson',
+            },
+            {
+                id: 3,
+                patientName: 'Mike Wilson',
+                patientPhone: '+1122334455',
+                appointmentDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'confirmed',
+                reason: 'IVF Counseling',
+                doctorName: 'Dr. Brown',
+            },
+            {
+                id: 4,
+                patientName: 'Sarah Davis',
+                patientPhone: '+5544332211',
+                appointmentDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'completed',
+                reason: 'Post-Surgery Follow-up',
+                doctorName: 'Dr. Wilson',
+            },
+        ];
+        setAppointments(sampleAppointments);
+    };
+
+    if (loading) {
+        return <PageLoader message="Loading appointments..." />;
+    }
 
     return (
-        <div className="min-h-full bg-gray-50/50">
-            {/* Ambient Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute -top-1/4 -left-1/4 w-1/3 h-1/3 bg-gradient-to-br from-emerald-400/10 to-teal-400/5 rounded-full blur-3xl" />
-                <div className="absolute -bottom-1/4 -right-1/4 w-1/3 h-1/3 bg-gradient-to-tl from-teal-400/10 to-cyan-400/5 rounded-full blur-3xl" />
-            </div>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Appointments</h1>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        Manage and view all patient appointments
+                    </p>
+                </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                    <div>
-                        <Link
-                            href="/dashboard/hospital"
-                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-emerald-600 mb-3 transition-colors group"
-                        >
-                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                            Back to Dashboard
-                        </Link>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Appointments</h1>
-                            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
-                                {appointments.length}
-                            </div>
-                        </div>
-                        <p className="text-gray-600 flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            Manage scheduled visits and patient consultations
-                        </p>
-                    </div>
-
-                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all">
-                        <Plus className="w-5 h-5" />
-                        New Appointment
+                {/* View Toggle */}
+                <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1">
+                    <button
+                        onClick={() => setViewMode('calendar')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'calendar'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                            }`}
+                    >
+                        <CalendarIcon className="w-4 h-4" />
+                        Calendar
+                    </button>
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'list'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                            }`}
+                    >
+                        <List className="w-4 h-4" />
+                        List
                     </button>
                 </div>
+            </div>
 
-                {/* Tabs & Search */}
-                <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
-                    <div className="flex p-1 bg-white border border-gray-100 rounded-xl shadow-sm w-full md:w-auto">
-                        {['upcoming', 'completed', 'cancelled'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-medium capitalize transition-all ${activeTab === tab
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative w-full md:max-w-xs">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Find appointment..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
-                        />
-                    </div>
-                </div>
-
-                {/* Date Group */}
-                <div className="mb-6">
-                    <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Today, Oct 24</h2>
-                    <div className="space-y-4">
-                        {appointments.slice(0, 2).map((apt, index) => (
-                            <div
-                                key={apt.id}
-                                className="group bg-white/90 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200/50 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row gap-6 items-center"
-                            >
-                                {/* Time Column */}
-                                <div className="min-w-[140px] flex flex-col items-center md:items-start border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-6">
-                                    <div className="flex items-center gap-2 text-blue-600 font-bold text-lg">
-                                        <Clock className="w-5 h-5" />
-                                        {apt.time.split(' - ')[0]}
-                                    </div>
-                                    <p className="text-gray-400 text-sm mt-1">{apt.time.split(' - ')[1]} End</p>
-                                </div>
-
-                                {/* Main Info */}
-                                <div className="flex-1 w-full">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors">{apt.type}</h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${apt.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
-                                            }`}>
-                                            {apt.status}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
-                                                {apt.avatar}
-                                            </div>
-                                            {apt.patientName}
-                                        </div>
-                                        <div className="hidden sm:block w-px h-4 bg-gray-200"></div>
-                                        <div className="flex items-center gap-2">
-                                            <User className="w-4 h-4 text-gray-400" />
-                                            {apt.doctorName}
+            {/* Content */}
+            {viewMode === 'calendar' ? (
+                <AppointmentCalendar appointments={appointments} />
+            ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                        {appointments.map((apt) => (
+                            <div key={apt.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{apt.patientName}</h3>
+                                        <p className="text-gray-600 dark:text-gray-400 mt-1">{apt.reason}</p>
+                                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                            <span>{new Date(apt.appointmentDate).toLocaleString()}</span>
+                                            {apt.doctorName && <span>• {apt.doctorName}</span>}
                                         </div>
                                     </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
-                                    <button className="flex-1 md:flex-none py-2 px-4 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-medium hover:bg-emerald-100 transition flex items-center justify-center gap-2">
-                                        <Check className="w-4 h-4" />
-                                        <span className="md:hidden">Accept</span>
-                                    </button>
-                                    <button className="flex-1 md:flex-none py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition flex items-center justify-center gap-2">
-                                        <FileText className="w-4 h-4" />
-                                        <span className="md:hidden">Details</span>
-                                    </button>
-                                    <button className="flex-1 md:flex-none py-2 px-4 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition flex items-center justify-center gap-2">
-                                        <X className="w-4 h-4" />
-                                        <span className="md:hidden">Cancel</span>
-                                    </button>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${apt.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' :
+                                            apt.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                                                apt.status === 'completed' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' :
+                                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                        }`}>
+                                        {apt.status.toUpperCase()}
+                                    </span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-
-                {/* Next Days */}
-                <div className="mb-6">
-                    <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Tomorrow, Oct 25</h2>
-                    <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
-                        <p className="text-gray-500">You have 1 appointment scheduled.</p>
-                        <button className="text-blue-600 font-medium mt-2 hover:underline">View Schedule</button>
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
     );
 }

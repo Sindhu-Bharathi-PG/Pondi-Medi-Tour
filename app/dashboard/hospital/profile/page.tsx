@@ -517,15 +517,28 @@ export default function HospitalProfilePage() {
                                         <p className="text-sm text-gray-500">Centers of excellence at your facility</p>
                                     </div>
 
+                                    {/* Instructions Banner */}
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                                            <AlertCircle className="w-4 h-4" /> Important Guidelines
+                                        </h3>
+                                        <ul className="text-sm text-blue-700 space-y-1 list-disc pl-5">
+                                            <li>Use <strong>short names only</strong> (max 25 characters)</li>
+                                            <li>Examples: &quot;Cardiology&quot;, &quot;Orthopedics&quot;, &quot;IVF Center&quot;</li>
+                                            <li>Do NOT write descriptions here - save that for Description tab</li>
+                                            <li>Add one specialty per entry</li>
+                                        </ul>
+                                    </div>
+
                                     <div>
-                                        <div className="grid grid-cols-2 gap-3 mb-3">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                                             {formData.specializedCenters.map((center, i) => (
-                                                <div key={i} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-                                                    <span className="text-sm font-medium text-gray-900">{center}</span>
+                                                <div key={i} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors bg-white">
+                                                    <span className="text-sm font-medium text-gray-900 truncate">{center}</span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeItem('specializedCenters', i)}
-                                                        className="text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                                                        className="text-red-600 hover:bg-red-50 p-1 rounded transition-colors flex-shrink-0"
                                                     >
                                                         <X className="w-4 h-4" />
                                                     </button>
@@ -533,18 +546,27 @@ export default function HospitalProfilePage() {
                                             ))}
                                         </div>
                                         {newItemInputs.showCenterInput ? (
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={newItemInputs.center}
-                                                    onChange={e => setNewItemInputs({ ...newItemInputs, center: e.target.value })}
-                                                    onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addItem('specializedCenters'))}
-                                                    placeholder="e.g., Cardiac Care Center"
-                                                    className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm"
-                                                    autoFocus
-                                                />
-                                                <button type="button" onClick={() => addItem('specializedCenters')} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Add</button>
-                                                <button type="button" onClick={() => setNewItemInputs({ ...newItemInputs, showCenterInput: false, center: '' })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                                            <div className="space-y-2">
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={newItemInputs.center}
+                                                        onChange={e => {
+                                                            // Limit to 25 characters
+                                                            if (e.target.value.length <= 25) {
+                                                                setNewItemInputs({ ...newItemInputs, center: e.target.value });
+                                                            }
+                                                        }}
+                                                        onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addItem('specializedCenters'))}
+                                                        placeholder="e.g., Cardiology, Orthopedics"
+                                                        className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm"
+                                                        autoFocus
+                                                        maxLength={25}
+                                                    />
+                                                    <button type="button" onClick={() => addItem('specializedCenters')} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Add</button>
+                                                    <button type="button" onClick={() => setNewItemInputs({ ...newItemInputs, showCenterInput: false, center: '' })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                                                </div>
+                                                <p className="text-xs text-gray-500">{newItemInputs.center.length}/25 characters</p>
                                             </div>
                                         ) : (
                                             <button
@@ -552,9 +574,10 @@ export default function HospitalProfilePage() {
                                                 onClick={() => setNewItemInputs({ ...newItemInputs, showCenterInput: true })}
                                                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
                                             >
-                                                <Plus className="w-4 h-4" /> Add Center
+                                                <Plus className="w-4 h-4" /> Add Specialty
                                             </button>
                                         )}
+                                        <p className="text-xs text-gray-400 mt-2">Max 6 specialties recommended for best display</p>
                                     </div>
                                 </div>
                             )}
@@ -675,28 +698,56 @@ export default function HospitalProfilePage() {
                                         <p className="text-sm text-gray-500">Tell patients about your hospital</p>
                                     </div>
 
+                                    {/* Guidelines Banner */}
+                                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                        <h3 className="text-sm font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                                            <FileText className="w-4 h-4" /> Writing Tips
+                                        </h3>
+                                        <ul className="text-sm text-amber-700 space-y-1 list-disc pl-5">
+                                            <li><strong>Short Description:</strong> 1-2 sentences, shown on listing cards</li>
+                                            <li><strong>Full Description:</strong> Detailed info about expertise, facilities</li>
+                                            <li>Avoid ALL CAPS - use proper sentence case</li>
+                                            <li>Keep paragraphs short and scannable</li>
+                                        </ul>
+                                    </div>
+
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Short Description</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Short Description *</label>
                                         <textarea
                                             value={formData.shortDescription}
-                                            onChange={e => setFormData({ ...formData, shortDescription: e.target.value })}
+                                            onChange={e => {
+                                                if (e.target.value.length <= 200) {
+                                                    setFormData({ ...formData, shortDescription: e.target.value });
+                                                }
+                                            }}
                                             className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                                             rows={2}
-                                            placeholder="Brief overview (shown in listings)"
+                                            placeholder="Leading multi-specialty hospital offering world-class cardiac care..."
                                             maxLength={200}
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">{formData.shortDescription.length}/200 characters</p>
+                                        <p className={`text-xs mt-1 ${formData.shortDescription.length > 180 ? 'text-amber-600' : 'text-gray-500'}`}>
+                                            {formData.shortDescription.length}/200 characters
+                                            {formData.shortDescription.length > 180 && ' - Almost at limit!'}
+                                        </p>
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Description</label>
                                         <textarea
                                             value={formData.fullDescription}
-                                            onChange={e => setFormData({ ...formData, fullDescription: e.target.value })}
+                                            onChange={e => {
+                                                if (e.target.value.length <= 2000) {
+                                                    setFormData({ ...formData, fullDescription: e.target.value });
+                                                }
+                                            }}
                                             className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                                             rows={8}
-                                            placeholder="Detailed information about services, expertise, achievements..."
+                                            placeholder="Share your hospital's history, achievements, areas of expertise, infrastructure highlights, and what makes you unique..."
+                                            maxLength={2000}
                                         />
+                                        <p className={`text-xs mt-1 ${formData.fullDescription.length > 1800 ? 'text-amber-600' : 'text-gray-500'}`}>
+                                            {formData.fullDescription.length}/2000 characters
+                                        </p>
                                     </div>
                                 </div>
                             )}

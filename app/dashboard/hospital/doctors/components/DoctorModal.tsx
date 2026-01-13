@@ -59,14 +59,14 @@ export default function DoctorModal({ isOpen, onClose, onSubmit, initialData, ti
         bio: initialData?.bio || "",
         surgeriesCount: initialData?.surgeriesCount || 0,
         publicationsCount: initialData?.publicationsCount || 0,
-        languages: initialData?.languages || [],
+        languages: Array.isArray(initialData?.languages) ? initialData.languages : [],
         consultationTimings: initialData?.consultationTimings || "",
         isAvailable: initialData?.isAvailable ?? true,
         isFeatured: initialData?.isFeatured ?? false,
-        education: initialData?.education || [],
-        expertise: initialData?.expertise || [],
-        internationalTraining: initialData?.internationalTraining || [],
-        awards: initialData?.awards || [],
+        education: Array.isArray(initialData?.education) ? initialData.education : [],
+        expertise: Array.isArray(initialData?.expertise) ? initialData.expertise : [],
+        internationalTraining: Array.isArray(initialData?.internationalTraining) ? initialData.internationalTraining : [],
+        awards: Array.isArray(initialData?.awards) ? initialData.awards : [],
         serviceSlug: initialData?.serviceSlug || ""
     });
     const [loading, setLoading] = useState(false);
@@ -91,14 +91,14 @@ export default function DoctorModal({ isOpen, onClose, onSubmit, initialData, ti
                 bio: initialData?.bio || "",
                 surgeriesCount: initialData?.surgeriesCount || 0,
                 publicationsCount: initialData?.publicationsCount || 0,
-                languages: initialData?.languages || [],
+                languages: Array.isArray(initialData?.languages) ? initialData.languages : [],
                 consultationTimings: initialData?.consultationTimings || "",
                 isAvailable: initialData?.isAvailable ?? true,
                 isFeatured: initialData?.isFeatured ?? false,
-                education: initialData?.education || [],
-                expertise: initialData?.expertise || [],
-                internationalTraining: initialData?.internationalTraining || [],
-                awards: initialData?.awards || [],
+                education: Array.isArray(initialData?.education) ? initialData.education : [],
+                expertise: Array.isArray(initialData?.expertise) ? initialData.expertise : [],
+                internationalTraining: Array.isArray(initialData?.internationalTraining) ? initialData.internationalTraining : [],
+                awards: Array.isArray(initialData?.awards) ? initialData.awards : [],
                 serviceSlug: initialData?.serviceSlug || ""
             });
         } else {

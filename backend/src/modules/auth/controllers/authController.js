@@ -4,32 +4,34 @@ const { eq } = require('drizzle-orm');
 const db = require('../../../config/database');
 const { users } = require('../models/User');
 
+const fs = require('fs');
+const path = require('path');
+
 const login = async (request, reply) => {
-  console.error('=== LOGIN CONTROLLER REACHED ===');
+  console.log('=== LOGIN ATTEMPT ===');
   
   const { email, password } = request.body;
-  console.error('Email:', email, 'Password provided:', !!password);
+  console.log(`Email: ${email}`);
 
   try {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    console.error('User query result:', !!user);
     
     if (!user) {
-      console.error('User not found');
+      console.log('User not found in DB');
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
-    console.error('User found:', user.id, user.email);
+    console.log(`User found: ID=${user.id}`);
     
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.error('Password valid:', isValidPassword);
+    console.log(`Password match: ${isValidPassword}`);
     
     if (!isValidPassword) {
-      console.error('Password mismatch');
+      console.log('Password mismatch');
       return reply.code(401).send({ error: 'Invalid credentials' });
     }
 
-    console.error('Login successful!');
+    console.log('Login successful!');
     
     const token = jwt.sign(
       { userId: user.id, userType: user.userType },

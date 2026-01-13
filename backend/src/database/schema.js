@@ -192,7 +192,10 @@ const inquiries = pgTable('inquiries', {
   country: text('country'),
   
   // Inquiry Details
+  inquiryType: text('inquiry_type').default('general'),
+  packageId: integer('package_id').references(() => packages.id),
   treatmentType: text('treatment_type'),
+  packageName: text('package_name'), // Package the patient is interested in
   subject: text('subject').notNull(),
   message: text('message').notNull(),
   
@@ -204,6 +207,7 @@ const inquiries = pgTable('inquiries', {
   
   // Source & Tracking
   source: text('source').default('website'),
+  sourcePage: text('source_page'),
   referrerUrl: text('referrer_url'),
   ipAddress: text('ip_address'),
   
@@ -254,6 +258,11 @@ const packages = pgTable('packages', {
   // Status
   isActive: boolean('is_active').default(true),
   isFeatured: boolean('is_featured').default(false),
+  
+  // Popularity Tracking
+  viewCount: integer('view_count').default(0),
+  inquiryCount: integer('inquiry_count').default(0),
+  popularityScore: integer('popularity_score').default(0),
   
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
@@ -363,6 +372,33 @@ const mediaLibrary = pgTable('media_library', {
   tags: text('tags').array(),
 });
 
+// 15. Reviews - Patient reviews for hospitals
+const reviews = pgTable('reviews', {
+  id: serial('id').primaryKey(),
+  hospitalId: integer('hospital_id').references(() => hospitalDetails.id),
+  
+  // Reviewer info
+  userName: text('user_name').notNull(),
+  userEmail: text('user_email'),
+  origin: text('origin'), // Country of origin e.g., 'USA', 'UK'
+  
+  // Review content
+  rating: integer('rating').notNull(), // 1-5 stars
+  title: text('title'),
+  comment: text('comment'),
+  
+  // Treatment info (optional)
+  treatmentType: text('treatment_type'),
+  treatmentDate: timestamp('treatment_date'),
+  
+  // Moderation
+  isVerified: boolean('is_verified').default(false),
+  isApproved: boolean('is_approved').default(true),
+  
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
 // Export all tables
 module.exports = { 
   users, 
@@ -382,5 +418,7 @@ module.exports = {
   // Page builder tables
   pageConfigurations,
   pageVersions,
-  mediaLibrary
+  mediaLibrary,
+  // Reviews
+  reviews
 };

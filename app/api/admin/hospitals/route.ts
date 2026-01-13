@@ -12,6 +12,12 @@ export async function GET(request: NextRequest) {
         }
 
         const { searchParams } = new URL(request.url);
+
+        // Set a higher default limit to show more hospitals
+        if (!searchParams.has('limit')) {
+            searchParams.set('limit', '100');
+        }
+
         const queryString = searchParams.toString();
 
         try {
@@ -23,10 +29,15 @@ export async function GET(request: NextRequest) {
                 headers['Authorization'] = `Bearer ${session.accessToken}`;
             }
 
-            const response = await fetch(`${BACKEND_URL}/admin/hospitals${queryString ? `?${queryString}` : ''}`, {
+            const fetchUrl = `${BACKEND_URL}/api/admin/hospitals${queryString ? `?${queryString}` : ''}`;
+            console.log(`[Admin Hospitals API] Fetching from backend: ${fetchUrl}`);
+
+            const response = await fetch(fetchUrl, {
                 headers,
                 cache: 'no-store'
             });
+
+            console.log(`[Admin Hospitals API] Backend response status: ${response.status}`);
 
             if (response.ok) {
                 const data = await response.json();

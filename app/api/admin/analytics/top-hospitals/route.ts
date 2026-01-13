@@ -11,16 +11,20 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Return mock data for top hospitals (can be enhanced with real data later)
-        return NextResponse.json({
-            success: true,
-            data: [
-                { name: 'Apollo Specialty Hospital', inquiries: 45, rating: 4.8, growth: 12 },
-                { name: 'MGMCRI', inquiries: 38, rating: 4.6, growth: 8 },
-                { name: 'Sri Venkateshwaraa Hospital', inquiries: 32, rating: 4.5, growth: 15 },
-                { name: 'SMVMCH', inquiries: 28, rating: 4.4, growth: 5 },
-            ]
+        const response = await fetch(`${BACKEND_URL}/api/admin/analytics/top-hospitals`, {
+            headers: {
+                'Authorization': `Bearer ${session.accessToken}`,
+                'Content-Type': 'application/json'
+            }
         });
+
+        if (!response.ok) {
+            console.warn('Backend failed to return top hospitals, using fallback');
+            return NextResponse.json({ success: true, data: [] });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error fetching top hospitals:', error);
         return NextResponse.json({ success: true, data: [] });

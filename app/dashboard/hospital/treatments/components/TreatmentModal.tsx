@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { AlertCircle, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TreatmentModalProps {
@@ -131,6 +131,18 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                     {/* Basic Info Tab */}
                     {activeTab === 'basic' && (
                         <div className="space-y-6">
+                            {/* Guidelines Banner */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4" /> Guidelines for Best Display
+                                </h3>
+                                <ul className="text-sm text-blue-700 space-y-1 list-disc pl-5">
+                                    <li><strong>Name:</strong> Short, clear treatment name (max 50 chars)</li>
+                                    <li><strong>Short Description:</strong> 1-2 sentences for listing cards (max 150 chars)</li>
+                                    <li>Use proper sentence case, avoid ALL CAPS</li>
+                                </ul>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 {/* Name */}
                                 <div className="col-span-2">
@@ -140,11 +152,13 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                                     <input
                                         type="text"
                                         required
+                                        maxLength={50}
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                                         placeholder="e.g. Total Knee Replacement"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">{formData.name.length}/50 characters</p>
                                 </div>
 
                                 {/* Category */}
@@ -162,11 +176,12 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                                         <option value="Orthopedics">Orthopedics</option>
                                         <option value="Cardiology">Cardiology</option>
                                         <option value="Dental">Dental</option>
-                                        <option value="Cosmetic">Cosmetic</option>
-                                        <option value="Fertility">Fertility</option>
+                                        <option value="Cosmetic">Cosmetic Surgery</option>
+                                        <option value="IVF & Fertility">IVF & Fertility</option>
                                         <option value="Neurology">Neurology</option>
                                         <option value="Oncology">Oncology</option>
                                         <option value="Ophthalmology">Ophthalmology</option>
+                                        <option value="Gastroenterology">Gastroenterology</option>
                                         <option value="General Surgery">General Surgery</option>
                                     </select>
                                 </div>
@@ -178,6 +193,7 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                                     </label>
                                     <input
                                         type="text"
+                                        maxLength={30}
                                         value={formData.subCategory}
                                         onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
@@ -189,15 +205,23 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                             {/* Short Description */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Short Description
+                                    Short Description <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     value={formData.shortDescription}
-                                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                                    rows={3}
+                                    onChange={(e) => {
+                                        if (e.target.value.length <= 150) {
+                                            setFormData({ ...formData, shortDescription: e.target.value });
+                                        }
+                                    }}
+                                    rows={2}
+                                    maxLength={150}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition resize-none"
-                                    placeholder="Brief overview for the card display..."
+                                    placeholder="Brief overview shown on cards (1-2 sentences)..."
                                 />
+                                <p className={`text-xs mt-1 ${formData.shortDescription.length > 130 ? 'text-amber-600' : 'text-gray-500'}`}>
+                                    {formData.shortDescription.length}/150 characters
+                                </p>
                             </div>
 
                             {/* Full Description */}
@@ -207,11 +231,17 @@ export default function TreatmentModal({ isOpen, onClose, treatment, onSave }: T
                                 </label>
                                 <textarea
                                     value={formData.fullDescription}
-                                    onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
+                                    onChange={(e) => {
+                                        if (e.target.value.length <= 1000) {
+                                            setFormData({ ...formData, fullDescription: e.target.value });
+                                        }
+                                    }}
                                     rows={5}
+                                    maxLength={1000}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition resize-none"
-                                    placeholder="Detailed description of the treatment procedure..."
+                                    placeholder="Detailed description of the treatment procedure, benefits, post-care..."
                                 />
+                                <p className="text-xs text-gray-500 mt-1">{formData.fullDescription.length}/1000 characters</p>
                             </div>
                         </div>
                     )}
