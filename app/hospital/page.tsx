@@ -31,15 +31,42 @@ function transformDbHospital(dbHospital: any) {
             name: normalizeName(dbHospital.name),
             fullName: normalizeName(dbHospital.name),
             slug: dbHospital.slug || `hospital-${dbHospital.id}`,
-            image: (dbHospital.gallery?.[0] || dbHospital.coverUrl || '').trim() || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
-            heroImage: dbHospital.coverUrl || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600',
-            gallery: dbHospital.gallery || [],
+            image: (() => {
+                  // Safely get gallery first image or coverUrl
+                  let imageUrl = '';
+                  if (Array.isArray(dbHospital.gallery) && dbHospital.gallery.length > 0) {
+                        const firstImage = dbHospital.gallery[0];
+                        if (firstImage && typeof firstImage === 'string') {
+                              imageUrl = firstImage.trim();
+                        }
+                  }
+                  // Fallback to coverUrl if gallery didn't provide valid image
+                  if (!imageUrl && dbHospital.coverUrl && typeof dbHospital.coverUrl === 'string') {
+                        imageUrl = dbHospital.coverUrl.trim();
+                  }
+                  // Final fallback to placeholder
+                  return imageUrl || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800';
+            })(),
+            heroImage: (typeof dbHospital.coverUrl === 'string' && dbHospital.coverUrl.trim()) || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600',
+            gallery: Array.isArray(dbHospital.gallery) ? dbHospital.gallery.filter((img: any) => img && typeof img === 'string' && img.trim() !== '') : [],
             rating: dbHospital.rating || 4.5,
             reviewCount: dbHospital.reviewCount || 0,
             specialties: normalizeSpecialties(dbHospital.specializedCenters),
             serviceSlugs: [],
             accreditation: normalizeAccreditations(dbHospital.accreditations || []),
-            location: dbHospital.location?.city ? `${dbHospital.location.city}, ${dbHospital.location.state || 'India'}` : 'Pondicherry',
+            location: (() => {
+                  const city = dbHospital.location?.city || 'Pondicherry';
+                  const state = dbHospital.location?.state || 'India';
+                  // Avoid redundancy: Pondicherry is in Puducherry union territory
+                  const cityLower = city.toLowerCase();
+                  const stateLower = state.toLowerCase();
+                  if (cityLower === stateLower ||
+                        (cityLower === 'pondicherry' && stateLower === 'puducherry') ||
+                        (cityLower === 'puducherry' && stateLower === 'pondicherry')) {
+                        return `${city}, India`;
+                  }
+                  return `${city}, ${state}`;
+            })(),
             established: dbHospital.establishmentYear || 2000,
             beds: dbHospital.infrastructure?.beds || dbHospital.infrastructure?.totalBeds || 100,
             type: dbHospital.type || 'Private',

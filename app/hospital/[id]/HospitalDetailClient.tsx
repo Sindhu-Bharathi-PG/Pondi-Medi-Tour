@@ -1,7 +1,8 @@
 "use client";
 
+import { API_BASE } from '@/app/hooks/useApi';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, ArrowLeft, Building2, Calendar, Camera, CheckCircle, Clock, Heart, MapPin, Phone, Star, Stethoscope, TrendingUp, X } from 'lucide-react';
+import { Activity, ArrowLeft, Building2, Calendar, Camera, CheckCircle, ChevronRight, Clock, Heart, MapPin, Phone, Star, Stethoscope, TrendingUp, User, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -65,6 +66,26 @@ export function HospitalDetailClient({ hospital }: HospitalDetailClientProps) {
     const [selectedDept, setSelectedDept] = useState<any | null>(null);
     const [filterRating, setFilterRating] = useState<number | 'all'>('all');
     const [counts, setCounts] = useState<Record<number, number>>({});
+    const [hospitalDoctors, setHospitalDoctors] = useState<any[]>([]);
+    const [loadingDoctors, setLoadingDoctors] = useState(true);
+
+    // Fetch doctors for this hospital
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/doctors?hospitalId=${hospital.id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setHospitalDoctors(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch doctors:', error);
+            } finally {
+                setLoadingDoctors(false);
+            }
+        };
+        fetchDoctors();
+    }, [hospital.id]);
 
     // Derived stats for UI
     const stats = [
@@ -101,9 +122,10 @@ export function HospitalDetailClient({ hospital }: HospitalDetailClientProps) {
         filterRating === 'all' || r.rating === filterRating
     ) || [];
 
-    // Helper to get main image
+    // Helper to get main image with validation
     const getMainImage = () => {
-        if (hospital.photos && hospital.photos.length > 0 && hospital.photos[0]) return hospital.photos[0];
+        const validPhotos = (hospital.photos || []).filter(p => p && typeof p === 'string' && p.trim() !== '');
+        if (validPhotos.length > 0) return validPhotos[0];
         return 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1200';
     };
 
@@ -273,40 +295,43 @@ export function HospitalDetailClient({ hospital }: HospitalDetailClientProps) {
             </section>
 
             {/* Image Gallery */}
-            {hospital.photos && hospital.photos.length > 0 && (
-                <section className="py-12 bg-white">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <Camera className="w-7 h-7 text-blue-600" />
-                            Photo Gallery
-                        </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {hospital.photos.map((img: string, i: number) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    className="relative h-48 rounded-xl overflow-hidden cursor-pointer group"
-                                    onClick={() => setSelectedImage(img)}
-                                >
-                                    <Image
-                                        src={img}
-                                        alt={`${hospital.name} gallery ${i + 1}`}
-                                        fill
-                                        sizes="(max-width: 768px) 50vw, 25vw"
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                                        <Camera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                </motion.div>
-                            ))}
+            {(() => {
+                const validPhotos = (hospital.photos || []).filter(p => p && typeof p === 'string' && p.trim() !== '');
+                return validPhotos.length > 0 && (
+                    <section className="py-12 bg-white">
+                        <div className="container mx-auto px-4">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                <Camera className="w-7 h-7 text-blue-600" />
+                                Photo Gallery
+                            </h2>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {validPhotos.map((img: string, i: number) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        whileHover={{ scale: 1.05 }}
+                                        className="relative h-48 rounded-xl overflow-hidden cursor-pointer group"
+                                        onClick={() => setSelectedImage(img)}
+                                    >
+                                        <Image
+                                            src={img}
+                                            alt={`${hospital.name} gallery ${i + 1}`}
+                                            fill
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                            <Camera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </section>
-            )}
+                    </section>
+                );
+            })()}
 
             {/* Image Modal */}
             <AnimatePresence>
@@ -410,6 +435,98 @@ export function HospitalDetailClient({ hospital }: HospitalDetailClientProps) {
                                         </motion.span>
                                     ))}
                                 </div>
+                            </motion.div>
+
+                            {/* Our Doctors Section */}
+                            <motion.div
+                                initial={{ y: 50, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                className="bg-white rounded-2xl shadow-lg p-8"
+                            >
+                                <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                    <User className="w-7 h-7 text-blue-600" />
+                                    Our Doctors
+                                </h2>
+
+                                {loadingDoctors ? (
+                                    <div className="text-center py-8">
+                                        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+                                        <p className="text-gray-500">Loading doctors...</p>
+                                    </div>
+                                ) : hospitalDoctors.length > 0 ? (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {hospitalDoctors.map((doctor: any, i: number) => (
+                                            <motion.div
+                                                key={doctor.id || i}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                className="group"
+                                            >
+                                                <Link
+                                                    href={`/doctor/${doctor.id}`}
+                                                    className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all bg-gray-50 hover:bg-blue-50"
+                                                >
+                                                    <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                                                        <Image
+                                                            src={doctor.imageUrl || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200'}
+                                                            alt={doctor.name}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-300"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                                                            {doctor.name}
+                                                        </h3>
+                                                        <p className="text-sm text-blue-600 font-medium truncate">
+                                                            {doctor.specialty}
+                                                        </p>
+                                                        {doctor.subSpecialty && (
+                                                            <p className="text-xs text-gray-500 truncate">
+                                                                {doctor.subSpecialty}
+                                                            </p>
+                                                        )}
+                                                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                                                            {doctor.experience && (
+                                                                <span className="flex items-center gap-1">
+                                                                    <Clock className="w-3 h-3" />
+                                                                    {doctor.experience}
+                                                                </span>
+                                                            )}
+                                                            {doctor.rating && (
+                                                                <span className="flex items-center gap-1">
+                                                                    <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                                                                    {doctor.rating}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 self-center transition-colors" />
+                                                </Link>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <User className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                        <p>No doctors listed for this hospital yet.</p>
+                                    </div>
+                                )}
+
+                                {hospitalDoctors.length > 0 && (
+                                    <div className="mt-6 text-center">
+                                        <Link
+                                            href={`/doctor?hospital=${hospital.id}`}
+                                            className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+                                        >
+                                            View All Doctors
+                                            <ChevronRight className="w-4 h-4" />
+                                        </Link>
+                                    </div>
+                                )}
                             </motion.div>
 
                             {/* Equipment & Facilities */}

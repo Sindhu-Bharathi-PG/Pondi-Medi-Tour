@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, CheckCircle2, Clock, Mail, MessageSquare, Package, Search, Stethoscope, User } from "lucide-react";
+import { CheckCircle2, Clock, Mail, MapPin, MessageSquare, Phone, Search, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Inquiry {
@@ -25,30 +25,33 @@ export default function AdminInquiriesPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState('all'); // all | pending | responded
-    const [typeFilter, setTypeFilter] = useState('all'); // all | general | hospital | package | treatment
 
-    useEffect(() => {
-        fetchInquiries();
-    }, []);
+
 
     const fetchInquiries = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/inquiries`);
+            // Use relative path to hit Next.js API route proxy
+            const response = await fetch('/api/inquiries');
             if (response.ok) {
                 const data = await response.json();
-                setInquiries(data);
+                setInquiries(Array.isArray(data) ? data : []);
             } else {
-                // Use mock data if API fails
-                useMockData();
+                console.error("Failed to fetch inquiries:", response.status, response.statusText);
+                // Don't fall back to mock data silently, let the user know
+                // useMockData(); 
             }
         } catch (error) {
             console.error("Failed to fetch inquiries", error);
-            // Use mock data as fallback
-            useMockData();
+            // useMockData();
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchInquiries();
+    }, []);
 
     const useMockData = () => {
         setInquiries([
@@ -84,16 +87,21 @@ export default function AdminInquiriesPage() {
 
     const handleMarkAsResponded = async (id: number) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/inquiries/${id}`, {
+            const response = await fetch(`/api/inquiries/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'responded' })
             });
             if (response.ok) {
                 fetchInquiries();
+            } else {
+                const err = await response.json().catch(() => ({}));
+                console.error("Update failed:", response.status, err);
+                alert(`Failed to update status: ${response.status}`);
             }
         } catch (error) {
             console.error("Failed to update inquiry", error);
+            alert("Network error updating status");
         }
     };
 
@@ -102,35 +110,25 @@ export default function AdminInquiriesPage() {
             (inquiry.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
             (inquiry.subject?.toLowerCase() || '').includes(searchQuery.toLowerCase());
         const matchesFilter = filter === 'all' || inquiry.status === filter;
-        const matchesType = typeFilter === 'all' || (inquiry.inquiryType || 'general') === typeFilter;
+        const matchesType = !inquiry.inquiryType || inquiry.inquiryType === 'general';
         return matchesSearch && matchesFilter && matchesType;
     });
 
-    const getInquiryTypeBadge = (inquiry: Inquiry) => {
-        const type = inquiry.inquiryType || 'general';
-        const badges = {
-            general: { bg: 'bg-gray-100', text: 'text-gray-700', icon: MessageSquare, label: 'General' },
-            hospital: { bg: 'bg-blue-100', text: 'text-blue-700', icon: Building2, label: inquiry.hospitalName || 'Hospital' },
-            package: { bg: 'bg-purple-100', text: 'text-purple-700', icon: Package, label: 'Package' },
-            treatment: { bg: 'bg-teal-100', text: 'text-teal-700', icon: Stethoscope, label: inquiry.treatmentType || 'Treatment' }
-        };
-        const badge = badges[type];
-        const Icon = badge.icon;
-        return (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
-                <Icon className="w-3.5 h-3.5" />
-                {badge.label}
-            </span>
-        );
-    };
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">Inquiries</h1>
-                    <p className="text-sm text-gray-500">Manage patient inquiries from the website.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">General Consultation Inquiries</h1>
+                    <p className="text-sm text-gray-500">Manage general inquiries and consultation requests.</p>
                 </div>
+                <button
+                    onClick={fetchInquiries}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                >
+                    <Clock className="w-4 h-4" />
+                    Refresh
+                </button>
             </div>
 
             {/* Filters */}
@@ -166,38 +164,6 @@ export default function AdminInquiriesPage() {
                             Responded
                         </button>
                     </div>
-                    <div className="flex gap-2 bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
-                        <button
-                            onClick={() => setTypeFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'all' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                        >
-                            All Types
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('general')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'general' ? 'bg-gray-100 text-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                        >
-                            General
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('hospital')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'hospital' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                        >
-                            Hospital
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('package')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'package' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                        >
-                            Package
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('treatment')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${typeFilter === 'treatment' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                        >
-                            Treatment
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -222,7 +188,7 @@ export default function AdminInquiriesPage() {
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">No inquiries found</h3>
                     <p className="text-slate-500">
-                        {searchQuery ? "Try adjusting your search" : "Patient inquiries will appear here"}
+                        {searchQuery ? "Try adjusting your search" : "No general inquiries found"}
                     </p>
                 </div>
             ) : (
@@ -242,18 +208,15 @@ export default function AdminInquiriesPage() {
                                 {/* Content */}
                                 <div className="flex-1">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                                                {inquiry.subject}
-                                            </h3>
-                                            {getInquiryTypeBadge(inquiry)}
-                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
+                                            {inquiry.subject}
+                                        </h3>
                                         <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
                                             {new Date(inquiry.createdAt).toLocaleString()}
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
                                         <span className="flex items-center gap-1">
                                             <User className="w-4 h-4" />
                                             {inquiry.patientName || 'Unknown'}
@@ -262,6 +225,18 @@ export default function AdminInquiriesPage() {
                                             <Mail className="w-4 h-4" />
                                             {inquiry.email || 'No email'}
                                         </span>
+                                        {inquiry.phone && (
+                                            <span className="flex items-center gap-1">
+                                                <Phone className="w-4 h-4" />
+                                                {inquiry.phone}
+                                            </span>
+                                        )}
+                                        {inquiry.country && (
+                                            <span className="flex items-center gap-1">
+                                                <MapPin className="w-4 h-4" />
+                                                {inquiry.country}
+                                            </span>
+                                        )}
                                     </div>
 
                                     <p className="text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-xl text-sm border border-gray-100 whitespace-pre-wrap">

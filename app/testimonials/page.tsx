@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Star, Quote, Play, MapPin, Calendar, Heart, ChevronRight, CheckCircle, Globe, Award, Video, X } from 'lucide-react';
-import { Header, Footer } from '@/app/components/common';
+import { Footer, Header } from '@/app/components/common';
+import { useQuote } from '@/app/context/QuoteContext';
 import { useScrolled } from '@/app/hooks';
+import { ChevronRight, MapPin, Play, Star } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 const TestimonialsPage = () => {
       const scrolled = useScrolled(50);
+      const { openQuoteWidget } = useQuote();
       const [activeVideo, setActiveVideo] = useState<string | null>(null);
       const [activeFilter, setActiveFilter] = useState('all');
 
@@ -272,9 +273,12 @@ const TestimonialsPage = () => {
                               <p className="text-xl text-rose-100 mb-8 max-w-2xl mx-auto">
                                     Join our community of successful patients. Get a free consultation today.
                               </p>
-                              <Link href="/booking" className="bg-white text-rose-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2">
+                              <button
+                                    onClick={() => openQuoteWidget({ source: 'testimonials-page' })}
+                                    className="bg-white text-rose-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2"
+                              >
                                     Book Free Consultation <ChevronRight className="w-5 h-5" />
-                              </Link>
+                              </button>
                         </div>
                   </section>
 

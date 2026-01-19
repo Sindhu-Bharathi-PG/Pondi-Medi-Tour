@@ -1,7 +1,8 @@
 "use client";
 
 import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
-import { Award, Clock, MapPin, Sparkles, Star, TrendingUp } from 'lucide-react';
+import { useQuote } from '@/app/context/QuoteContext';
+import { Award, Clock, MapPin, MessageCircle, Sparkles, Star, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -92,6 +93,7 @@ const FALLBACK_PACKAGES: Package[] = [
 ];
 
 const HybridPackages: React.FC = () => {
+      const { openQuoteWidget } = useQuote();
       const [packages, setPackages] = useState<Package[]>([]);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
@@ -194,8 +196,8 @@ const HybridPackages: React.FC = () => {
                                     <div
                                           key={pkg.id}
                                           className={`group relative bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-3 ${index === 0
-                                                      ? 'shadow-2xl shadow-emerald-200/50 ring-2 ring-emerald-100'
-                                                      : 'shadow-xl hover:shadow-2xl'
+                                                ? 'shadow-2xl shadow-emerald-200/50 ring-2 ring-emerald-100'
+                                                : 'shadow-xl hover:shadow-2xl'
                                                 }`}
                                     >
                                           {/* Popularity Badge */}
@@ -286,15 +288,31 @@ const HybridPackages: React.FC = () => {
                                                             </div>
                                                       </div>
 
-                                                      <Link
-                                                            href={`/packages/${pkg.slug || pkg.id}`}
-                                                            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-200 hover:scale-105 transition-all duration-300"
-                                                      >
-                                                            View Details
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                                            </svg>
-                                                      </Link>
+                                                      <div className="flex items-center gap-2">
+                                                            <button
+                                                                  onClick={() => openQuoteWidget({
+                                                                        hospitalId: pkg.hospitalId,
+                                                                        hospitalName: pkg.hospitalName || undefined,
+                                                                        packageId: pkg.id,
+                                                                        packageName: pkg.name,
+                                                                        treatmentType: pkg.category,
+                                                                        source: 'home-packages'
+                                                                  })}
+                                                                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-200 hover:scale-105 transition-all duration-300"
+                                                            >
+                                                                  <MessageCircle className="w-4 h-4" />
+                                                                  Get Quote
+                                                            </button>
+                                                            <Link
+                                                                  href={`/packages/${pkg.slug || pkg.id}`}
+                                                                  className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-5 py-3 rounded-full font-semibold hover:bg-gray-50 hover:scale-105 transition-all duration-300"
+                                                            >
+                                                                  Details
+                                                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                                  </svg>
+                                                            </Link>
+                                                      </div>
                                                 </div>
 
                                                 {/* Popularity Stats (Subtle) */}

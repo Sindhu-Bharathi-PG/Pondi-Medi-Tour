@@ -55,6 +55,23 @@ module.exports = async function (fastify, opts) {
     }
   }, authController.changePassword);
 
+  // Create hospital account route (Admin only)
+  fastify.post('/create-hospital-account', {
+    preHandler: fastify.authenticate,
+    schema: {
+      body: {
+        type: 'object',
+        required: ['email', 'password', 'hospitalId'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+          password: { type: 'string', minLength: 6 },
+          hospitalId: { type: 'number' },
+          hospitalName: { type: 'string' }
+        }
+      }
+    }
+  }, authController.createHospitalAccount);
+
   // TEMPORARY DEBUG ROUTE
   fastify.get('/reset-debug', async (request, reply) => {
     const bcrypt = require('bcryptjs');

@@ -40,7 +40,16 @@ export function PackagesClient({ initialPackages }: PackagesClientProps) {
             {/* 3D Animation Showcase */}
             <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
                 <div className="container mx-auto px-4">
-                    <Packages3DAnimation packages={initialPackages} />
+                    <Packages3DAnimation
+                        packages={initialPackages}
+                        onGetQuote={(pkg) => openQuoteWidget({
+                            hospitalId: (pkg as any).hospitalId,
+                            hospitalName: (pkg as any).hospitalName,
+                            packageName: pkg.name,
+                            treatmentType: pkg.name,
+                            source: 'packages-3d-carousel'
+                        })}
+                    />
                 </div>
             </section>
 
@@ -67,19 +76,25 @@ export function PackagesClient({ initialPackages }: PackagesClientProps) {
                                 <div
                                     key={pkg.id}
                                     className={`group relative bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 ${pkg.popular
-                                            ? 'shadow-2xl shadow-emerald-500/20 ring-2 ring-emerald-500'
-                                            : 'shadow-xl hover:shadow-2xl'
+                                        ? 'shadow-2xl shadow-emerald-500/20 ring-2 ring-emerald-500'
+                                        : 'shadow-xl hover:shadow-2xl'
                                         }`}
                                 >
-                                    {/* Popular badge */}
+                                    {/* Duration badge - top left */}
+                                    <div className="absolute top-4 left-4 z-10 bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        {pkg.duration}
+                                    </div>
+
+                                    {/* Popular badge - top right */}
                                     {pkg.popular && (
-                                        <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">
-                                            ⭐ MOST POPULAR
+                                        <div className="absolute top-4 right-4 z-20 bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                                            ⭐ Popular
                                         </div>
                                     )}
 
                                     {/* Header image with gradient overlay */}
-                                    <div className="relative h-52 overflow-hidden">
+                                    <div className="relative h-48 overflow-hidden">
                                         <Image
                                             src={pkg.image}
                                             alt={pkg.name}
@@ -89,20 +104,14 @@ export function PackagesClient({ initialPackages }: PackagesClientProps) {
                                         />
                                         <div className={`absolute inset-0 bg-gradient-to-t ${pkg.color} opacity-85`} />
 
-                                        {/* Floating content */}
-                                        <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                                                    <Sparkles className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-white/70 text-sm">{pkg.duration}</span>
-                                            </div>
-                                            <h3 className="text-2xl font-bold tracking-tight">{pkg.name}</h3>
-                                            <p className="text-white/80 text-sm">{pkg.tagline}</p>
+                                        {/* Floating content - at bottom */}
+                                        <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                                            <h3 className="text-xl font-bold tracking-tight mb-1">{pkg.name}</h3>
+                                            <p className="text-white/80 text-sm line-clamp-2">{pkg.tagline}</p>
                                             {pkg.hospitalName && (
                                                 <div className="flex items-center gap-1.5 mt-2 text-white/70 text-xs">
                                                     <Building2 className="w-3.5 h-3.5" />
-                                                    <span>{pkg.hospitalName}</span>
+                                                    <span className="truncate">{pkg.hospitalName}</span>
                                                 </div>
                                             )}
                                         </div>

@@ -162,6 +162,53 @@ const changePassword = async (request, reply) => {
   }
 };
 
+/**
+ * Create hospital account - Admin only
+ * Creates a new user with userType='hospital' and links to hospitalId
+ */
+const createHospitalAccount = async (request, reply) => {
+  const { email, password, hospitalId, hospitalName } = request.body;
+
+  console.log('=== CREATE HOSPITAL ACCOUNT ===');
+  console.log(`Email: ${email}, HospitalId: ${hospitalId}`);
+
+  try {
+    // Check if email already exists
+    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existingUser.length > 0) {
+      return reply.code(409).send({ error: 'A user with this email already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 12);
+
+    // Create the hospital user
+    const [newUser] = await db.insert(users).values({
+      email,
+      password: hashedPassword,
+      userType: 'hospital',
+      hospitalId: parseInt(hospitalId),
+      name: hospitalName || null,
+    }).returning();
+
+    console.log(`Hospital account created: ID=${newUser.id}`);
+
+    return reply.code(201).send({
+      success: true,
+      message: 'Hospital account created successfully',
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        userType: newUser.userType,
+        hospitalId: newUser.hospitalId
+      }
+    });
+  } catch (error) {
+    console.error('Create hospital account error:', error);
+    return reply.code(500).send({ error: 'Failed to create hospital account' });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -171,4 +218,5 @@ module.exports = {
   verifyMFA,
   verifyCredentialsForRole,
   changePassword,
+  createHospitalAccount,
 };

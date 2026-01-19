@@ -27,27 +27,27 @@ const Footer: React.FC = () => {
                                     <h4 className="text-white font-semibold mb-4">Popular Treatments</h4>
                                     <ul className="space-y-2 text-sm">
                                           <li>
-                                                <Link href="/services/orthopedics" className="hover:text-emerald-400 transition">
+                                                <Link href="/services?category=Orthopedics" className="hover:text-emerald-400 transition">
                                                       Orthopedics
                                                 </Link>
                                           </li>
                                           <li>
-                                                <Link href="/services/ivf" className="hover:text-emerald-400 transition">
+                                                <Link href="/services?category=IVF%20%26%20Fertility" className="hover:text-emerald-400 transition">
                                                       IVF & Fertility
                                                 </Link>
                                           </li>
                                           <li>
-                                                <Link href="/services/dental" className="hover:text-emerald-400 transition">
+                                                <Link href="/services?category=Dental" className="hover:text-emerald-400 transition">
                                                       Dental Care
                                                 </Link>
                                           </li>
                                           <li>
-                                                <Link href="/services/gastroenterology" className="hover:text-emerald-400 transition">
+                                                <Link href="/services?category=Gastroenterology" className="hover:text-emerald-400 transition">
                                                       Gastroenterology
                                                 </Link>
                                           </li>
                                           <li>
-                                                <Link href="/services/eye" className="hover:text-emerald-400 transition">
+                                                <Link href="/services?category=Ophthalmology" className="hover:text-emerald-400 transition">
                                                       Eye Surgery
                                                 </Link>
                                           </li>

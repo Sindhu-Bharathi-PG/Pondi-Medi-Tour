@@ -177,7 +177,7 @@ export default function TreatmentDetailPage() {
                   <Header />
 
                   {/* Hero Section */}
-                  <section className="relative pt-20 pb-32 overflow-hidden">
+                  <section className="relative pt-28 pb-32 overflow-hidden">
                         <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg}`}>
                               <div
                                     className="absolute inset-0 opacity-20"

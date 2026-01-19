@@ -1,5 +1,6 @@
 "use client";
 
+import { ConvertedPrice } from "@/app/components/common/ConvertedPrice";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { CheckCircle, ChevronLeft, ChevronRight, Sparkles, Star, Zap } from "lucide-react";
 import { useState } from "react";
@@ -66,13 +67,15 @@ function TiltCard({
     isCenter,
     offset,
     onClick,
-    index
+    index,
+    onGetQuote
 }: {
     pkg: CarouselPackage;
     isCenter: boolean;
     offset: number;
     onClick: () => void;
     index: number;
+    onGetQuote?: (pkg: CarouselPackage) => void;
 }) {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -119,7 +122,7 @@ function TiltCard({
             }}
         >
             <motion.div
-                className={`relative w-[320px] rounded-3xl overflow-visible ${shadowColor}`}
+                className={`relative w-[300px] sm:w-[320px] rounded-3xl overflow-visible ${shadowColor}`}
                 style={{
                     rotateX: isCenter ? rotateX : 0,
                     rotateY: offset * -8,
@@ -149,7 +152,12 @@ function TiltCard({
                     <div className="bg-gradient-to-b from-white to-gray-50 rounded-[22px] overflow-hidden">
 
                         {/* Header with gradient */}
-                        <div className={`relative h-44 bg-gradient-to-br ${pkg.color} p-6 overflow-hidden`}>
+                        <div className={`relative h-40 bg-gradient-to-br ${pkg.color} p-5 overflow-hidden`}>
+
+                            {/* Duration badge - top left */}
+                            <div className="absolute top-4 left-4 z-10 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
+                                {pkg.duration}
+                            </div>
 
                             {/* Animated background orb */}
                             <motion.div
@@ -163,15 +171,14 @@ function TiltCard({
                             />
 
                             {/* Icon badge */}
-                            <div className="absolute top-5 right-5 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
-                                <Icon className="w-7 h-7 text-white" />
+                            <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                <Icon className="w-6 h-6 text-white" />
                             </div>
 
-                            {/* Content */}
-                            <div className="relative z-10 h-full flex flex-col justify-end text-white">
-                                <span className="text-white/70 text-sm font-medium mb-1">{pkg.duration}</span>
-                                <h3 className="text-2xl font-bold tracking-tight mb-1">{pkg.name}</h3>
-                                <p className="text-white/80 text-sm">{pkg.tagline}</p>
+                            {/* Content - at bottom */}
+                            <div className="absolute bottom-4 left-5 right-5 z-10 text-white">
+                                <h3 className="text-xl font-bold tracking-tight mb-1 truncate">{pkg.name}</h3>
+                                <p className="text-white/80 text-sm line-clamp-2">{pkg.tagline}</p>
                             </div>
 
                             {/* Shine sweep */}
@@ -192,12 +199,16 @@ function TiltCard({
                         <div className="p-6 pt-5">
 
                             {/* Price */}
-                            <div className="flex items-baseline gap-2 mb-5">
-                                <span className="text-gray-400 text-sm">From</span>
-                                <span className="text-4xl font-extrabold text-gray-900">
-                                    ${pkg.basePrice.toLocaleString()}
+                            <div className="flex items-center justify-between gap-2 mb-5">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-gray-400 text-sm">From</span>
+                                    <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+                                        <ConvertedPrice amount={pkg.basePrice} fromCurrency="USD" />
+                                    </span>
+                                </div>
+                                <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                                    📄 Visa
                                 </span>
-                                <span className="text-gray-400 text-sm">USD</span>
                             </div>
 
                             {/* Features */}
@@ -217,6 +228,10 @@ function TiltCard({
                                 className={`w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r ${pkg.color} shadow-lg ${shadowColor} relative overflow-hidden group`}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onGetQuote?.(pkg);
+                                }}
                             >
                                 <span className="relative z-10">Get Quote</span>
                                 <motion.div
@@ -240,9 +255,10 @@ function TiltCard({
 // Main Component - now accepts packages from props
 interface Packages3DAnimationProps {
     packages?: CarouselPackage[];
+    onGetQuote?: (pkg: CarouselPackage) => void;
 }
 
-export default function Packages3DAnimation({ packages }: Packages3DAnimationProps) {
+export default function Packages3DAnimation({ packages, onGetQuote }: Packages3DAnimationProps) {
     const displayPackages = packages && packages.length >= 3 ? packages.slice(0, 3) : fallbackPackages;
     const [activeIndex, setActiveIndex] = useState(displayPackages.findIndex(p => p.popular) >= 0 ? displayPackages.findIndex(p => p.popular) : 1);
 
@@ -305,6 +321,7 @@ export default function Packages3DAnimation({ packages }: Packages3DAnimationPro
                                 offset={offset}
                                 onClick={() => setActiveIndex(index)}
                                 index={index}
+                                onGetQuote={onGetQuote}
                             />
                         );
                     })}

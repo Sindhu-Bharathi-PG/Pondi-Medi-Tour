@@ -178,14 +178,29 @@ const getHospital = async (req, reply) => {
         ? hospital.accreditations.map(a => typeof a === 'object' ? a.name : a).filter(Boolean)
         : [],
       
-      // Location object
-      location: {
-        address: hospital.location?.address || `${hospital.location?.city || 'Pondicherry'}, ${hospital.location?.state || 'India'}`,
-        city: hospital.location?.city || 'Pondicherry',
-        state: hospital.location?.state || 'Puducherry',
-        country: hospital.location?.country || 'India',
-        coordinates: hospital.location?.coordinates || null
-      },
+      // Location object - avoid duplication if city and state are the same
+      location: (() => {
+        const city = hospital.location?.city || 'Pondicherry';
+        const state = hospital.location?.state || 'India';
+        const address = hospital.location?.address;
+        const cityLower = city.toLowerCase();
+        const stateLower = state.toLowerCase();
+        
+        // Avoid redundancy: Pondicherry is in Puducherry union territory
+        const isRedundant = cityLower === stateLower || 
+          (cityLower === 'pondicherry' && stateLower === 'puducherry') ||
+          (cityLower === 'puducherry' && stateLower === 'pondicherry');
+        
+        const displayLocation = isRedundant ? `${city}, India` : `${city}, ${state}`;
+          
+        return {
+          address: address || displayLocation,
+          city: city,
+          state: isRedundant ? 'Puducherry' : state,
+          country: hospital.location?.country || 'India',
+          coordinates: hospital.location?.coordinates || null
+        };
+      })(),
       
       // Contact object
       contact: {
@@ -217,8 +232,21 @@ const getHospital = async (req, reply) => {
         description: `Our ${center} department offers comprehensive care with the latest technology and experienced specialists.`
       })),
       
-      // Photos/Gallery
-      photos: hospital.gallery || (hospital.coverUrl ? [hospital.coverUrl] : []),
+      // Photos/Gallery - ensure proper array formatting and filter invalid URLs
+      photos: (() => {
+        let photoArray = [];
+        // Check if gallery exists and is an array
+        if (Array.isArray(hospital.gallery) && hospital.gallery.length > 0) {
+          photoArray = hospital.gallery.filter(url => 
+            url && typeof url === 'string' && url.trim() !== ''
+          );
+        }
+        // If no valid photos in gallery, try coverUrl
+        if (photoArray.length === 0 && hospital.coverUrl && typeof hospital.coverUrl === 'string' && hospital.coverUrl.trim() !== '') {
+          photoArray = [hospital.coverUrl];
+        }
+        return photoArray;
+      })(),
       logo: hospital.logoUrl,
       
       // Related data

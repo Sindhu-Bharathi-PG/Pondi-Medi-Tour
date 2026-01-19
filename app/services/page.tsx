@@ -1,12 +1,14 @@
 "use client";
 
 import { useCurrency } from '@/app/context/CurrencyContext';
+import { getCategoryImage } from '@/app/data/categoryImages';
 import { API_BASE } from '@/app/hooks/useApi';
 import { normalizeCategory, normalizeDescription, normalizeName, normalizeSuccessRate } from '@/app/utils/normalize';
 import { motion } from 'framer-motion';
 import { Activity, ArrowRight, Award, Baby, Bone, Brain, Building2, ChevronRight, Eye, Heart, MapPin, Plane, Scissors, Search, Shield, Sparkles, Stethoscope, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Footer, Header } from '../components/common';
 
@@ -33,10 +35,14 @@ const categoryStyles: Record<string, { icon: any; bg: string; text: string; ligh
 
 const ServicesPage = () => {
       const { convertAmount, formatCurrency, selectedCurrency } = useCurrency();
+      const searchParams = useSearchParams();
+      const urlCategory = searchParams.get('category');
+
       const [services, setServices] = useState<any[]>([]);
       const [filteredServices, setFilteredServices] = useState<any[]>([]);
       const [isLoading, setIsLoading] = useState(true);
       const [searchQuery, setSearchQuery] = useState('');
+      const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory || '');
       const [convertedPrices, setConvertedPrices] = useState<Record<string, { pondy: number; us: number }>>({});
       const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +62,7 @@ const ServicesPage = () => {
                                           id: t.slug || t.id.toString(),
                                           title: normalizeName(t.name),
                                           description: normalizeDescription(t.shortDescription, 150),
-                                          image: t.thumbnailUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
+                                          image: getCategoryImage(category),
                                           procedures: Array.isArray(t.technology) ? t.technology : [],
                                           savings: t.isPopular ? '70%+' : '60%+',
                                           pondyPriceINR: t.minPrice || 50000,
@@ -83,13 +89,26 @@ const ServicesPage = () => {
       // Filter services
       useEffect(() => {
             const lowerQuery = searchQuery.toLowerCase();
-            const filtered = services.filter(service =>
-                  service.title.toLowerCase().includes(lowerQuery) ||
-                  service.category.toLowerCase().includes(lowerQuery) ||
-                  service.description.toLowerCase().includes(lowerQuery)
-            );
+            let filtered = services;
+
+            // Filter by category if selected
+            if (selectedCategory) {
+                  filtered = filtered.filter(service =>
+                        service.category.toLowerCase() === selectedCategory.toLowerCase()
+                  );
+            }
+
+            // Filter by search query
+            if (lowerQuery) {
+                  filtered = filtered.filter(service =>
+                        service.title.toLowerCase().includes(lowerQuery) ||
+                        service.category.toLowerCase().includes(lowerQuery) ||
+                        service.description.toLowerCase().includes(lowerQuery)
+                  );
+            }
+
             setFilteredServices(filtered);
-      }, [searchQuery, services]);
+      }, [searchQuery, services, selectedCategory]);
 
       // Price conversion
       useEffect(() => {
@@ -168,6 +187,27 @@ const ServicesPage = () => {
                                                 Search
                                           </button>
                                     </div>
+
+                                    {/* Category Filter Badge */}
+                                    {selectedCategory && (
+                                          <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="mt-4 inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white border border-white/20"
+                                          >
+                                                <span className="text-sm">Filtered by:</span>
+                                                <span className="font-semibold">{selectedCategory}</span>
+                                                <button
+                                                      onClick={() => setSelectedCategory('')}
+                                                      className="ml-2 hover:bg-white/20 rounded-full p-1 transition-colors"
+                                                      title="Clear filter"
+                                                >
+                                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                      </svg>
+                                                </button>
+                                          </motion.div>
+                                    )}
                               </motion.div>
 
                               {/* Trust Signals */}
@@ -282,24 +322,24 @@ const ServicesPage = () => {
                                                                                     </p>
                                                                               </div>
 
-                                                                              {/* Key Info Grid */}
-                                                                              <div className="grid grid-cols-2 gap-4 mb-6">
+                                                                              {/* Key Info - Hospital & Price */}
+                                                                              <div className="space-y-3 mb-6">
                                                                                     <div className={`flex items-center gap-3 ${service.styles.light} p-3 rounded-2xl group-hover:bg-[var(--medical-light-teal)]/30 transition-colors`}>
-                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm">
+                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm shrink-0">
                                                                                                 <Building2 className={`w-4 h-4 ${service.styles.text}`} />
                                                                                           </div>
-                                                                                          <div className="flex flex-col">
+                                                                                          <div className="flex flex-col min-w-0">
                                                                                                 <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Hospital</span>
-                                                                                                <span className="text-xs font-bold text-[var(--medical-navy)] truncate max-w-[80px]">{service.hospitalName}</span>
+                                                                                                <span className="text-xs font-bold text-[var(--medical-navy)]">{service.hospitalName}</span>
                                                                                           </div>
                                                                                     </div>
                                                                                     <div className={`flex items-center gap-3 ${service.styles.light} p-3 rounded-2xl group-hover:bg-[var(--medical-light-teal)]/30 transition-colors`}>
-                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm">
+                                                                                          <div className="p-2 bg-white rounded-xl shadow-sm shrink-0">
                                                                                                 <Sparkles className={`w-4 h-4 ${service.styles.text}`} />
                                                                                           </div>
                                                                                           <div className="flex flex-col">
-                                                                                                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Price</span>
-                                                                                                <span className={`text-xs font-bold ${service.styles.text}`}>{formatCurrency(getPrice(service.id, 'pondy'))}</span>
+                                                                                                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Starting Price</span>
+                                                                                                <span className={`text-sm font-bold ${service.styles.text}`}>{formatCurrency(getPrice(service.id, 'pondy'))}</span>
                                                                                           </div>
                                                                                     </div>
                                                                               </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuote } from '@/app/context/QuoteContext';
 import {
       ArrowRight,
       Award,
@@ -89,6 +90,7 @@ const costSavings = [
 
 export default function MedicalTourismPage() {
       const scrolled = useScrolled(50);
+      const { openQuoteWidget } = useQuote();
       const [isVisible, setIsVisible] = useState(false);
 
       useEffect(() => {
@@ -367,9 +369,12 @@ export default function MedicalTourismPage() {
                                     <Link href="/services" className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-10 py-5 rounded-full font-semibold text-xl hover:shadow-2xl transition-all">
                                           Browse Treatments <ArrowRight className="w-6 h-6" />
                                     </Link>
-                                    <Link href="/booking" className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-10 py-5 rounded-full font-semibold text-xl hover:bg-white/20 transition-all">
+                                    <button
+                                          onClick={() => openQuoteWidget({ source: 'medical-tourism-page' })}
+                                          className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-10 py-5 rounded-full font-semibold text-xl hover:bg-white/20 transition-all"
+                                    >
                                           Free Consultation <ChevronRight className="w-6 h-6" />
-                                    </Link>
+                                    </button>
                               </div>
                         </div>
                   </section>

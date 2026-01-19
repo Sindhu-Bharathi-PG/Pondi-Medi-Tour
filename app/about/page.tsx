@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuote } from '@/app/context/QuoteContext';
 import { API_BASE } from '@/app/hooks/useApi';
 import { Award, CheckCircle, Globe, Heart, MapPin, Phone, Shield, Star, Users } from 'lucide-react';
 import Image from 'next/image';
@@ -9,6 +10,7 @@ import { useScrolled } from '../hooks';
 
 const AboutPage = () => {
       const scrolled = useScrolled(50);
+      const { openQuoteWidget } = useQuote();
       const [dynamicStats, setDynamicStats] = useState({
             totalHospitals: 10, // Default fallback
             totalUsers: 5000,
@@ -360,7 +362,10 @@ const AboutPage = () => {
                                     Get a free consultation, personalized treatment plan, and transparent cost estimate—all within 24 hours.
                               </p>
                               <div className="flex flex-wrap justify-center gap-4">
-                                    <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                                    <button
+                                          onClick={() => openQuoteWidget({ source: 'about-page' })}
+                                          className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                                    >
                                           Get Free Consultation
                                     </button>
                                     <button className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-2">

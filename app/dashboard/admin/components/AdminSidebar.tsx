@@ -62,6 +62,14 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             borderActive: "border-green-500"
         },
         {
+            title: "Categories",
+            icon: LayoutDashboard,
+            href: "/dashboard/admin/categories",
+            color: "text-teal-600",
+            bgActive: "bg-teal-50",
+            borderActive: "border-teal-500"
+        },
+        {
             title: "Analytics",
             icon: BarChart3,
             href: "/dashboard/admin/analytics",

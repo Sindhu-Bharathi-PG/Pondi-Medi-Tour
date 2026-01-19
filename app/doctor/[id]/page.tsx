@@ -93,6 +93,27 @@ export default function DoctorDetailPage() {
             );
       }
 
+      // Safely parse arrays that may come as JSON strings or null
+      const safeArray = (data: any): any[] => {
+            if (!data) return [];
+            if (Array.isArray(data)) return data;
+            if (typeof data === 'string') {
+                  try {
+                        const parsed = JSON.parse(data);
+                        return Array.isArray(parsed) ? parsed : [];
+                  } catch {
+                        return [];
+                  }
+            }
+            return [];
+      };
+
+      const education = safeArray(doctor.education);
+      const expertise = safeArray(doctor.expertise);
+      const awards = safeArray(doctor.awards);
+      const languages = safeArray(doctor.languages);
+      const internationalTraining = safeArray(doctor.internationalTraining);
+
       return (
             <div className="min-h-screen bg-gray-50">
                   <Header />
@@ -292,7 +313,7 @@ export default function DoctorDetailPage() {
                                                       Areas of Expertise
                                                 </h2>
                                                 <div className="grid md:grid-cols-2 gap-3">
-                                                      {doctor.expertise.map((item: string, i: number) => (
+                                                      {expertise.map((item: string, i: number) => (
                                                             <motion.div
                                                                   key={i}
                                                                   initial={{ x: -20, opacity: 0 }}
@@ -320,7 +341,7 @@ export default function DoctorDetailPage() {
                                                       Education & Training
                                                 </h2>
                                                 <div className="space-y-4">
-                                                      {doctor.education.map((edu: any, i: number) => (
+                                                      {education.map((edu: any, i: number) => (
                                                             <motion.div
                                                                   key={i}
                                                                   initial={{ x: -20, opacity: 0 }}
@@ -340,14 +361,14 @@ export default function DoctorDetailPage() {
                                                       ))}
                                                 </div>
 
-                                                {doctor.internationalTraining && (
+                                                {internationalTraining.length > 0 && (
                                                       <div className="mt-8 pt-6 border-t">
                                                             <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                                                                   <Globe className="w-5 h-5 text-blue-600" />
                                                                   International Training
                                                             </h3>
                                                             <div className="flex flex-wrap gap-2">
-                                                                  {doctor.internationalTraining.map((country: string, i: number) => (
+                                                                  {internationalTraining.map((country: string, i: number) => (
                                                                         <span key={i} className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg font-medium">
                                                                               {country}
                                                                         </span>
@@ -358,7 +379,7 @@ export default function DoctorDetailPage() {
                                           </motion.div>
 
                                           {/* Awards */}
-                                          {doctor.awards && (
+                                          {awards.length > 0 && (
                                                 <motion.div
                                                       initial={{ y: 50, opacity: 0 }}
                                                       whileInView={{ y: 0, opacity: 1 }}
@@ -370,7 +391,7 @@ export default function DoctorDetailPage() {
                                                             Awards & Recognition
                                                       </h2>
                                                       <div className="space-y-3">
-                                                            {doctor.awards.map((award: string, i: number) => (
+                                                            {awards.map((award: string, i: number) => (
                                                                   <motion.div
                                                                         key={i}
                                                                         initial={{ scale: 0.9, opacity: 0 }}
@@ -412,7 +433,7 @@ export default function DoctorDetailPage() {
                                                             <Languages className="w-5 h-5 text-blue-600 mt-0.5" />
                                                             <div>
                                                                   <div className="text-sm text-gray-500">Languages</div>
-                                                                  <div className="text-gray-800 font-medium">{doctor.languages.join(', ')}</div>
+                                                                  <div className="text-gray-800 font-medium">{languages.join(', ') || 'English'}</div>
                                                             </div>
                                                       </div>
 
@@ -429,10 +450,10 @@ export default function DoctorDetailPage() {
 
                                                 <div className="mt-6 pt-6 border-t">
                                                       <Link
-                                                            href={`/services/${doctor.serviceSlug}`}
+                                                            href={doctor.specialty ? `/services?category=${encodeURIComponent(doctor.specialty)}` : '/services'}
                                                             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all"
                                                       >
-                                                            View {doctor.specialty} Treatments
+                                                            View {doctor.specialty || 'All'} Treatments
                                                             <ChevronRight className="w-4 h-4" />
                                                       </Link>
 

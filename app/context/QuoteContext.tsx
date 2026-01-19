@@ -6,6 +6,7 @@ interface QuoteData {
     hospitalId?: number;
     hospitalName?: string;
     treatmentType?: string;
+    packageId?: number;
     packageName?: string;
     source?: string;
 }

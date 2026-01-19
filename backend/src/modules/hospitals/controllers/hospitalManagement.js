@@ -244,19 +244,50 @@ const deleteTreatment = async (request, reply) => {
 
 const getMyInquiries = async (request, reply) => {
   try {
-    const hospitalId = await getHospitalIdFromUser(request.user.userId);
+    const userId = request.user.userId;
+    console.log(`[getMyInquiries] Request received from User ID: ${userId}`);
+    
+    const hospitalId = await getHospitalIdFromUser(userId);
+    console.log(`[getMyInquiries] Resolved Hospital ID: ${hospitalId}`);
+    
     if (!hospitalId) {
+      console.log('[getMyInquiries] ERROR: No hospital linked to this user');
       return reply.code(404).send({ error: 'No hospital linked to this user' });
     }
 
-    const inquiriesList = await db.select().from(inquiries)
-      .where(eq(inquiries.hospitalId, hospitalId))
-      .orderBy(desc(inquiries.createdAt));
+    // Query all columns from inquiries table
+    const { sql } = require('drizzle-orm');
+    const inquiriesList = await db.execute(sql`
+      SELECT 
+        id,
+        hospital_id as "hospitalId",
+        patient_name as "patientName",
+        email,
+        phone,
+        country,
+        subject,
+        message,
+        COALESCE(status, 'pending') as status,
+        COALESCE(priority, 'normal') as priority,
+        treatment_type as "treatmentType",
+        package_name as "packageName",
+        package_id as "packageId",
+        inquiry_type as "inquiryType",
+        COALESCE(source, 'website') as source,
+        source_page as "sourcePage",
+        created_at as "createdAt",
+        updated_at as "updatedAt"
+      FROM inquiries 
+      WHERE hospital_id = ${hospitalId}
+      ORDER BY created_at DESC
+    `);
 
+    console.log(`[getMyInquiries] Found ${inquiriesList.length} inquiries for hospital ${hospitalId}`);
+    
     return inquiriesList;
   } catch (error) {
     console.error('Get inquiries error:', error);
-    return reply.code(500).send({ error: 'Failed to fetch inquiries' });
+    return reply.code(500).send({ error: 'Failed to fetch inquiries', details: error.message });
   }
 };
 

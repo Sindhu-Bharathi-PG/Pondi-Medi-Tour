@@ -16,7 +16,10 @@ export async function PUT(
 
         const body = await request.json();
 
-        const response = await fetch(`${BACKEND_URL}/inquiries/${params.id}`, {
+        const url = `${BACKEND_URL}/api/inquiries/${params.id}`;
+        console.log(`[Proxy] PUT Inquiry ${params.id} -> ${url}`);
+
+        const response = await fetch(url, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${session.accessToken}`,
@@ -25,8 +28,12 @@ export async function PUT(
             body: JSON.stringify(body)
         });
 
+        console.log(`[Proxy] Response status: ${response.status}`);
+
         if (!response.ok) {
-            throw new Error('Backend request failed');
+            const errorText = await response.text();
+            console.error(`[Proxy] Backend Error: ${response.status} - ${errorText}`);
+            throw new Error(`Backend request failed: ${response.status}`);
         }
 
         const data = await response.json();

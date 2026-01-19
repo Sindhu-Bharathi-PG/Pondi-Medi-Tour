@@ -321,3 +321,4 @@ const start = async () => {
 };
 
 start();
+// trigger restart

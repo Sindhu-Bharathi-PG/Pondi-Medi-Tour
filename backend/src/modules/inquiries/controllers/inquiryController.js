@@ -106,40 +106,41 @@ const updateInquiry = async (req, reply) => {
 // Public: Create inquiry
 const createInquiry = async (req, reply) => {
     try {
-        const { 
-            hospitalId, 
-            packageId, 
-            inquiryType, 
-            sourcePage,
-            ...data 
-        } = req.body;
+        const body = req.body;
+        console.log('[createInquiry] Received body:', JSON.stringify(body, null, 2));
         
-        // Auto-detect inquiry type if not provided
-        let detectedType = inquiryType || 'general';
-        if (!inquiryType) {
-            if (packageId) detectedType = 'package';
-            else if (hospitalId) detectedType = 'hospital';
-            else if (data.treatmentType) detectedType = 'treatment';
-        }
+        // Explicitly extract and map fields
+        const insertData = {
+            patientName: body.patientName,
+            email: body.email,
+            phone: body.phone || null,
+            country: body.country || null,
+            subject: body.subject,
+            message: body.message,
+            hospitalId: body.hospitalId || null,
+            packageId: body.packageId || null,
+            packageName: body.packageName || null,
+            treatmentType: body.treatmentType || null,
+            inquiryType: body.inquiryType || (body.packageId ? 'package' : body.hospitalId ? 'hospital' : 'general'),
+            source: body.source || 'website',
+            sourcePage: body.sourcePage || null,
+            status: 'pending',
+            priority: body.packageId ? 'high' : 'normal'
+        };
         
-        console.log('Creating inquiry with data:', { ...data, inquiryType: detectedType });
+        console.log('[createInquiry] Insert data:', JSON.stringify(insertData, null, 2));
+        
         const [newInquiry] = await db.insert(inquiries)
-            .values({ 
-                ...data, 
-                hospitalId: hospitalId || null,
-                packageId: packageId || null,
-                inquiryType: detectedType,
-                sourcePage: sourcePage || data.referrerUrl || null,
-                status: 'pending',
-                priority: packageId ? 'high' : 'normal' // Package inquiries get priority
-            })
+            .values(insertData)
             .returning();
 
+        console.log('[createInquiry] SUCCESS! Created inquiry ID:', newInquiry.id);
         reply.code(201).send(newInquiry);
     } catch (err) {
-        console.error('INQUIRY CREATION ERROR:', err);
+        console.error('[createInquiry] ERROR:', err.message);
+        console.error('[createInquiry] Stack:', err.stack);
         req.log.error(err);
-        reply.code(500).send({ error: 'Internal Server Error', message: err.message });
+        reply.code(500).send({ error: 'Failed to create inquiry', message: err.message });
     }
 };
 

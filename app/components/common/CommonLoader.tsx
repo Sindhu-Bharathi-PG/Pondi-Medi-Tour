@@ -235,3 +235,175 @@ export function PageLoader({ message = 'Loading...' }: { message?: string }) {
         </div>
     );
 }
+
+/**
+ * Package Card Skeleton - For package listings
+ */
+export function PackageCardSkeleton() {
+    return (
+        <div className="bg-white rounded-3xl overflow-hidden shadow-xl animate-pulse">
+            {/* Image placeholder */}
+            <div className="h-52 bg-gradient-to-br from-gray-200 to-gray-300" />
+
+            {/* Body */}
+            <div className="p-6">
+                {/* Price row */}
+                <div className="flex items-center justify-between mb-5 pb-5 border-b border-gray-100">
+                    <div>
+                        <div className="h-3 bg-gray-200 rounded w-12 mb-2" />
+                        <div className="h-8 bg-gray-300 rounded w-24" />
+                    </div>
+                    <div className="flex gap-1.5">
+                        <div className="h-6 bg-gray-200 rounded-full w-16" />
+                        <div className="h-6 bg-gray-200 rounded-full w-12" />
+                    </div>
+                </div>
+
+                {/* Features */}
+                <div className="space-y-3 mb-6">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="flex items-center gap-3">
+                            <div className="w-5 h-5 bg-gray-200 rounded-full" />
+                            <div className="h-3 bg-gray-200 rounded flex-1" style={{ width: `${60 + Math.random() * 30}%` }} />
+                        </div>
+                    ))}
+                </div>
+
+                {/* CTA Button */}
+                <div className="h-14 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl" />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Hospital Card Skeleton - For hospital listings
+ */
+export function HospitalCardSkeleton() {
+    return (
+        <div className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
+            {/* Image */}
+            <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300" />
+
+            {/* Content */}
+            <div className="p-5">
+                <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-xl shrink-0" />
+                    <div className="flex-1">
+                        <div className="h-5 bg-gray-300 rounded w-3/4 mb-2" />
+                        <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex gap-4 mb-4">
+                    <div className="h-4 bg-gray-200 rounded w-16" />
+                    <div className="h-4 bg-gray-200 rounded w-20" />
+                    <div className="h-4 bg-gray-200 rounded w-12" />
+                </div>
+
+                {/* Specialties */}
+                <div className="flex gap-2 mb-4">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-6 bg-gray-100 rounded-full w-20" />
+                    ))}
+                </div>
+
+                {/* Button */}
+                <div className="h-10 bg-gray-200 rounded-xl" />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Treatment Card Skeleton - For treatment listings
+ */
+export function TreatmentCardSkeleton() {
+    return (
+        <div className="bg-white rounded-2xl p-6 shadow-lg animate-pulse">
+            {/* Icon and title */}
+            <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl" />
+                <div className="flex-1">
+                    <div className="h-5 bg-gray-300 rounded w-3/4 mb-2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2 mb-4">
+                <div className="h-3 bg-gray-200 rounded w-full" />
+                <div className="h-3 bg-gray-200 rounded w-5/6" />
+            </div>
+
+            {/* Stats row */}
+            <div className="flex justify-between pt-4 border-t border-gray-100">
+                <div className="h-4 bg-gray-200 rounded w-20" />
+                <div className="h-4 bg-gray-200 rounded w-24" />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Inquiry Card Skeleton - For inquiry listings
+ */
+export function InquiryCardSkeleton() {
+    return (
+        <div className="grid grid-cols-12 gap-4 px-6 py-4 animate-pulse">
+            <div className="col-span-4">
+                <div className="h-5 bg-gray-300 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+            </div>
+            <div className="col-span-2">
+                <div className="h-4 bg-gray-200 rounded w-full" />
+            </div>
+            <div className="col-span-2">
+                <div className="h-6 bg-gray-200 rounded-full w-20" />
+            </div>
+            <div className="col-span-2">
+                <div className="h-6 bg-gray-200 rounded-full w-16" />
+            </div>
+            <div className="col-span-2">
+                <div className="h-4 bg-gray-200 rounded w-12" />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Card Grid Skeleton - For loading grids of cards
+ */
+export function CardGridSkeleton({
+    count = 6,
+    type = 'package'
+}: {
+    count?: number;
+    type?: 'package' | 'hospital' | 'treatment' | 'inquiry'
+}) {
+    const SkeletonComponent = {
+        package: PackageCardSkeleton,
+        hospital: HospitalCardSkeleton,
+        treatment: TreatmentCardSkeleton,
+        inquiry: InquiryCardSkeleton
+    }[type];
+
+    if (type === 'inquiry') {
+        return (
+            <div className="divide-y divide-gray-100">
+                {Array.from({ length: count }).map((_, i) => (
+                    <SkeletonComponent key={i} />
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <div className={`grid gap-6 ${type === 'package' ? 'lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+            {Array.from({ length: count }).map((_, i) => (
+                <SkeletonComponent key={i} />
+            ))}
+        </div>
+    );
+}
