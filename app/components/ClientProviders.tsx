@@ -4,6 +4,7 @@ import React from 'react';
 import { AuthProvider } from '../context/AuthContext';
 import { CurrencyProvider } from '../context/CurrencyContext';
 import { HomeConfigProvider } from '../context/HomeConfigContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { SiteModeProvider } from '../context/SiteModeContext';
 import FloatingAccessibility from './common/FloatingAccessibility';
 
@@ -15,17 +16,20 @@ import TourGuide from './common/TourGuide';
 export const ClientProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <AuthProvider>
-            <SiteModeProvider>
-                <HomeConfigProvider>
-                    <CurrencyProvider>
-                        {children}
-                        <FloatingAccessibility />
-                        <TourGuide />
-                    </CurrencyProvider>
-                </HomeConfigProvider>
-            </SiteModeProvider>
+            <LanguageProvider>
+                <SiteModeProvider>
+                    <HomeConfigProvider>
+                        <CurrencyProvider>
+                            {children}
+                            <FloatingAccessibility />
+                            <TourGuide />
+                        </CurrencyProvider>
+                    </HomeConfigProvider>
+                </SiteModeProvider>
+            </LanguageProvider>
         </AuthProvider>
     );
 };
 
 export default ClientProviders;
+

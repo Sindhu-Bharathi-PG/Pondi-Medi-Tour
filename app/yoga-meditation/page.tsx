@@ -1,421 +1,466 @@
 "use client";
 
-import React, { useState } from 'react';
+import { Footer, Header } from '@/app/components/common';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+      Compass, Eye,
+      Flower2, Heart,
+      Moon,
+      Sun,
+      Wind
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-      Sun, Moon, Wind, Heart, ChevronRight, CheckCircle, Clock,
-      MapPin, Users, Star, Calendar, GraduationCap, Award,
-      BookOpen, Sparkles, ArrowRight
-} from 'lucide-react';
-import { Footer, Header } from '@/app/components/common';
-import { ConvertedPrice } from '@/app/components/common/ConvertedPrice';
+import { useRef } from 'react';
 
-// Yoga Traditions/Lineages
-const yogaStyles = [
+// Animation variants
+const fadeInUp = {
+      hidden: { opacity: 0, y: 40 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const staggerContainer = {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
+};
+
+// Spiritual destinations
+const spiritualPlaces = [
       {
-            name: 'Hatha Yoga',
+            name: "Matrimandir",
+            tagline: "The Soul of Auroville",
+            description: "A golden sphere of silence where inner peace becomes reality",
+            image: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800",
+            color: "from-amber-400 to-yellow-500",
+      },
+      {
+            name: "Sri Aurobindo Ashram",
+            tagline: "Where Seekers Find Themselves",
+            description: "A sanctuary of meditation since 1926",
+            image: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800",
+            color: "from-purple-500 to-indigo-600",
+      },
+      {
+            name: "Beach Meditation",
+            tagline: "Breathe with the Waves",
+            description: "Let the ocean's rhythm guide your meditation",
+            image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800",
+            color: "from-cyan-500 to-blue-600",
+      },
+      {
+            name: "Temple Serenity",
+            tagline: "Ancient Wisdom Awaits",
+            description: "Sacred spaces that have witnessed centuries of devotion",
+            image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800",
+            color: "from-orange-500 to-red-500",
+      },
+];
+
+// Experiences
+const experiences = [
+      {
+            title: "Sunrise Meditation",
+            tagline: "Greet the dawn with intention",
+            image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
             icon: Sun,
-            description: 'Classical poses for physical balance and mental focus',
-            intensity: 'Gentle to Moderate',
-            bestFor: 'Beginners, All levels',
-            color: 'from-amber-500 to-orange-500',
       },
       {
-            name: 'Ashtanga Vinyasa',
-            icon: Wind,
-            description: 'Dynamic flowing sequences synchronized with breath',
-            intensity: 'Moderate to Intense',
-            bestFor: 'Intermediate, Athletes',
-            color: 'from-blue-500 to-indigo-500',
-      },
-      {
-            name: 'Kundalini Yoga',
-            icon: Sparkles,
-            description: 'Awakening spiritual energy through kriyas and meditation',
-            intensity: 'Varies',
-            bestFor: 'Spiritual seekers',
-            color: 'from-purple-500 to-pink-500',
-      },
-      {
-            name: 'Yin Yoga',
+            title: "Moonlit Yoga",
+            tagline: "Flow under the stars",
+            image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
             icon: Moon,
-            description: 'Deep stretching with long-held poses for flexibility',
-            intensity: 'Gentle',
-            bestFor: 'Recovery, Flexibility',
-            color: 'from-teal-500 to-cyan-500',
+      },
+      {
+            title: "Sound Healing",
+            tagline: "Let vibrations heal your soul",
+            image: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=800",
+            icon: Wind,
+      },
+      {
+            title: "Inner Journey",
+            tagline: "Discover who you truly are",
+            image: "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=800",
+            icon: Eye,
       },
 ];
 
-// Ashrams & Spiritual Centers
-const spiritualCenters = [
-      {
-            name: 'Sri Aurobindo Ashram',
-            type: 'Spiritual Community',
-            image: '/images/generated/yoga_ashram_courtyard_1765431282553.png',
-            description: 'World-renowned spiritual center founded by Sri Aurobindo. Offers meditation, integral yoga, and spiritual development programs.',
-            programs: ['Morning meditation', 'Evening collective prayers', 'Karma yoga', 'Study circles'],
-            location: 'White Town, Pondicherry',
-            established: '1926',
-      },
-      {
-            name: 'Auroville Yoga Centers',
-            type: 'Experimental Township',
-            image: '/images/generated/yoga_auroville_center_1765431301870.png',
-            description: 'Multiple yoga and meditation centers within UNESCO-recognized Auroville. Focus on integral yoga and conscious living.',
-            programs: ['Pitanga Cultural Centre', 'Quiet Healing Centre', 'Savitri Bhawan', 'Matrimandir meditation'],
-            location: 'Auroville (12 km from city)',
-            established: '1968',
-      },
-      {
-            name: 'Traditional Yoga Shalas',
-            type: 'Authentic Studios',
-            image: '/images/generated/ayush_grid_yoga_practice_1765431210782.png',
-            description: 'Local studios offering daily drop-in classes and short-term intensives in various yoga traditions.',
-            programs: ['Morning Mysore', 'Evening Hatha', 'Weekend workshops', 'Private sessions'],
-            location: 'Throughout Pondicherry',
-            established: 'Various',
-      },
-];
-
-// Teacher Training Programs
-const teacherTraining = [
-      {
-            title: '200-Hour Teacher Training',
-            duration: '28 days',
-            certification: 'Yoga Alliance RYT-200',
-            priceFrom: 2500,
-            includes: ['Comprehensive curriculum', 'Anatomy & physiology', 'Teaching methodology', 'Practicum', 'Accommodation & meals'],
-            nextBatch: 'Monthly',
-      },
-      {
-            title: '300-Hour Advanced Training',
-            duration: '45 days',
-            certification: 'Yoga Alliance RYT-500',
-            priceFrom: 3800,
-            includes: ['Advanced asanas', 'Yoga therapy', 'Ayurveda basics', 'Business of yoga', 'Mentorship'],
-            nextBatch: 'Quarterly',
-      },
-      {
-            title: 'Meditation Teacher Training',
-            duration: '21 days',
-            certification: 'Certified Meditation Instructor',
-            priceFrom: 1800,
-            includes: ['Multiple techniques', 'Neuroscience of meditation', 'Guided practice', 'Teaching skills'],
-            nextBatch: 'Bi-monthly',
-      },
-];
-
-// Meditation & Pranayama
-const meditationPractices = [
-      { name: 'Vipassana', desc: 'Insight meditation for self-observation' },
-      { name: 'Pranayama', desc: 'Breath control techniques' },
-      { name: 'Yoga Nidra', desc: 'Conscious sleep for deep relaxation' },
-      { name: 'Mantra Meditation', desc: 'Sound-based spiritual practice' },
-      { name: 'Walking Meditation', desc: 'Mindful movement practice' },
-      { name: 'Trataka', desc: 'Candle gazing for concentration' },
-];
+// Floating lotus animation
+const FloatingLotus = () => (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) => (
+                  <motion.div
+                        key={i}
+                        className="absolute text-4xl"
+                        style={{
+                              left: `${10 + i * 12}%`,
+                              top: `${20 + (i % 3) * 30}%`,
+                        }}
+                        animate={{
+                              y: [0, -20, 0],
+                              rotate: [0, 10, -10, 0],
+                              opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                              duration: 5 + i * 0.5,
+                              delay: i * 0.3,
+                              repeat: Infinity,
+                              ease: 'easeInOut',
+                        }}
+                  >
+                        🪷
+                  </motion.div>
+            ))}
+      </div>
+);
 
 const YogaMeditationPage = () => {
-      const [activeTab, setActiveTab] = useState<'programs' | 'training'>('programs');
+      const heroRef = useRef<HTMLElement>(null);
+      const { scrollY } = useScroll();
+      const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+      const heroOpacity = useTransform(scrollY, [0, 400], [1, 0.3]);
 
       return (
             <div className="min-h-screen bg-white">
                   <Header />
 
-                  {/* Hero Section */}
-                  <section className="relative min-h-[70vh] flex items-center pt-20">
-                        <div className="absolute inset-0">
+                  {/* Hero - Serene & Colorful */}
+                  <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+                        <motion.div className="absolute inset-0" style={{ y: heroY }}>
                               <Image
-                                    src="/images/generated/yoga_hero_ocean_sunrise_1765431260796.png"
-                                    alt="Yoga Practice"
+                                    src="https://images.unsplash.com/photo-1545389336-cf090694435e?w=1920"
+                                    alt="Meditation Paradise"
                                     fill
                                     className="object-cover"
                                     priority
                               />
-                              <div className="absolute inset-0 bg-gradient-to-r from-orange-900/95 via-orange-800/80 to-transparent" />
-                        </div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/85 via-purple-800/70 to-pink-700/50" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        </motion.div>
 
-                        <div className="relative container mx-auto px-6 lg:px-8">
-                              <div className="max-w-4xl p-32">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/20">
-                                          <Sun className="w-5 h-5 text-amber-300" />
-                                          <span className="text-white text-sm font-medium">
-                                                Birthplace of Yoga • Authentic Lineages
+                        <FloatingLotus />
+
+                        {/* Animated mandala background */}
+                        <motion.div
+                              className="absolute inset-0 flex items-center justify-center opacity-10"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                        >
+                              <div className="w-[800px] h-[800px] border-2 border-white rounded-full" />
+                              <div className="absolute w-[600px] h-[600px] border-2 border-white rounded-full" />
+                              <div className="absolute w-[400px] h-[400px] border-2 border-white rounded-full" />
+                        </motion.div>
+
+                        <motion.div
+                              className="relative container mx-auto px-6 lg:px-8 text-center"
+                              style={{ opacity: heroOpacity }}
+                        >
+                              <motion.div
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={staggerContainer}
+                                    className="max-w-5xl mx-auto"
+                              >
+                                    <motion.div
+                                          variants={fadeInUp}
+                                          className="inline-flex items-center gap-3 bg-white/15 backdrop-blur-md px-6 py-3 rounded-full mb-8 border border-white/25"
+                                    >
+                                          <motion.div
+                                                animate={{ rotate: [0, 360] }}
+                                                transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+                                          >
+                                                <Flower2 className="w-6 h-6 text-pink-300" />
+                                          </motion.div>
+                                          <span className="text-white text-lg font-medium">
+                                                Find Your Inner Peace
                                           </span>
-                                    </div>
+                                    </motion.div>
 
-                                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-                                          Yoga &
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-200">
-                                                Meditation
+                                    <motion.h1
+                                          variants={fadeInUp}
+                                          className="text-6xl md:text-8xl lg:text-9xl font-black mb-8"
+                                    >
+                                          <motion.span
+                                                className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200"
+                                                animate={{ backgroundPosition: ['0% center', '200% center'] }}
+                                                transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                                                style={{ backgroundSize: '200% auto' }}
+                                          >
+                                                BREATHE
+                                          </motion.span>
+                                          <span className="block text-white text-5xl md:text-6xl mt-2">
+                                                • Flow • Be
                                           </span>
-                                    </h1>
+                                    </motion.h1>
 
-                                    <p className="text-xl md:text-2xl text-orange-100 leading-relaxed mb-10 max-w-2xl">
-                                          Experience authentic yoga in Pondicherry&apos;s renowned spiritual centers.
-                                          From beginner retreats to advanced teacher training at Sri Aurobindo Ashram and Auroville.
-                                    </p>
+                                    <motion.p
+                                          variants={fadeInUp}
+                                          className="text-2xl md:text-3xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed"
+                                    >
+                                          Where the ocean meets the soul,
+                                          <br />
+                                          <span className="text-pink-200 font-semibold">transformation begins.</span>
+                                    </motion.p>
 
-                                    <div className="flex flex-wrap gap-4">
-                                          <Link
-                                                href="#programs"
-                                                className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
-                                          >
-                                                View Programs
-                                                <ChevronRight className="w-5 h-5" />
-                                          </Link>
-                                          <Link
-                                                href="#training"
-                                                className="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
-                                          >
-                                                Teacher Training
-                                          </Link>
-                                    </div>
+                                    <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
+                                          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                                <Link
+                                                      href="#discover"
+                                                      className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-purple-500/50 transition-all inline-flex items-center gap-3"
+                                                >
+                                                      <Compass className="w-6 h-6" />
+                                                      Begin Your Journey
+                                                </Link>
+                                          </motion.div>
+                                    </motion.div>
+                              </motion.div>
+                        </motion.div>
+
+                        {/* Scroll Indicator */}
+                        <motion.div
+                              className="absolute bottom-10 left-1/2 -translate-x-1/2"
+                              animate={{ y: [0, 15, 0] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                        >
+                              <div className="w-8 h-12 border-2 border-white/50 rounded-full flex justify-center pt-3">
+                                    <motion.div
+                                          className="w-2 h-4 bg-white rounded-full"
+                                          animate={{ y: [0, 16, 0], opacity: [1, 0.3, 1] }}
+                                          transition={{ duration: 2, repeat: Infinity }}
+                                    />
                               </div>
-                        </div>
+                        </motion.div>
                   </section>
 
-                  {/* Yoga Styles Grid */}
-                  <section className="py-12 bg-gradient-to-b from-orange-50 to-white">
+                  {/* Spiritual Places */}
+                  <section id="discover" className="py-24 bg-gradient-to-b from-indigo-50 via-purple-50 to-pink-50">
                         <div className="container mx-auto px-6 lg:px-8">
-                              <div className="text-center mb-8">
-                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                                          Yoga Traditions We Offer
-                                    </h2>
-                                    <p className="text-gray-600 max-w-2xl mx-auto">
-                                          Explore various yoga styles taught by certified instructors in authentic lineages
-                                    </p>
-                              </div>
-
-                              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {yogaStyles.map((style, i) => (
-                                          <div key={i} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all group">
-                                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${style.color} flex items-center justify-center mb-4`}>
-                                                      <style.icon className="w-7 h-7 text-white" />
-                                                </div>
-                                                <h3 className="text-xl font-bold text-gray-800 mb-2">{style.name}</h3>
-                                                <p className="text-gray-600 text-sm mb-4">{style.description}</p>
-                                                <div className="space-y-2 text-sm">
-                                                      <div className="flex justify-between">
-                                                            <span className="text-gray-500">Intensity:</span>
-                                                            <span className="font-medium text-gray-700">{style.intensity}</span>
-                                                      </div>
-                                                      <div className="flex justify-between">
-                                                            <span className="text-gray-500">Best for:</span>
-                                                            <span className="font-medium text-gray-700">{style.bestFor}</span>
-                                                      </div>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Spiritual Centers */}
-                  <section id="programs" className="py-12 bg-white">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <div className="text-center mb-8">
-                                    <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full mb-4">
-                                          <MapPin className="w-4 h-4" />
-                                          <span className="text-sm font-semibold">Sacred Spaces</span>
-                                    </div>
-                                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                                          Ashrams & Spiritual Centers
-                                    </h2>
-                                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                                          Pondicherry is home to world-renowned spiritual institutions offering authentic yoga and meditation
-                                    </p>
-                              </div>
-
-                              <div className="space-y-6">
-                                    {spiritualCenters.map((center, i) => (
-                                          <div
-                                                key={i}
-                                                className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all"
-                                          >
-                                                <div className="grid lg:grid-cols-2">
-                                                      <div className="relative h-64 lg:h-auto">
-                                                            <Image
-                                                                  src={center.image}
-                                                                  alt={center.name}
-                                                                  fill
-                                                                  className="object-cover"
-                                                            />
-                                                      </div>
-                                                      <div className="p-8 lg:p-10">
-                                                            <div className="flex items-center gap-2 text-sm text-amber-600 font-medium mb-2">
-                                                                  <Sparkles className="w-4 h-4" />
-                                                                  {center.type}
-                                                            </div>
-                                                            <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">{center.name}</h3>
-                                                            <p className="text-gray-600 mb-6">{center.description}</p>
-
-                                                            <div className="mb-6">
-                                                                  <h4 className="font-semibold text-gray-800 mb-3">Programs Offered:</h4>
-                                                                  <div className="flex flex-wrap gap-2">
-                                                                        {center.programs.map((program, j) => (
-                                                                              <span key={j} className="bg-orange-50 text-orange-700 px-3 py-1.5 rounded-full text-sm">
-                                                                                    {program}
-                                                                              </span>
-                                                                        ))}
-                                                                  </div>
-                                                            </div>
-
-                                                            <div className="flex items-center gap-6 text-sm text-gray-500">
-                                                                  <div className="flex items-center gap-1">
-                                                                        <MapPin className="w-4 h-4" />
-                                                                        {center.location}
-                                                                  </div>
-                                                                  <div className="flex items-center gap-1">
-                                                                        <Calendar className="w-4 h-4" />
-                                                                        Est. {center.established}
-                                                                  </div>
-                                                            </div>
-                                                      </div>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Teacher Training */}
-                  <section id="training" className="py-12 bg-gradient-to-b from-orange-50 to-white">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <div className="text-center mb-8">
-                                    <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full mb-4">
-                                          <GraduationCap className="w-4 h-4" />
-                                          <span className="text-sm font-semibold">Professional Certification</span>
-                                    </div>
-                                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                                          Yoga Teacher Training
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.span
+                                          className="text-7xl mb-6 block"
+                                          animate={{ scale: [1, 1.2, 1] }}
+                                          transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                          🕉️
+                                    </motion.span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 mb-6">
+                                          Sacred Sanctuaries
                                     </h2>
                                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                                          Internationally recognized certifications in authentic yoga teaching
+                                          Spaces where silence speaks and the soul finds its home
                                     </p>
-                              </div>
+                              </motion.div>
 
-                              <div className="grid lg:grid-cols-3 gap-6">
-                                    {teacherTraining.map((program, i) => (
-                                          <div
+                              <div className="grid md:grid-cols-2 gap-8">
+                                    {spiritualPlaces.map((place, i) => (
+                                          <motion.div
                                                 key={i}
-                                                className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all"
+                                                initial={{ opacity: 0, y: 60 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.15 }}
+                                                whileHover={{ scale: 1.03, y: -10 }}
+                                                className="relative group cursor-pointer"
                                           >
-                                                <div className="flex items-center gap-2 text-amber-600 mb-4">
-                                                      <Award className="w-5 h-5" />
-                                                      <span className="text-sm font-medium">{program.certification}</span>
-                                                </div>
+                                                <div className="relative h-80 md:h-96 rounded-3xl overflow-hidden shadow-2xl">
+                                                      <Image
+                                                            src={place.image}
+                                                            alt={place.name}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                      />
+                                                      <div className={`absolute inset-0 bg-gradient-to-t ${place.color} opacity-60 group-hover:opacity-70 transition-opacity`} />
 
-                                                <h3 className="text-2xl font-bold text-gray-800 mb-2">{program.title}</h3>
-
-                                                <div className="flex items-center gap-4 mb-6 text-sm text-gray-500">
-                                                      <div className="flex items-center gap-1">
-                                                            <Clock className="w-4 h-4" />
-                                                            {program.duration}
+                                                      <div className="absolute inset-0 flex flex-col justify-end p-8">
+                                                            <p className="text-white/80 text-lg italic mb-2">"{place.tagline}"</p>
+                                                            <h3 className="text-3xl md:text-4xl font-black text-white mb-3">
+                                                                  {place.name}
+                                                            </h3>
+                                                            <p className="text-white/90">
+                                                                  {place.description}
+                                                            </p>
                                                       </div>
-                                                      <div className="flex items-center gap-1">
-                                                            <Calendar className="w-4 h-4" />
-                                                            {program.nextBatch}
-                                                      </div>
                                                 </div>
-
-                                                <ul className="space-y-3 mb-8">
-                                                      {program.includes.map((item, j) => (
-                                                            <li key={j} className="flex items-start gap-2 text-gray-600">
-                                                                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                                                                  {item}
-                                                            </li>
-                                                      ))}
-                                                </ul>
-
-                                                <div className="pt-6 border-t border-gray-100">
-                                                      <div className="flex items-center justify-between mb-4">
-                                                            <div>
-                                                                  <span className="text-sm text-gray-500">Starting from</span>
-                                                                  <div className="text-2xl font-bold text-amber-600">
-                                                                        <ConvertedPrice amount={program.priceFrom} fromCurrency="USD" />
-                                                                  </div>
-                                                            </div>
-                                                      </div>
-                                                      <Link
-                                                            href="/booking"
-                                                            className="block w-full text-center bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-                                                      >
-                                                            Apply Now
-                                                      </Link>
-                                                </div>
-                                          </div>
+                                          </motion.div>
                                     ))}
                               </div>
                         </div>
                   </section>
 
-                  {/* Meditation & Pranayama */}
-                  <section className="py-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                  {/* Quote Banner */}
+                  <section className="py-24 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600" />
+                        <motion.div
+                              className="absolute inset-0 opacity-20"
+                              animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+                              transition={{ duration: 30, repeat: Infinity, repeatType: 'reverse' }}
+                              style={{
+                                    backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                                    backgroundSize: '30px 30px',
+                              }}
+                        />
+
+                        <div className="container mx-auto px-6 lg:px-8 relative z-10">
+                              <motion.div
+                                    className="text-center max-w-4xl mx-auto"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.div
+                                          className="text-8xl mb-8"
+                                          animate={{ y: [0, -10, 0] }}
+                                          transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                          ✨
+                                    </motion.div>
+                                    <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+                                          "Stillness is not the absence of movement,
+                                          <span className="text-yellow-300"> but the presence of peace."</span>
+                                    </h2>
+                              </motion.div>
+                        </div>
+                  </section>
+
+                  {/* Experiences Grid */}
+                  <section className="py-24 bg-white">
                         <div className="container mx-auto px-6 lg:px-8">
-                              <div className="grid lg:grid-cols-2 gap-8 items-center">
-                                    <div>
-                                          <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
-                                                <Moon className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Inner Journey</span>
-                                          </div>
-                                          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                                                Meditation & Pranayama
-                                          </h2>
-                                          <p className="text-xl text-purple-100 mb-8">
-                                                Go beyond asanas into the deeper practices of yoga. Learn ancient breathing
-                                                and meditation techniques for lasting inner peace.
-                                          </p>
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <span className="text-6xl mb-6 block">🧘</span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-gray-800 mb-6">
+                                          Soul
+                                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500"> Experiences</span>
+                                    </h2>
+                              </motion.div>
 
-                                          <div className="grid grid-cols-2 gap-4">
-                                                {meditationPractices.map((practice, i) => (
-                                                      <div key={i} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                                                            <h4 className="font-semibold mb-1">{practice.name}</h4>
-                                                            <p className="text-purple-200 text-sm">{practice.desc}</p>
+                              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {experiences.map((exp, i) => (
+                                          <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, y: 50 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                whileHover={{ y: -15, scale: 1.02 }}
+                                                className="group cursor-pointer"
+                                          >
+                                                <div className="relative h-80 rounded-3xl overflow-hidden shadow-xl">
+                                                      <Image
+                                                            src={exp.image}
+                                                            alt={exp.title}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                      />
+                                                      <div className="absolute inset-0 bg-gradient-to-t from-purple-900/90 via-purple-800/40 to-transparent" />
+                                                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                                                            <motion.div
+                                                                  className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4"
+                                                                  whileHover={{ rotate: 360 }}
+                                                                  transition={{ duration: 0.5 }}
+                                                            >
+                                                                  <exp.icon className="w-7 h-7 text-white" />
+                                                            </motion.div>
+                                                            <h3 className="text-xl font-bold text-white mb-2">{exp.title}</h3>
+                                                            <p className="text-purple-200 italic">"{exp.tagline}"</p>
                                                       </div>
-                                                ))}
-                                          </div>
-                                    </div>
-
-                                    <div className="relative">
-                                          <Image
-                                                src="/images/generated/yoga_meditation_close_up_1765431316106.png"
-                                                alt="Meditation"
-                                                width={600}
-                                                height={500}
-                                                className="rounded-3xl shadow-2xl"
-                                          />
-                                    </div>
+                                                </div>
+                                          </motion.div>
+                                    ))}
                               </div>
                         </div>
                   </section>
 
-                  {/* CTA */}
-                  <section className="py-12 bg-white">
-                        <div className="container mx-auto px-6 lg:px-8 text-center">
-                              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                                    Begin Your Yoga Journey
-                              </h2>
-                              <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                                    Whether you&apos;re a complete beginner or seeking advanced training,
-                                    Pondicherry offers the perfect environment for your practice.
-                              </p>
-                              <div className="flex flex-wrap justify-center gap-4">
-                                    <Link
-                                          href="/booking"
-                                          className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-10 py-5 rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
-                                    >
-                                          Book a Program
-                                          <ArrowRight className="w-5 h-5" />
-                                    </Link>
-                                    <Link
-                                          href="/wellness"
-                                          className="bg-gray-100 text-gray-700 px-10 py-5 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all duration-300"
-                                    >
-                                          View Complete Packages
-                                    </Link>
+                  {/* Visual Gallery */}
+                  <section className="py-24 bg-gradient-to-b from-pink-50 via-purple-50 to-indigo-50">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <span className="text-6xl mb-6 block">🌸</span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-6">
+                                          Moments of Bliss
+                                    </h2>
+                              </motion.div>
+
+                              <div className="grid grid-cols-3 gap-4">
+                                    {[
+                                          "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600",
+                                          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600",
+                                          "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=600",
+                                          "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600",
+                                          "https://images.unsplash.com/photo-1545389336-cf090694435e?w=600",
+                                          "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=600",
+                                    ].map((src, i) => (
+                                          <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                whileInView={{ opacity: 1, scale: 1 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                whileHover={{ scale: 1.05, zIndex: 10 }}
+                                                className={`relative rounded-2xl overflow-hidden shadow-xl cursor-pointer ${i === 1 || i === 4 ? 'row-span-2 h-80' : 'h-40'
+                                                      }`}
+                                          >
+                                                <Image
+                                                      src={src}
+                                                      alt="Meditation moment"
+                                                      fill
+                                                      className="object-cover"
+                                                />
+                                          </motion.div>
+                                    ))}
                               </div>
+                        </div>
+                  </section>
+
+                  {/* Final CTA */}
+                  <section className="py-32 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600" />
+
+                        <FloatingLotus />
+
+                        <div className="container mx-auto px-6 lg:px-8 relative z-10 text-center">
+                              <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.div
+                                          className="text-8xl mb-8"
+                                          animate={{ scale: [1, 1.2, 1] }}
+                                          transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                          🪷
+                                    </motion.div>
+                                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
+                                          Your Soul is
+                                          <span className="block text-yellow-300">Calling</span>
+                                    </h2>
+                                    <p className="text-2xl text-white/90 mb-12 max-w-2xl mx-auto">
+                                          Answer the call. Find your peace. Transform your life.
+                                    </p>
+                                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                          <Link
+                                                href="/destination"
+                                                className="bg-white text-purple-600 px-12 py-6 rounded-full font-black text-2xl shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3"
+                                          >
+                                                <Heart className="w-8 h-8 fill-current" />
+                                                Explore More
+                                          </Link>
+                                    </motion.div>
+                              </motion.div>
                         </div>
                   </section>
 

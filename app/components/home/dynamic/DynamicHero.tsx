@@ -102,16 +102,16 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
     const updateParallax = useCallback(() => {
         if (!bgRef.current) return;
 
-        // Lerp (linear interpolation) for smooth animation
+        // Lerp - use high factor (0.3) for fast catch-up when scrolling quickly
         const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
-        currentOffsetRef.current = lerp(currentOffsetRef.current, targetOffsetRef.current, 0.1);
+        currentOffsetRef.current = lerp(currentOffsetRef.current, targetOffsetRef.current, 0.3);
 
-        // Apply transform
-        bgRef.current.style.transform = `translate3d(0, ${currentOffsetRef.current}px, 0) scale(1.15)`;
+        // Apply transform with scale 1.5 for complete coverage
+        bgRef.current.style.transform = `translate3d(0, ${currentOffsetRef.current}px, 0) scale(1.5)`;
 
         // Continue animation if not close enough to target
-        if (Math.abs(targetOffsetRef.current - currentOffsetRef.current) > 0.5) {
+        if (Math.abs(targetOffsetRef.current - currentOffsetRef.current) > 0.1) {
             rafIdRef.current = requestAnimationFrame(updateParallax);
         } else {
             rafIdRef.current = null;
@@ -120,8 +120,11 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
 
     const handleScroll = useCallback(() => {
         const scrollY = window.scrollY;
-        const parallaxSpeed = 0.5;
-        targetOffsetRef.current = scrollY * parallaxSpeed;
+        // Reduced parallax speed from 0.5 to 0.25 for subtler effect
+        const parallaxSpeed = 0.25;
+        // Clamp the offset to prevent image from moving too far (max 150px movement)
+        const maxOffset = 150;
+        targetOffsetRef.current = Math.min(scrollY * parallaxSpeed, maxOffset);
 
         // Start RAF loop if not already running
         if (rafIdRef.current === null) {
@@ -240,27 +243,29 @@ export default function DynamicHero({ config, mode }: DynamicHeroProps) {
     return (
         <section ref={sectionRef} className="relative h-screen min-h-[800px] flex items-center overflow-hidden pb-32">
             {/* Background with Parallax - using native scroll listener for smooth effect */}
-            <div
-                ref={bgRef}
-                className="absolute inset-0 will-change-transform"
-                style={{
-                    transform: 'translate3d(0, 0, 0) scale(1.15)',
-                    transformOrigin: 'center top'
-                }}
-            >
-                <Image
-                    src={config.content.backgroundImage}
-                    alt={mode === 'medical' ? 'Medical Tourism' : 'Wellness in Pondicherry'}
-                    fill
-                    className="object-cover brightness-90"
-                    priority
-                    quality={100}
-                    sizes="100vw"
-                />
-                <div className={`absolute inset-0 bg-gradient-to-r ${config.content.gradientColors} opacity-80`} />
+            <div className="absolute inset-0 bg-gray-900">
+                <div
+                    ref={bgRef}
+                    className="absolute inset-[-25%] will-change-transform"
+                    style={{
+                        transform: 'translate3d(0, 0, 0) scale(1.5)',
+                        transformOrigin: 'center center'
+                    }}
+                >
+                    <Image
+                        src={config.content.backgroundImage}
+                        alt={mode === 'medical' ? 'Medical Tourism' : 'Wellness in Pondicherry'}
+                        fill
+                        className="object-cover brightness-90"
+                        priority
+                        quality={100}
+                        sizes="100vw"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-r ${config.content.gradientColors} opacity-80`} />
 
-                {/* Animated Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+                    {/* Animated Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+                </div>
             </div>
 
             {/* Floating Particles */}

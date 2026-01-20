@@ -51,13 +51,13 @@ export default function DynamicHospitals({ config, mode }: DynamicHospitalsProps
 
         // Only apply parallax when section is in view
         if (rect.top < windowHeight && rect.bottom > 0) {
-            // Lerp for smooth animation
+            // Lerp - high factor (0.25) for fast catch-up
             const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
-            currentOffsetRef.current = lerp(currentOffsetRef.current, targetOffsetRef.current, 0.08);
+            currentOffsetRef.current = lerp(currentOffsetRef.current, targetOffsetRef.current, 0.25);
 
-            // Apply transform
-            bgRef.current.style.transform = `translate3d(0, ${currentOffsetRef.current}px, 0) scale(1.2)`;
+            // Apply transform with scale 1.5 for complete coverage
+            bgRef.current.style.transform = `translate3d(0, ${currentOffsetRef.current}px, 0) scale(1.5)`;
 
             // Continue animation if not close enough to target
             if (Math.abs(targetOffsetRef.current - currentOffsetRef.current) > 0.5) {
@@ -170,27 +170,29 @@ export default function DynamicHospitals({ config, mode }: DynamicHospitalsProps
     return (
         <section ref={sectionRef} className={`py-24 text-white relative overflow-hidden`}>
             {/* Background Image with Parallax */}
-            <div
-                ref={bgRef}
-                className="absolute inset-0 will-change-transform"
-                style={{
-                    transform: 'translate3d(0, -75px, 0) scale(1.2)',
-                    transformOrigin: 'center center'
-                }}
-            >
-                <Image
-                    src={backgroundImage}
-                    alt="Hospital Partners Background"
-                    fill
-                    className="object-cover"
-                    quality={85}
-                    sizes="100vw"
-                />
-                {/* Gradient overlay based on mode */}
-                <div className={`absolute inset-0 ${mode === 'medical'
-                    ? 'bg-gradient-to-br from-emerald-900/90 via-teal-800/85 to-cyan-900/90'
-                    : 'bg-gradient-to-br from-amber-900/90 via-orange-800/85 to-red-900/90'
-                    }`} />
+            <div className="absolute inset-0 bg-gray-900">
+                <div
+                    ref={bgRef}
+                    className="absolute inset-[-25%] will-change-transform"
+                    style={{
+                        transform: 'translate3d(0, -75px, 0) scale(1.5)',
+                        transformOrigin: 'center center'
+                    }}
+                >
+                    <Image
+                        src={backgroundImage}
+                        alt="Hospital Partners Background"
+                        fill
+                        className="object-cover"
+                        quality={85}
+                        sizes="100vw"
+                    />
+                    {/* Gradient overlay based on mode */}
+                    <div className={`absolute inset-0 ${mode === 'medical'
+                        ? 'bg-gradient-to-br from-emerald-900/90 via-teal-800/85 to-cyan-900/90'
+                        : 'bg-gradient-to-br from-amber-900/90 via-orange-800/85 to-red-900/90'
+                        }`} />
+                </div>
             </div>
 
             {/* Animated background decorations */}

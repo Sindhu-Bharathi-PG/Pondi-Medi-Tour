@@ -1,351 +1,488 @@
 "use client";
 
+import { Footer, Header } from '@/app/components/common';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import {
-      CheckCircle,
-      ChevronRight,
-      Clock,
-      Heart, Leaf, MapPin,
+      Camera,
+      Compass,
+      Heart,
       Sparkles,
-      Star, Sun,
-      Users
+      Sun,
+      TreePine,
+      Waves
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Footer, Header } from '../components/common';
-import { ConvertedPrice } from '../components/common/ConvertedPrice';
+import { useRef } from 'react';
 
-// Highlights
-const highlights = [
-      { icon: Heart, title: 'Holistic Approach', desc: 'Mind, body & spirit healing' },
-      { icon: Leaf, title: 'Natural Therapies', desc: 'Ayurveda, naturopathy, yoga' },
-      { icon: Sun, title: 'Tropical Climate', desc: 'Year-round healing weather' },
-      { icon: Users, title: 'Expert Care', desc: 'Certified wellness practitioners' },
-];
+// Animation variants
+const fadeInUp = {
+      hidden: { opacity: 0, y: 40 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+};
 
-// Why Pondicherry features
-const pondicherryFeatures = [
-      'Pristine beaches for natural healing',
-      'Auroville\'s sustainable eco-communities',
-      'Sri Aurobindo Ashram\'s spiritual practices',
-      'Authentic Ayurveda & wellness traditions',
-];
+const staggerContainer = {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
+};
 
-// Featured Packages
-const featuredPackages = [
+// Tourist attractions data
+const attractions = [
       {
-            id: 'detox-7',
-            name: '7-Day Ayurvedic Detox',
-            location: 'Traditional Wellness Centre',
-            duration: '7 days / 6 nights',
-            image: '/images/generated/package_ayurveda_detox_massage_1765430995885.png',
-            priceFrom: 1200,
-            rating: 4.9,
-            reviews: 234,
-            description: 'Authentic Kerala-style Ayurveda for complete detoxification and rejuvenation. Observable benefits within 7 days.',
-            includes: ['Daily Abhyanga Massage', 'Panchakarma Treatments', 'Shirodhara Therapy', 'Sattvic Diet (Pure Foods)', 'Daily Meditation'],
-            featured: true,
+            title: "French Quarter Magic",
+            tagline: "Where Europe Meets India",
+            image: "/images/french-quarter.png",
+            color: "from-amber-500 to-orange-600",
+            icon: Camera,
       },
       {
-            id: 'yoga-14',
-            name: '14-Day Yoga & Spiritual Immersion',
-            location: 'Sri Aurobindo Ashram',
-            duration: '14 days / 13 nights',
-            image: '/images/generated/package_yoga_ashram_immersion_1765431015643.png',
-            priceFrom: 1800,
-            rating: 4.9,
-            reviews: 312,
-            description: 'Deep yoga immersion with spiritual practices at the renowned Sri Aurobindo Ashram. Transform body and mind.',
-            includes: ['Morning & Evening Yoga', 'Ashram Meditation', 'Philosophy Teachings', 'Beach Walks', 'Cultural Tours'],
-            featured: true,
+            title: "Golden Matrimandir",
+            tagline: "Silence Speaks Louder",
+            image: "/images/matrimandir.png",
+            color: "from-yellow-400 to-amber-500",
+            icon: Sun,
       },
       {
-            id: 'complete-21',
-            name: '21-Day Complete Wellness Rejuvenation',
-            location: 'Quiet Healing Centre, Auroville',
-            duration: '21 days / 20 nights',
-            image: '/images/generated/package_complete_wellness_auroville_1765431034682.png',
-            priceFrom: 3200,
-            rating: 4.9,
-            reviews: 156,
-            description: 'The ultimate wellness experience combining all AYUSH modalities. Complete mind-body-spirit transformation.',
-            includes: ['Ayurveda + Yoga + Naturopathy', 'Intensive Daily Schedule', 'Lifestyle Coaching', 'Complete Transformation', 'Expert Consultations'],
-            featured: true,
+            title: "Pristine Beaches",
+            tagline: "Where Waves Kiss the Shore",
+            image: "/images/paradise-beach.png",
+            color: "from-cyan-500 to-blue-600",
+            icon: Waves,
+      },
+      {
+            title: "Auroville Serenity",
+            tagline: "City of Tomorrow, Today",
+            image: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800",
+            color: "from-green-500 to-emerald-600",
+            icon: TreePine,
       },
 ];
 
-// Other Packages
-const otherPackages = [
+// Experience highlights
+const experiences = [
       {
-            id: 'recovery-14',
-            name: 'Post-Surgery Recovery Retreat',
-            location: 'Beach Resort, ECR',
-            duration: '14 days',
-            image: '/images/generated/package_recovery_beach_resort_1765431053203.png',
-            priceFrom: 2000,
-            rating: 4.8,
-            description: 'Holistic post-surgical recovery with physiotherapy and nature healing. Sea salt air aids respiratory healing.',
-            includes: ['Aquatic Therapy', 'Physiotherapy', 'Gentle Yoga', 'Organic Meals', 'Spa Treatments'],
+            title: "Sunrise at Promenade",
+            description: "Watch the golden sun rise over the Bay of Bengal",
+            image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            tagline: "Every morning is a masterpiece",
       },
       {
-            id: 'auroville-eco',
-            name: 'Auroville Eco-Healing Experience',
-            location: 'Auroville Community',
-            duration: '7 days',
-            image: '/images/generated/package_auroville_eco_living_1765431070820.png',
-            priceFrom: 1100,
-            rating: 4.9,
-            description: 'Experience sustainable healing in the experimental township of Auroville. UNESCO-recognized spiritual community.',
-            includes: ['Eco-friendly Stay', 'Organic Farm Tours', 'Sustainable Living Workshops', 'Forest Walks', 'Community Dining'],
+            title: "Café Culture",
+            description: "Sip authentic French coffee in colonial cafés",
+            image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800",
+            tagline: "Taste the French connection",
       },
       {
-            id: 'heritage-7',
-            name: 'French Heritage Wellness Stay',
-            location: 'Heritage Hotel, White Town',
-            duration: '7 days',
-            image: '/images/generated/package_french_heritage_villa_1765431092375.png',
-            priceFrom: 1600,
-            rating: 4.9,
-            description: 'Recover in colonial-era luxury while exploring Pondicherry\'s unique French-Indian heritage.',
-            includes: ['Colonial Villa Stay', 'French Cuisine', 'Beach Walks', 'Cultural Tours', 'Spa Access'],
+            title: "Heritage Walks",
+            description: "Wander through colorful streets frozen in time",
+            image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800",
+            tagline: "History whispers at every corner",
+      },
+      {
+            title: "Spiritual Awakening",
+            description: "Find peace in world-renowned ashrams",
+            image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800",
+            tagline: "Discover your inner calm",
       },
 ];
+
+// Photo gallery
+const gallery = [
+      { src: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600", alt: "French architecture" },
+      { src: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600", alt: "Paradise beach" },
+      { src: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600", alt: "Wellness moment" },
+      { src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600", alt: "Nature retreat" },
+      { src: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=600", alt: "Spa experience" },
+      { src: "https://images.unsplash.com/photo-1476673160081-cf065f0d2a86?w=600", alt: "Ocean view" },
+];
+
+// Catchy quotes
+const quotes = [
+      { text: "Find Your Paradise", author: "Pondicherry awaits" },
+      { text: "Where Time Slows Down", author: "And life speeds up" },
+      { text: "Colors of Serenity", author: "Painted by nature" },
+];
+
+// Floating elements
+const FloatingElements = () => (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(15)].map((_, i) => (
+                  <motion.div
+                        key={i}
+                        className="absolute w-3 h-3 rounded-full"
+                        style={{
+                              left: `${Math.random() * 100}%`,
+                              top: `${Math.random() * 100}%`,
+                              background: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'][i % 5],
+                        }}
+                        animate={{
+                              y: [0, -30, 0],
+                              x: [0, 15, -15, 0],
+                              opacity: [0.3, 0.7, 0.3],
+                              scale: [1, 1.5, 1],
+                        }}
+                        transition={{
+                              duration: 4 + i * 0.5,
+                              delay: i * 0.2,
+                              repeat: Infinity,
+                              ease: 'easeInOut',
+                        }}
+                  />
+            ))}
+      </div>
+);
 
 const WellnessPage = () => {
+      const heroRef = useRef<HTMLElement>(null);
+      const { scrollY } = useScroll();
+      const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+      const heroOpacity = useTransform(scrollY, [0, 400], [1, 0.3]);
+
       return (
             <div className="min-h-screen bg-white">
                   <Header />
 
-                  {/* Hero Section */}
-                  <section className="relative min-h-[70vh] flex items-center pt-20">
-                        <div className="absolute inset-0">
+                  {/* Hero Section - Vibrant & Colorful */}
+                  <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+                        <motion.div className="absolute inset-0" style={{ y: heroY }}>
                               <Image
-                                    src="/images/generated/wellness_page_hero_retreat_1765430977781.png"
-                                    alt="Wellness Retreat"
+                                    src="/images/hero-wellness.png"
+                                    alt="Pondicherry Paradise"
                                     fill
                                     className="object-cover"
                                     priority
                               />
-                              <div className="absolute inset-0 bg-gradient-to-r from-amber-900/90 via-amber-800/80 to-transparent" />
-                        </div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 via-pink-800/60 to-orange-700/40" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        </motion.div>
 
-                        <div className="relative container mx-auto px-6 lg:px-8">
-                              <div className="max-w-3xl">
-                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
-                                          <Leaf className="w-4 h-4 text-amber-300" />
-                                          <span className="text-white text-sm font-medium">Heal in India • National Wellness Destination</span>
-                                    </div>
+                        <FloatingElements />
 
-                                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                                          Heal Your Body.
-                                          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-200">
-                                                Nurture Your Soul.
-                                          </span>
-                                    </h1>
+                        {/* Animated rainbow gradient */}
+                        <motion.div
+                              className="absolute inset-0 opacity-30"
+                              style={{
+                                    background: 'linear-gradient(45deg, #ff006650, #8b5cf650, #06b6d450, #10b98150, #f59e0b50)',
+                                    backgroundSize: '400% 400%',
+                              }}
+                              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+                              transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                        />
 
-                                    <p className="text-lg md:text-xl text-amber-100 leading-relaxed mb-8 max-w-2xl">
-                                          Wellness isn&apos;t a one-hour massage; it&apos;s a lifestyle reset. Our Naturopathy centers focus on diet correction (Satvic food), fasting therapy, and mud therapy to cure lifestyle diseases like diabetes and hypertension naturally.
-                                    </p>
-
-                                    <div className="flex flex-wrap gap-3">
-                                          <Link
-                                                href="#packages"
-                                                className="bg-white text-amber-700 px-6 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
-                                          >
-                                                View Packages
-                                                <ChevronRight className="w-5 h-5" />
-                                          </Link>
-                                          <Link
-                                                href="/booking"
-                                                className="bg-white/10 backdrop-blur-md text-white px-6 py-3 rounded-full font-semibold hover:bg-white/20 transition-all duration-300 border border-white/20"
-                                          >
-                                                Free Consultation
-                                          </Link>
-                                    </div>
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Highlights Strip */}
-                  <section className="py-8 bg-white border-b border-gray-100">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {highlights.map((item, i) => (
-                                          <div key={i} className="flex items-center gap-3 p-3">
-                                                <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                                                      <item.icon className="w-5 h-5 text-amber-600" />
-                                                </div>
-                                                <div>
-                                                      <h3 className="font-semibold text-gray-800 text-sm">{item.title}</h3>
-                                                      <p className="text-gray-500 text-xs">{item.desc}</p>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Why Pondicherry Section */}
-                  <section className="py-12 bg-gradient-to-b from-amber-50 to-white">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <div className="grid lg:grid-cols-2 gap-8 items-center">
-                                    <div>
-                                          <span className="text-amber-600 font-medium text-sm">The Perfect Healing Destination</span>
-                                          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mt-2 mb-4">
-                                                Where French Elegance Meets Indian Spirituality
-                                          </h2>
-                                          <p className="text-gray-600 mb-6">
-                                                Pondicherry offers a unique environment for recovery and wellness that combines:
-                                          </p>
-                                          <ul className="space-y-3">
-                                                {pondicherryFeatures.map((feature, i) => (
-                                                      <li key={i} className="flex items-center gap-3">
-                                                            <CheckCircle className="w-5 h-5 text-amber-500 shrink-0" />
-                                                            <span className="text-gray-700">{feature}</span>
-                                                      </li>
-                                                ))}
-                                          </ul>
-                                    </div>
-                                    <div className="relative h-72 lg:h-80 rounded-2xl overflow-hidden shadow-lg">
-                                          <Image
-                                                src="/images/generated/why_pondicherry_french_indian_fusion_1765431109687.png"
-                                                alt="Pondicherry"
-                                                fill
-                                                className="object-cover"
-                                          />
-                                    </div>
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Featured Packages */}
-                  <section id="packages" className="py-12 bg-white">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <div className="text-center mb-10">
-                                    <span className="text-amber-600 font-medium text-sm">Curated Wellness Experiences</span>
-                                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mt-2">
-                                          Featured Packages
-                                    </h2>
-                                    <p className="text-gray-600 mt-2 max-w-xl mx-auto">
-                                          Choose from our carefully designed recovery and rejuvenation packages.
-                                    </p>
-                              </div>
-
-                              <div className="grid lg:grid-cols-3 gap-6">
-                                    {featuredPackages.map((pkg) => (
-                                          <div key={pkg.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group border border-gray-100">
-                                                <div className="relative h-48">
-                                                      <Image src={pkg.image} alt={pkg.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
-                                                            <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                                                            <span className="font-bold text-sm text-gray-800">{pkg.rating}</span>
-                                                      </div>
-                                                      <div className="absolute bottom-3 left-3">
-                                                            <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium">{pkg.duration}</span>
-                                                      </div>
-                                                </div>
-
-                                                <div className="p-5">
-                                                      <div className="flex items-center gap-1 text-xs text-amber-600 mb-1">
-                                                            <MapPin className="w-3 h-3" />
-                                                            {pkg.location}
-                                                      </div>
-                                                      <h3 className="text-lg font-bold text-gray-800 mb-2">{pkg.name}</h3>
-                                                      <p className="text-gray-500 text-sm mb-3 line-clamp-2">{pkg.description}</p>
-
-                                                      <div className="space-y-1.5 mb-4">
-                                                            {pkg.includes.slice(0, 4).map((item, i) => (
-                                                                  <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
-                                                                        <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                                                                        {item}
-                                                                  </div>
-                                                            ))}
-                                                            {pkg.includes.length > 4 && (
-                                                                  <span className="text-xs text-amber-600">+{pkg.includes.length - 4} more</span>
-                                                            )}
-                                                      </div>
-
-                                                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                                                            <div>
-                                                                  <span className="text-xs text-gray-500">From</span>
-                                                                  <div className="text-lg font-bold text-amber-600">
-                                                                        <ConvertedPrice amount={pkg.priceFrom} fromCurrency="USD" />
-                                                                  </div>
-                                                            </div>
-                                                            <Link
-                                                                  href={`/booking?package=${pkg.id}`}
-                                                                  className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-amber-600 transition-all"
-                                                            >
-                                                                  Book Now
-                                                            </Link>
-                                                      </div>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* Other Packages */}
-                  <section className="py-12 bg-gray-50">
-                        <div className="container mx-auto px-6 lg:px-8">
-                              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Other Packages</h2>
-
-                              <div className="grid md:grid-cols-3 gap-5">
-                                    {otherPackages.map((pkg) => (
-                                          <div key={pkg.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all group">
-                                                <div className="relative h-40">
-                                                      <Image src={pkg.image} alt={pkg.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                                      <div className="absolute bottom-3 left-3 right-3">
-                                                            <h3 className="text-white font-bold">{pkg.name}</h3>
-                                                            <div className="flex items-center gap-3 text-white/80 text-xs mt-1">
-                                                                  <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{pkg.location}</span>
-                                                                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{pkg.duration}</span>
-                                                            </div>
-                                                      </div>
-                                                </div>
-                                                <div className="p-4">
-                                                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{pkg.description}</p>
-                                                      <div className="flex flex-wrap gap-1.5 mb-3">
-                                                            {pkg.includes.slice(0, 3).map((item, i) => (
-                                                                  <span key={i} className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-xs">{item}</span>
-                                                            ))}
-                                                      </div>
-                                                      <div className="flex items-center justify-between">
-                                                            <div className="text-amber-600 font-bold">
-                                                                  <ConvertedPrice amount={pkg.priceFrom} fromCurrency="USD" />
-                                                            </div>
-                                                            <div className="flex items-center gap-1 text-sm">
-                                                                  <Star className="w-4 h-4 text-amber-500 fill-current" />
-                                                                  <span className="font-medium">{pkg.rating}</span>
-                                                            </div>
-                                                      </div>
-                                                </div>
-                                          </div>
-                                    ))}
-                              </div>
-                        </div>
-                  </section>
-
-                  {/* CTA Section */}
-                  <section className="py-12 bg-gradient-to-r from-amber-500 to-orange-500 text-white">
-                        <div className="container mx-auto px-6 lg:px-8 text-center">
-                              <Sparkles className="w-10 h-10 mx-auto mb-4 text-amber-200" />
-                              <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                                    Ready for Your Wellness Journey?
-                              </h2>
-                              <p className="text-amber-100 mb-8 max-w-xl mx-auto">
-                                    Let us create a personalized wellness package tailored to your recovery needs.
-                              </p>
-                              <div className="flex flex-wrap justify-center gap-3">
-                                    <Link
-                                          href="/booking"
-                                          className="bg-white text-amber-600 px-8 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
+                        <motion.div
+                              className="relative container mx-auto px-6 lg:px-8 text-center"
+                              style={{ opacity: heroOpacity }}
+                        >
+                              <motion.div
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={staggerContainer}
+                                    className="max-w-5xl mx-auto"
+                              >
+                                    <motion.div
+                                          variants={fadeInUp}
+                                          className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-8 border border-white/30"
                                     >
-                                          Plan My Wellness Retreat
-                                    </Link>
+                                          <motion.div
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                                          >
+                                                <Sparkles className="w-6 h-6 text-yellow-300" />
+                                          </motion.div>
+                                          <span className="text-white text-lg font-medium">
+                                                Discover the Magic of Pondicherry
+                                          </span>
+                                    </motion.div>
+
+                                    <motion.h1
+                                          variants={fadeInUp}
+                                          className="text-6xl md:text-8xl lg:text-9xl font-black mb-8"
+                                    >
+                                          <motion.span
+                                                className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200"
+                                                animate={{ backgroundPosition: ['0% center', '200% center'] }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                                                style={{ backgroundSize: '200% auto' }}
+                                          >
+                                                ESCAPE
+                                          </motion.span>
+                                          <span className="block text-white text-5xl md:text-6xl mt-2">
+                                                to Paradise
+                                          </span>
+                                    </motion.h1>
+
+                                    <motion.p
+                                          variants={fadeInUp}
+                                          className="text-2xl md:text-3xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed"
+                                    >
+                                          Where French elegance dances with Tamil soul,
+                                          <br />
+                                          <span className="text-yellow-200 font-semibold">and every moment becomes a memory.</span>
+                                    </motion.p>
+
+                                    <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
+                                          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                                <Link
+                                                      href="#explore"
+                                                      className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-pink-500/50 transition-all inline-flex items-center gap-3"
+                                                >
+                                                      <Compass className="w-6 h-6" />
+                                                      Start Exploring
+                                                </Link>
+                                          </motion.div>
+                                    </motion.div>
+                              </motion.div>
+                        </motion.div>
+
+                        {/* Scroll Indicator */}
+                        <motion.div
+                              className="absolute bottom-10 left-1/2 -translate-x-1/2"
+                              animate={{ y: [0, 15, 0] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                        >
+                              <div className="w-8 h-12 border-3 border-white/50 rounded-full flex justify-center pt-3">
+                                    <motion.div
+                                          className="w-2 h-4 bg-white rounded-full"
+                                          animate={{ y: [0, 16, 0], opacity: [1, 0.3, 1] }}
+                                          transition={{ duration: 2, repeat: Infinity }}
+                                    />
                               </div>
+                        </motion.div>
+                  </section>
+
+                  {/* Attractions Grid - Vibrant Cards */}
+                  <section id="explore" className="py-24 bg-gradient-to-b from-purple-50 via-pink-50 to-orange-50">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.span
+                                          className="text-6xl mb-6 block"
+                                          animate={{ rotate: [0, 10, -10, 0] }}
+                                          transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                          ✨
+                                    </motion.span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 mb-6">
+                                          Must-See Wonders
+                                    </h2>
+                                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                          Every corner tells a story, every view takes your breath away
+                                    </p>
+                              </motion.div>
+
+                              <div className="grid md:grid-cols-2 gap-8">
+                                    {attractions.map((attraction, i) => (
+                                          <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, y: 60, rotate: i % 2 === 0 ? -2 : 2 }}
+                                                whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.15 }}
+                                                whileHover={{ scale: 1.03, y: -10 }}
+                                                className="relative group cursor-pointer"
+                                          >
+                                                <div className="relative h-80 md:h-96 rounded-3xl overflow-hidden shadow-2xl">
+                                                      <Image
+                                                            src={attraction.image}
+                                                            alt={attraction.title}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                      />
+                                                      <div className={`absolute inset-0 bg-gradient-to-t ${attraction.color} opacity-60 group-hover:opacity-70 transition-opacity`} />
+
+                                                      <div className="absolute inset-0 flex flex-col justify-end p-8">
+                                                            <motion.div
+                                                                  className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4"
+                                                                  whileHover={{ rotate: 360 }}
+                                                                  transition={{ duration: 0.5 }}
+                                                            >
+                                                                  <attraction.icon className="w-8 h-8 text-white" />
+                                                            </motion.div>
+                                                            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">
+                                                                  {attraction.title}
+                                                            </h3>
+                                                            <p className="text-xl text-white/90 italic">
+                                                                  "{attraction.tagline}"
+                                                            </p>
+                                                      </div>
+                                                </div>
+                                          </motion.div>
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* Quote Section - Colorful */}
+                  <section className="py-20 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600" />
+                        <motion.div
+                              className="absolute inset-0"
+                              animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+                              transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse' }}
+                              style={{
+                                    backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                              }}
+                        />
+
+                        <div className="container mx-auto px-6 lg:px-8 relative z-10">
+                              <motion.div
+                                    className="text-center"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.div
+                                          className="text-8xl mb-8"
+                                          animate={{ scale: [1, 1.2, 1] }}
+                                          transition={{ duration: 2, repeat: Infinity }}
+                                    >
+                                          💫
+                                    </motion.div>
+                                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
+                                          {quotes[0].text}
+                                    </h2>
+                                    <p className="text-2xl text-white/80 italic">— {quotes[0].author}</p>
+                              </motion.div>
+                        </div>
+                  </section>
+
+                  {/* Experiences Section */}
+                  <section className="py-24 bg-white">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <span className="text-6xl mb-6 block">🌈</span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-gray-800 mb-6">
+                                          Unforgettable
+                                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500"> Moments</span>
+                                    </h2>
+                              </motion.div>
+
+                              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {experiences.map((exp, i) => (
+                                          <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, y: 50 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                whileHover={{ y: -15, scale: 1.02 }}
+                                                className="group cursor-pointer"
+                                          >
+                                                <div className="relative h-72 rounded-3xl overflow-hidden shadow-xl">
+                                                      <Image
+                                                            src={exp.image}
+                                                            alt={exp.title}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                      />
+                                                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                                                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                                                            <p className="text-yellow-300 text-sm font-medium mb-2 italic">"{exp.tagline}"</p>
+                                                            <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
+                                                            <p className="text-white/70 text-sm">{exp.description}</p>
+                                                      </div>
+                                                </div>
+                                          </motion.div>
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* Photo Gallery - Masonry Style */}
+                  <section className="py-24 bg-gradient-to-b from-cyan-50 via-blue-50 to-purple-50">
+                        <div className="container mx-auto px-6 lg:px-8">
+                              <motion.div
+                                    className="text-center mb-16"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <span className="text-6xl mb-6 block">📸</span>
+                                    <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+                                          Captured Beauty
+                                    </h2>
+                                    <p className="text-xl text-gray-600">Every frame tells a thousand stories</p>
+                              </motion.div>
+
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {gallery.map((img, i) => (
+                                          <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                whileInView={{ opacity: 1, scale: 1 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                whileHover={{ scale: 1.05, zIndex: 10 }}
+                                                className={`relative rounded-2xl overflow-hidden shadow-xl cursor-pointer ${i === 0 || i === 5 ? 'row-span-2' : ''
+                                                      }`}
+                                                style={{ height: i === 0 || i === 5 ? '400px' : '200px' }}
+                                          >
+                                                <Image
+                                                      src={img.src}
+                                                      alt={img.alt}
+                                                      fill
+                                                      className="object-cover hover:scale-110 transition-transform duration-500"
+                                                />
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                      <Camera className="w-10 h-10 text-white" />
+                                                </div>
+                                          </motion.div>
+                                    ))}
+                              </div>
+                        </div>
+                  </section>
+
+                  {/* Final CTA - Vibrant */}
+                  <section className="py-32 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600" />
+                        <motion.div
+                              className="absolute inset-0"
+                              style={{
+                                    backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Ccircle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/%3E%3C/svg%3E")',
+                              }}
+                        />
+
+                        <FloatingElements />
+
+                        <div className="container mx-auto px-6 lg:px-8 relative z-10 text-center">
+                              <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                              >
+                                    <motion.div
+                                          className="text-8xl mb-8"
+                                          animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                                          transition={{ duration: 3, repeat: Infinity }}
+                                    >
+                                          🌴
+                                    </motion.div>
+                                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
+                                          Your Adventure
+                                          <span className="block text-yellow-300">Starts Here</span>
+                                    </h2>
+                                    <p className="text-2xl text-white/90 mb-12 max-w-2xl mx-auto">
+                                          Don't just dream about paradise — live it.
+                                    </p>
+                                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                          <Link
+                                                href="/destination"
+                                                className="bg-white text-purple-600 px-12 py-6 rounded-full font-black text-2xl shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3"
+                                          >
+                                                <Heart className="w-8 h-8 fill-current" />
+                                                Explore More
+                                          </Link>
+                                    </motion.div>
+                              </motion.div>
                         </div>
                   </section>
 

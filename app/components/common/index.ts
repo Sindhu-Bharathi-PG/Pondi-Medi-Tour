@@ -42,3 +42,13 @@ export { default as SmoothTransition } from './SmoothTransition';
 export { default as TransitionOverlay } from './TransitionOverlay';
 export { default as VideoTransition } from './VideoTransition';
 
+// ============================================================================
+// Translation Components
+// ============================================================================
+export { default as TranslatableText, useTranslatedText } from './TranslatableText';
+
+// ============================================================================
+// Image Components
+// ============================================================================
+export { default as SafeImage, SafeImg } from './SafeImage';
+

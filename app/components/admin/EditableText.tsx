@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useLanguageOptional } from '@/app/context/LanguageContext';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface EditableTextProps {
     value: string;
@@ -24,6 +25,44 @@ export default function EditableText({
     const [isInEdit, setIsInEdit] = useState(false);
     const [editValue, setEditValue] = useState(value);
 
+    // Translation support
+    const languageContext = useLanguageOptional();
+    const [translatedValue, setTranslatedValue] = useState(value);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const lastTranslationKey = useRef('');
+
+    // Translate content when language changes
+    useEffect(() => {
+        if (!languageContext || languageContext.currentLanguage === 'en' || isEditing) {
+            setTranslatedValue(value);
+            return;
+        }
+
+        const translationKey = `${languageContext.currentLanguage}:${value}`;
+        if (lastTranslationKey.current === translationKey) {
+            return;
+        }
+
+        // Check cache first (instant)
+        const cached = languageContext.translateSync(value);
+        if (cached !== value) {
+            setTranslatedValue(cached);
+            lastTranslationKey.current = translationKey;
+            return;
+        }
+
+        // Async translation
+        setIsTranslating(true);
+        languageContext.translate(value).then(result => {
+            setTranslatedValue(result);
+            lastTranslationKey.current = translationKey;
+        }).catch(() => {
+            setTranslatedValue(value);
+        }).finally(() => {
+            setIsTranslating(false);
+        });
+    }, [value, languageContext?.currentLanguage, languageContext, isEditing]);
+
     const handleSave = () => {
         onSave(editValue);
         setIsInEdit(false);
@@ -36,8 +75,20 @@ export default function EditableText({
 
     const Component = as as React.ElementType;
 
+    // Display value (translated or original)
+    const displayValue = (!languageContext || languageContext.currentLanguage === 'en' || isEditing)
+        ? value
+        : translatedValue;
+
     if (!isEditing) {
-        return <Component className={className}>{value}</Component>;
+        return (
+            <Component
+                className={className}
+                style={isTranslating ? { opacity: 0.7 } : undefined}
+            >
+                {displayValue}
+            </Component>
+        );
     }
 
     if (isInEdit) {

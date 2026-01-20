@@ -1,6 +1,7 @@
 "use client";
 
 import { CURRENCIES, useCurrency } from '@/app/context/CurrencyContext';
+import { LANGUAGES, useLanguage } from '@/app/context/LanguageContext';
 import { MEDICAL_NAV_LINKS, useSiteMode, WELLNESS_NAV_LINKS } from '@/app/context/SiteModeContext';
 import { clsx, type ClassValue } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -31,24 +32,8 @@ const iconMap: Record<string, React.ElementType> = {
       FlowerLotus: Sparkles, // Fallback since FlowerLotus might not exist
 };
 
-// Language type definition
-type Language = 'en' | 'hi' | 'ta' | 'ml' | 'te' | 'fr' | 'de' | 'es' | 'it' | 'pt' | 'ja' | 'zh';
-
-// Language options with flags
-const LANGUAGES: Array<{ code: Language; name: string; flag: string }> = [
-      { code: 'en', name: 'English', flag: '🇺🇸' },
-      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-      { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-      { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
-      { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-      { code: 'fr', name: 'Français', flag: '🇫🇷' },
-      { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-      { code: 'es', name: 'Español', flag: '🇪🇸' },
-      { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-      { code: 'pt', name: 'Português', flag: '🇵🇹' },
-      { code: 'ja', name: '日本語', flag: '🇯🇵' },
-      { code: 'zh', name: '中文', flag: '🇨🇳' },
-];
+// Language type is imported from LanguageContext
+// LANGUAGES array is imported from LanguageContext
 
 
 
@@ -66,10 +51,10 @@ const Header: React.FC<HeaderProps> = ({
       const router = useRouter();
 
       // Get language from context
-      // const { currentLanguage, setLanguage, isLoading, t } = useLanguage();
+      const { currentLanguage, setLanguage, getLanguageInfo } = useLanguage();
+      const selectedLanguage = getLanguageInfo() || LANGUAGES[0];
 
-      // New state for language, currency, and search
-      const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
+      // Currency, search state
       const { selectedCurrency, setSelectedCurrency } = useCurrency();
       const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
       const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
@@ -79,14 +64,6 @@ const Header: React.FC<HeaderProps> = ({
       const searchInputRef = useRef<HTMLInputElement>(null);
       const languageDropdownRef = useRef<HTMLDivElement>(null);
       const currencyDropdownRef = useRef<HTMLDivElement>(null);
-
-      // Update selected language when context changes
-      // useEffect(() => {
-      //       const langOption = LANGUAGES.find(l => l.code === currentLanguage);
-      //       if (langOption) {
-      //             setSelectedLanguage(langOption);
-      //       }
-      // }, [currentLanguage]);
 
       // Close dropdowns when clicking outside
       useEffect(() => {
@@ -421,19 +398,19 @@ const Header: React.FC<HeaderProps> = ({
                                                                         <button
                                                                               key={lang.code}
                                                                               onClick={() => {
-                                                                                    // setLanguage(lang.code);
+                                                                                    setLanguage(lang.code);
                                                                                     setLanguageDropdownOpen(false);
                                                                               }}
                                                                               className={cn(
                                                                                     "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center gap-3",
-                                                                                    selectedLanguage.code === lang.code
+                                                                                    currentLanguage === lang.code
                                                                                           ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
                                                                                           : "hover:bg-gray-50 text-gray-700 active:scale-95"
                                                                               )}
                                                                         >
                                                                               <span className="text-base">{lang.flag}</span>
                                                                               <span className="font-medium">{lang.name}</span>
-                                                                              {selectedLanguage.code === lang.code && (
+                                                                              {currentLanguage === lang.code && (
                                                                                     <div className={cn("ml-auto w-1.5 h-1.5 rounded-full", isMedical ? "bg-emerald-500" : "bg-amber-500")} />
                                                                               )}
                                                                         </button>
@@ -670,12 +647,12 @@ const Header: React.FC<HeaderProps> = ({
                                                                                           <button
                                                                                                 key={lang.code}
                                                                                                 onClick={() => {
-                                                                                                      setSelectedLanguage(lang);
+                                                                                                      setLanguage(lang.code);
                                                                                                       setLanguageDropdownOpen(false);
                                                                                                 }}
                                                                                                 className={cn(
                                                                                                       "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors",
-                                                                                                      selectedLanguage.code === lang.code
+                                                                                                      currentLanguage === lang.code
                                                                                                             ? (isMedical ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")
                                                                                                             : "hover:bg-gray-50 text-gray-700"
                                                                                                 )}

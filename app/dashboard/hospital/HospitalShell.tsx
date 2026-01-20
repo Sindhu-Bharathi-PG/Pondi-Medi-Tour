@@ -48,7 +48,7 @@ export default function HospitalShell({ children }: { children: React.ReactNode 
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="h-screen bg-gray-50 flex overflow-hidden">
             {/* Sidebar */}
             <HospitalSidebar
                 isOpen={isSidebarOpen}
@@ -56,7 +56,7 @@ export default function HospitalShell({ children }: { children: React.ReactNode 
             />
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 pointer-events-auto">
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Top Navbar */}
                 <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
                     {/* Left: Mobile menu + Hospital Name */}
@@ -76,12 +76,17 @@ export default function HospitalShell({ children }: { children: React.ReactNode 
                                     src={hospital.logoUrl}
                                     alt={hospital.name}
                                     className="w-8 h-8 rounded-lg object-cover"
+                                    onError={(e) => {
+                                        // Replace with fallback icon on error
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        target.nextElementSibling?.classList.remove('hidden');
+                                    }}
                                 />
-                            ) : (
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
-                                    <Building2 className="w-5 h-5 text-white" />
-                                </div>
-                            )}
+                            ) : null}
+                            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center ${hospital?.logoUrl ? 'hidden' : ''}`}>
+                                <Building2 className="w-5 h-5 text-white" />
+                            </div>
                             <div className="hidden sm:block">
                                 <h1 className="font-bold text-gray-900 text-lg leading-tight">
                                     {hospital?.name || 'Hospital Portal'}
