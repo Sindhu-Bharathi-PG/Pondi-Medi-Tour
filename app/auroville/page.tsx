@@ -39,19 +39,19 @@ const places = [
         name: "Matrimandir",
         tagline: "The Soul of Auroville",
         description: "A golden sphere of contemplation and inner silence, the spiritual heart of the township.",
-        image: "/images/auroville-aerial.png",
+        image: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800",
     },
     {
         name: "Galaxy Garden",
         tagline: "Where Nature Speaks",
         description: "Twelve meditation gardens surrounding Matrimandir, each representing a quality of consciousness.",
-        image: "/images/auroville-night.png",
+        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
     },
     {
         name: "Visitors Center",
         tagline: "Your Gateway to Unity",
         description: "Begin your journey here - exhibitions, café, and boutique showcasing Auroville's vision.",
-        image: "/images/auroville-detail.png",
+        image: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800",
     },
 ];
 
@@ -99,9 +99,9 @@ const AurovillePage = () => {
     const [activeImage, setActiveImage] = useState(0);
 
     const images = [
-        "/images/auroville-aerial.png",
-        "/images/auroville-detail.png",
-        "/images/auroville-night.png",
+        "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=1200",
+        "https://images.unsplash.com/photo-1545389336-cf090694435e?w=1200",
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200",
     ];
 
     return (
@@ -112,7 +112,7 @@ const AurovillePage = () => {
             <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
                 <motion.div className="absolute inset-0" style={{ y: heroY }}>
                     <Image
-                        src="/images/auroville-aerial.png"
+                        src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=1920"
                         alt="Auroville Matrimandir"
                         fill
                         className="object-cover"

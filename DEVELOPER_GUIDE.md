@@ -210,14 +210,47 @@ import Image from 'next/image';
 - **External images:** Use Unsplash URLs with `?w=800` for optimization
 
 ### External Domains
-Add to `next.config.js`:
-```js
+Add to `next.config.ts`:
+```ts
 images: {
     remotePatterns: [
         { protocol: 'https', hostname: 'images.unsplash.com' },
+        { protocol: 'https', hostname: '**' }, // Allow all HTTPS
     ],
 },
 ```
+
+### Production Best Practices
+
+> ⚠️ **Important:** Local images in `public/images/` may not be available if not committed to git or not copied during deployment.
+
+**Solution 1: Use External URLs (Recommended)**
+```tsx
+// ✅ Always works - uses Unsplash CDN
+image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"
+```
+
+**Solution 2: Use Image Utils with Fallbacks**
+```tsx
+import { WELLNESS_IMAGES } from '@/app/utils/imageUtils';
+
+// Uses reliable external URLs
+<Image src={WELLNESS_IMAGES.heroWellness} ... />
+```
+
+**Solution 3: Handle Errors**
+```tsx
+import { handleImageError } from '@/app/utils/imageUtils';
+
+<Image 
+    src="/images/local.png"
+    onError={(e) => handleImageError(e, 'beach')}
+/>
+```
+
+**Available Fallback Categories:**
+- `hero`, `attraction`, `hospital`, `doctor`
+- `spa`, `yoga`, `beach`, `auroville`, `french`
 
 ---
 

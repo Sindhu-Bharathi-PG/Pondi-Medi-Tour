@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Building2, CheckCircle2, LayoutDashboard, MessageSquare, Package, Settings, Shield, Users, X } from "lucide-react";
+import { BarChart3, Building2, CheckCircle2, ImageIcon, LayoutDashboard, MessageSquare, Package, Settings, Shield, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -78,6 +78,14 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             borderActive: "border-amber-500"
         },
         {
+            title: "Images",
+            icon: ImageIcon,
+            href: "/dashboard/admin/images",
+            color: "text-pink-600",
+            bgActive: "bg-pink-50",
+            borderActive: "border-pink-500"
+        },
+        {
             title: "Settings",
             icon: Settings,
             href: "/dashboard/admin/settings",
@@ -99,9 +107,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
             {/* Sidebar - Clean White Theme */}
             <aside className={`
-                fixed top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-200
+                fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-200
                 shadow-lg transform transition-transform duration-300 ease-in-out
-                lg:translate-x-0 lg:sticky lg:top-0
+                lg:translate-x-0 flex-shrink-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col h-full">

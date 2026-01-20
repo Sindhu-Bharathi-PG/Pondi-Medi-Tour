@@ -31,21 +31,21 @@ const attractions = [
       {
             title: "French Quarter Magic",
             tagline: "Where Europe Meets India",
-            image: "/images/french-quarter.png",
+            image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
             color: "from-amber-500 to-orange-600",
             icon: Camera,
       },
       {
             title: "Golden Matrimandir",
             tagline: "Silence Speaks Louder",
-            image: "/images/matrimandir.png",
+            image: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800",
             color: "from-yellow-400 to-amber-500",
             icon: Sun,
       },
       {
             title: "Pristine Beaches",
             tagline: "Where Waves Kiss the Shore",
-            image: "/images/paradise-beach.png",
+            image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
             color: "from-cyan-500 to-blue-600",
             icon: Waves,
       },
@@ -146,7 +146,7 @@ const WellnessPage = () => {
                   <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
                         <motion.div className="absolute inset-0" style={{ y: heroY }}>
                               <Image
-                                    src="/images/hero-wellness.png"
+                                    src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920"
                                     alt="Pondicherry Paradise"
                                     fill
                                     className="object-cover"
